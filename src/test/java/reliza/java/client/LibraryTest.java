@@ -7,9 +7,12 @@ import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 
+import java.util.HashMap;
+
 public class LibraryTest {
     @Test public void testSomeLibraryMethod() {
-        Library classUnderTest = new Library();
+    	
+        Library classUnderTest = new Library(new HashMap<>());
         assertTrue("someLibraryMethod should return 'true'", classUnderTest.testRhCall());
     }
 }

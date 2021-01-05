@@ -14,14 +14,21 @@ import retrofit2.converter.jackson.JacksonConverterFactory;
 
 @Slf4j
 public class Library {
+	API args;
 	private static Retrofit retrofit = new Retrofit.Builder()
-			.baseUrl("https://jsonplaceholder.typicode.com/")
+			.baseUrl("https://app.relizahub.com")
 			.addConverterFactory(JacksonConverterFactory.create())
 			.build();
 	
+	Library(Map<String, Object> args) {
+		this.args = new API(args);
+	}
+
+	
     public boolean testRhCall() {
         RHService rhs = retrofit.create(RHService.class);
-        Call<Map<String, Object>> homeResp = rhs.todoTest(2);
+        Call<Map<String, Object>> homeResp = rhs.getVersion("/api/programmatic/v1/project/getNewVersion");
+    	
         try {
 			Response<Map<String, Object>> resp = homeResp.execute();
 			log.info(resp.body().toString());
