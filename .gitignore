@@ -29,3 +29,7 @@ hs_err_pid*
 
 # Ignore Gradle build output directory
 build
+
+# Eclipse plugins
+.classpath
+.project
