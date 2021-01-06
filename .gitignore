@@ -2,6 +2,8 @@
 *.class
 
 target/
+bin/
+.settings/
 
 # Log file
 *.log
@@ -33,3 +35,4 @@ build
 # Eclipse plugins
 .classpath
 .project
+.metadata
