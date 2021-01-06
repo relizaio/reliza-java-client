@@ -4,9 +4,11 @@
 package reliza.java.client;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Map;
 
 import lombok.extern.slf4j.Slf4j;
+import okhttp3.Credentials;
 import retrofit2.Call;
 import retrofit2.Response;
 import retrofit2.Retrofit;
@@ -14,27 +16,34 @@ import retrofit2.converter.jackson.JacksonConverterFactory;
 
 @Slf4j
 public class Library {
-	API args;
+	Flags flags;
 	private static Retrofit retrofit = new Retrofit.Builder()
-			.baseUrl("https://app.relizahub.com")
+			.baseUrl("https://test.relizahub.com")
 			.addConverterFactory(JacksonConverterFactory.create())
 			.build();
 	
-	Library(Map<String, Object> args) {
-		this.args = new API(args);
+	Library(String apiKeyId, String apiKey, String branch, String projectId) {
+		this.flags = new Flags(apiKeyId, apiKey, branch, projectId);
 	}
-
 	
-    public boolean testRhCall() {
+    @SuppressWarnings("unchecked")
+	public String getVersion() {
         RHService rhs = retrofit.create(RHService.class);
-        Call<Map<String, Object>> homeResp = rhs.getVersion("/api/programmatic/v1/project/getNewVersion");
+        Map<String, String> body = new HashMap<>();  
+    	body.put("branch", flags.getBranch());
+    	if (flags.getProjectId().length() > 0) {
+        	body.put("project", flags.getProjectId());
+    	}
+    	String basicAuth = Credentials.basic(flags.getApiKeyId(), flags.getApiKey());
+        Call<Map<String, Object>> homeResp = rhs.getVersionCall(body, basicAuth);
     	
         try {
 			Response<Map<String, Object>> resp = homeResp.execute();
 			log.info(resp.body().toString());
+			return resp.body().toString();
 		} catch (IOException e) {
 			log.error("IO exception", e);
+			return null;
 		}
-        return true;
     }
 }

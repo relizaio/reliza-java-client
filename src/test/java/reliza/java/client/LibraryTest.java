@@ -3,16 +3,14 @@
  */
 package reliza.java.client;
 
-import static org.junit.Assert.assertTrue;
-
 import org.junit.Test;
 
-import java.util.HashMap;
-
 public class LibraryTest {
-    @Test public void testSomeLibraryMethod() {
-    	
-        Library classUnderTest = new Library(new HashMap<>());
-        assertTrue("someLibraryMethod should return 'true'", classUnderTest.testRhCall());
+    @Test public void libraryMethod() {
+    	String api_key_id;
+    	String api_key;
+    	String branch;
+    	String project_id;
+//    	Input an empty string for missing parameters
     }
 }

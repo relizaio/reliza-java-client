@@ -1,13 +1,11 @@
 package reliza.java.client;
 
 import java.util.Map;
-
 import retrofit2.Call;
 import retrofit2.http.Body;
-import retrofit2.http.GET;
+import retrofit2.http.Header;
 import retrofit2.http.Headers;
 import retrofit2.http.POST;
-import retrofit2.http.Path;
 
 // retrofit docs - https://square.github.io/retrofit/
 
@@ -23,10 +21,6 @@ public interface RHService {
 	    "Accept-Encoding: gzip, deflate"
 	})
 	
-	@GET("{URL}")
-	Call<Map<String, Object>> getVersion(@Path("URL") String URL);
-	
-	@POST("body")
-	Call<String> setBody(@Body String body);
-
+	@POST("/api/programmatic/v1/project/getNewVersion")
+	Call<Map<String, Object>> getVersionCall(@Body Map<String, String> body, @Header("Authorization") String authorization);
 }
