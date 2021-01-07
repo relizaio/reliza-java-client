@@ -7,10 +7,10 @@ import org.junit.Test;
 
 public class LibraryTest {
     @Test public void libraryMethod() {
-    	String api_key_id;
-    	String api_key;
+    	String apiKeyId;
+    	String apiKey;
     	String branch;
-    	String project_id;
-//    	Input an empty string for missing parameters
+    	String projectId;
+//    	Input null or empty string for unused parameters
     }
 }

@@ -18,24 +18,24 @@ import retrofit2.converter.jackson.JacksonConverterFactory;
 public class Library {
 	Flags flags;
 	private static Retrofit retrofit = new Retrofit.Builder()
-			.baseUrl("https://test.relizahub.com")
+			.baseUrl("https://app.relizahub.com")
 			.addConverterFactory(JacksonConverterFactory.create())
 			.build();
 	
-	Library(String apiKeyId, String apiKey, String branch, String projectId) {
-		this.flags = new Flags(apiKeyId, apiKey, branch, projectId);
+	public Library(Flags flags) {
+		this.flags = flags;
 	}
 	
-    @SuppressWarnings("unchecked")
 	public String getVersion() {
         RHService rhs = retrofit.create(RHService.class);
-        Map<String, String> body = new HashMap<>();  
+        Map<String, Object> body = new HashMap<>();  
     	body.put("branch", flags.getBranch());
-    	if (flags.getProjectId().length() > 0) {
+    	if (flags.getProjectId() != null) {
         	body.put("project", flags.getProjectId());
     	}
+
     	String basicAuth = Credentials.basic(flags.getApiKeyId(), flags.getApiKey());
-        Call<Map<String, Object>> homeResp = rhs.getVersionCall(body, basicAuth);
+        Call<Map<String, Object>> homeResp = rhs.getVersion(body, basicAuth);
     	
         try {
 			Response<Map<String, Object>> resp = homeResp.execute();
@@ -43,6 +43,9 @@ public class Library {
 			return resp.body().toString();
 		} catch (IOException e) {
 			log.error("IO exception", e);
+			return null;
+		} catch (NullPointerException e) {
+			log.error("NullPointerException", e);
 			return null;
 		}
     }

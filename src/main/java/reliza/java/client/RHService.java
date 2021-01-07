@@ -20,7 +20,7 @@ public interface RHService {
 	    "User-Agent: Reliza Go Client",
 	    "Accept-Encoding: gzip, deflate"
 	})
-	
+
 	@POST("/api/programmatic/v1/project/getNewVersion")
-	Call<Map<String, Object>> getVersionCall(@Body Map<String, String> body, @Header("Authorization") String authorization);
+	Call<Map<String, Object>> getVersion(@Body Map<String, Object> body, @Header("Authorization") String authorization);
 }
