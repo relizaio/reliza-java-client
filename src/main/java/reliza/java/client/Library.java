@@ -30,6 +30,33 @@ public class Library {
 	}
 	
 	
+	public RelizaMetadata checkHash() {
+        RHService rhs = retrofit.create(RHService.class);
+        Map<String, Object> body = new HashMap<>();
+        body.put("hash", flags.getHash());
+    	
+    	String basicAuth = Credentials.basic(flags.getApiKeyId(), flags.getApiKey());
+        Call<Map<String, Object>> homeResp = rhs.checkHash(body, basicAuth);
+        System.out.println(body);
+        
+        try {
+			Response<Map<String, Object>> resp = homeResp.execute();
+			if (resp.body().isEmpty()) {
+				log.info(resp.body().toString());
+				return new RelizaMetadata(resp.body());
+			} else {
+				log.info(resp.body().get("release").toString());
+				return new RelizaMetadata((Map<String, Object>) resp.body().get("release"));
+			}
+		} catch (IOException e) {
+			log.error("IO exception", e);
+			return null;
+		} catch (NullPointerException e) {
+			log.error("NullPointerException", e);
+			return null;
+		}
+	}
+	
 	
 	public RelizaMetadata addRelease() {
         RHService rhs = retrofit.create(RHService.class);

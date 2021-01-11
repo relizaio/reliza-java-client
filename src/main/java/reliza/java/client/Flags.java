@@ -34,13 +34,14 @@ public class Flags {
 	private String[] artDigests;
 	private String[] tagKeyArr;
 	private String[] tagValArr;
+	private String hash;
 	
 	public Flags(String apiKeyId, String apiKey, String branch, String versionSchema, String version,
 			String status, String endPoint, String projectId, String commitHash,
 			 String vcsUri, String vcsType, String vcsTag, String dateActual, String[] artId,
 			String[] artBuildId, String[] artCiMeta, String[] artType, String[] artVersion,
 			String[] artPublisher, String[] artPackage,String[] artGroup, String[] dateStart,
-			String[] dateEnd, String[] artDigests, String[] tagKeyArr, String[] tagValArr) {
+			String[] dateEnd, String[] artDigests, String[] tagKeyArr, String[] tagValArr, String hash) {
 		this.apiKeyId = apiKeyId;
 		this.apiKey = apiKey;
 		this.branch = branch;
@@ -73,5 +74,6 @@ public class Flags {
 		this.artDigests = artDigests;
 		this.tagKeyArr = tagKeyArr;
 		this.tagValArr = tagValArr;
+		this.hash = hash;
 	}
 }

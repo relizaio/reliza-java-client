@@ -33,10 +33,11 @@ public class LibraryTest {
     	String[] artDigests = null;
     	String[] tagKeyArr = null;
     	String[] tagValArr = null;
+    	String hash = "";
     	Flags flags = new Flags(apiKeyId, apiKey, branch, versionSchema, version, status, endPoint, projectId,
     			commitHash, vcsUri, vcsType, vcsTag, dateActual, artId, artBuildId, artCiMeta,
     			artType, artVersion, artPublisher, artPackage, artGroup, dateStart,
-    			dateEnd, artDigests, tagKeyArr, tagValArr);
+    			dateEnd, artDigests, tagKeyArr, tagValArr, hash);
     	Library library = new Library(flags);
 //    	Input null or empty string/array for unused parameters
     }

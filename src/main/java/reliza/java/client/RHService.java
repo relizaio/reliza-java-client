@@ -26,4 +26,7 @@ public interface RHService {
 	
 	@POST("/api/programmatic/v1/release/create")
 	Call<Map<String, Object>> addRelease(@Body Map<String, Object> body, @Header("Authorization") String authorization);
+	
+	@POST("/api/programmatic/v1/release/getByHash")
+	Call<Map<String, Object>> checkHash(@Body Map<String, Object> body, @Header("Authorization") String authorization);
 }
