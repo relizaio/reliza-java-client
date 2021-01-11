@@ -31,7 +31,7 @@ public class Library {
 	
 	
 	
-	public String addRelease() {
+	public RelizaMetadata addRelease() {
         RHService rhs = retrofit.create(RHService.class);
         Map<String, Object> body = new HashMap<>();
         if (StringUtils.isNotEmpty(flags.getBranch())) {body.put("branch", flags.getBranch());}
@@ -64,7 +64,7 @@ public class Library {
         			flags.getArtPublisher(), flags.getArtPackage(), flags.getArtGroup(), flags.getDateStart(), flags.getDateEnd());
         	
         	List<String> artMessages = Arrays.asList("buildId", "cicdMeta", "type", "artifactVersion",
-        			"publisher", "packagetype", "group", "dateFrom", "dateTo");
+        			"publisher", "packageType", "group", "dateFrom", "dateTo");
         	
         	for (int i = 0; i < artFlags.size(); i++) {
 	        	if (ArrayUtils.isNotEmpty(artFlags.get(i)) && artFlags.get(i).length != flags.getArtId().length) {
@@ -123,7 +123,7 @@ public class Library {
         try {
 			Response<Map<String, Object>> resp = homeResp.execute();
 			log.info(resp.body().toString());
-			return resp.body().toString();
+			return new RelizaMetadata(resp.body());
 		} catch (IOException e) {
 			log.error("IO exception", e);
 			return null;
@@ -135,7 +135,7 @@ public class Library {
 	
 	
 	
-	public String getVersion() {
+	public RelizaVersion getVersion() {
         RHService rhs = retrofit.create(RHService.class);
         Map<String, Object> body = new HashMap<>();  
         if (StringUtils.isNotEmpty(flags.getBranch())) {body.put("branch", flags.getBranch());}
@@ -148,7 +148,7 @@ public class Library {
         try {
 			Response<Map<String, Object>> resp = homeResp.execute();
 			log.info(resp.body().toString());
-			return resp.body().toString();
+			return new RelizaVersion(resp.body());
 		} catch (IOException e) {
 			log.error("IO exception", e);
 			return null;
