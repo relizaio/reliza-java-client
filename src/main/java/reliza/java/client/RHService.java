@@ -23,4 +23,7 @@ public interface RHService {
 
 	@POST("/api/programmatic/v1/project/getNewVersion")
 	Call<Map<String, Object>> getVersion(@Body Map<String, Object> body, @Header("Authorization") String authorization);
+	
+	@POST("/api/programmatic/v1/release/create")
+	Call<Map<String, Object>> addRelease(@Body Map<String, Object> body, @Header("Authorization") String authorization);
 }

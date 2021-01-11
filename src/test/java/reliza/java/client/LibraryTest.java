@@ -7,10 +7,37 @@ import org.junit.Test;
 
 public class LibraryTest {
     @Test public void libraryMethod() {
-    	String apiKeyId;
-    	String apiKey;
-    	String branch;
-    	String projectId;
-//    	Input null or empty string for unused parameters
+    	String apiKeyId = "";
+    	String apiKey = "";
+    	String branch = "";
+    	String versionSchema = "";
+    	String version = "";
+    	String status = "";
+    	String endPoint = "";
+    	String projectId = "";
+    	String commitHash = "";
+    	String vcsUri = "";
+    	String vcsType = "";
+    	String vcsTag = "";
+    	String dateActual = "";
+    	String[] artId = null;
+    	String[] artBuildId = null;
+    	String[] artCiMeta = null;
+    	String[] artType = null;
+    	String[] artVersion = null;
+    	String[] artPublisher = null;
+    	String[] artPackage = null;
+    	String[] artGroup = null;
+    	String[] dateStart = null;
+    	String[] dateEnd = null;
+    	String[] artDigests = null;
+    	String[] tagKeyArr = null;
+    	String[] tagValArr = null;
+    	Flags flags = new Flags(apiKeyId, apiKey, branch, versionSchema, version, status, endPoint, projectId,
+    			commitHash, vcsUri, vcsType, vcsTag, dateActual, artId, artBuildId, artCiMeta,
+    			artType, artVersion, artPublisher, artPackage, artGroup, dateStart,
+    			dateEnd, artDigests, tagKeyArr, tagValArr);
+    	Library library = new Library(flags);
+//    	Input null or empty string/array for unused parameters
     }
 }
