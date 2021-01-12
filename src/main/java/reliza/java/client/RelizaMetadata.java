@@ -1,47 +1,30 @@
 package reliza.java.client;
 
+import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import lombok.Getter;
+import lombok.ToString;
 
-@Getter
+@Getter @ToString
 public class RelizaMetadata {
-	private Object uuid;
-	private Object branch;
-	private Object project;
-	private Object type;
-	private Object createdType;
-	private Object lastUpdatedBy;
-	private Object createdDate;
-	private Object version;
-	private Object status;
-	private Object org;
-	private Object parentReleases;
-	private Object optionalReleases;
-	private Object sourceCodeEntry;
-	private Object artifacts;
-	private Object notes;
-	private Object approvals;
-	private Object timing;
-	private Object endpoint;
-	
-	public RelizaMetadata(Map<String, Object> addReleaseOutput) {
-		this.uuid = addReleaseOutput.get("uuid");
-		this.branch = addReleaseOutput.get("branch");
-		this.project = addReleaseOutput.get("project");
-		this.type = addReleaseOutput.get("type");
-		this.createdType = addReleaseOutput.get("createdType");
-		this.lastUpdatedBy = addReleaseOutput.get("lastUpdatedBy");
-		this.createdDate = addReleaseOutput.get("createdDate");
-		this.version = addReleaseOutput.get("version");
-		this.status = addReleaseOutput.get("status");
-		this.org = addReleaseOutput.get("org");
-		this.parentReleases = addReleaseOutput.get("parentReleases");
-		this.optionalReleases = addReleaseOutput.get("optionalReleases");
-		this.sourceCodeEntry = addReleaseOutput.get("sourceCodeEntry");
-		this.artifacts = addReleaseOutput.get("artifacts");
-		this.notes = addReleaseOutput.get("notes");
-		this.approvals = addReleaseOutput.get("approvals");
-		this.timing = addReleaseOutput.get("timing");
-		this.endpoint = addReleaseOutput.get("endpoint");
-	}
+	// TODO Unknown response types: branch, org, parentReleases, optionalReleases, approvals, timing
+	private UUID uuid;
+	private String branch;
+	private UUID project;
+	private String type;
+	private String createdType;
+	private String lastUpdatedBy;
+	private String createdDate;
+	private String version;
+	private String status;
+	private String org;
+	private List<String> parentReleases;
+	private List<String> optionalReleases;
+	private UUID sourceCodeEntry;
+	private List<UUID> artifacts;
+	private String notes;
+	private Map<String, String> approvals;
+	private List<Map<String, String>> timing;
+	private String endpoint;
 }

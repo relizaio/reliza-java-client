@@ -1,15 +1,10 @@
 package reliza.java.client;
 
-import java.util.Map;
 import lombok.Getter;
+import lombok.ToString;
 
-@Getter
+@Getter @ToString
 public class RelizaVersion {
-	private Object dockerVersion;
-	private Object version;
-	
-	public RelizaVersion(Map<String, Object> getVersionOutput) {
-		this.dockerVersion = getVersionOutput.get("dockerTagSafeVersion");
-		this.version = getVersionOutput.get("version");
-	}
+	private String dockerTagSafeVersion;
+	private String version;
 }

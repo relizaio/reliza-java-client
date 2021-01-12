@@ -3,42 +3,54 @@
  */
 package reliza.java.client;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
 import org.junit.Test;
 
 public class LibraryTest {
     @Test public void libraryMethod() {
     	String apiKeyId = "";
     	String apiKey = "";
-    	String branch = "";
+    	String branch = "ho";
     	String versionSchema = "";
-    	String version = "";
-    	String status = "";
-    	String endPoint = "";
+    	String version = "ho.21";
+    	String status = "completed";
+    	String endPoint = "https://github.com/relizaio/reliza-java-client";
     	String projectId = "";
-    	String commitHash = "";
-    	String vcsUri = "";
-    	String vcsType = "";
+    	String commitHash = "b92b48da3779e3807862cf38d56f789e411af577";
+    	String vcsUri = "https://github.com/relizaio/reliza-java-client";
+    	String vcsType = "git";
     	String vcsTag = "";
-    	String dateActual = "";
-    	String[] artId = null;
-    	String[] artBuildId = null;
-    	String[] artCiMeta = null;
-    	String[] artType = null;
-    	String[] artVersion = null;
-    	String[] artPublisher = null;
-    	String[] artPackage = null;
-    	String[] artGroup = null;
-    	String[] dateStart = null;
-    	String[] dateEnd = null;
-    	String[] artDigests = null;
-    	String[] tagKeyArr = null;
-    	String[] tagValArr = null;
-    	String hash = "";
-    	Flags flags = new Flags(apiKeyId, apiKey, branch, versionSchema, version, status, endPoint, projectId,
-    			commitHash, vcsUri, vcsType, vcsTag, dateActual, artId, artBuildId, artCiMeta,
-    			artType, artVersion, artPublisher, artPackage, artGroup, dateStart,
-    			dateEnd, artDigests, tagKeyArr, tagValArr, hash);
+    	String dateActual = "2021-01-11T19:43:32.286086002Z";
+    	List<String> artId = new ArrayList<>(List.of("relizaio/reliza-cli", "relizaio/reliza-cli"));
+    	List<String> artBuildId = null;
+    	List<String> artCiMeta = new ArrayList<>(List.of("Github Actions", "Github Actions"));
+    	List<String> artType = new ArrayList<>(List.of("Docker", "Docker"));
+    	List<String> artVersion = null;
+    	List<String> artPublisher = new ArrayList<>(List.of("Rasa", "Rasa"));
+    	List<String> artPackage = new ArrayList<>(List.of("DOCKER", "DOCKER"));
+    	List<String> artGroup = new ArrayList<>(List.of("io.reliza", "io.reliza"));
+    	List<String> dateStart = new ArrayList<>(List.of("2021-01-11T19:43:32.286086002Z", "2021-01-11T19:43:32.286086002Z"));
+    	List<String> dateEnd = new ArrayList<>(List.of("2021-01-11T19:43:32.286086002Z", "2021-01-11T19:43:32.286086002Z"));;
+    	List<String> artDigests = null;
+    	List<String> tagKeyArr = new ArrayList<>(List.of("prod", "prod"));
+    	List<String> tagValArr = new ArrayList<>(List.of("true", "true"));
+    	String hash = null;
+    	
+    	Flags flags = Flags.builder().apiKey(apiKey).apiKeyId(apiKeyId).artCiMeta(artCiMeta).artDigests(artDigests)
+    			.artGroup(artGroup).artId(artId).artPackage(artPackage).artPublisher(artPublisher).artType(artType)
+    			.branch(branch).commitHash(commitHash).dateActual(dateActual).dateEnd(dateEnd)
+    			.dateStart(dateStart).endPoint(endPoint).hash(hash).status(status).tagKeyArr(tagKeyArr).tagValArr(tagValArr)
+    			.vcsTag(vcsTag).vcsType(vcsType).version(version).versionSchema(versionSchema).vcsUri(vcsUri).build();
     	Library library = new Library(flags);
-//    	Input null or empty string/array for unused parameters
     }
 }
+
+
+
+
+
+
+
