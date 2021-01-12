@@ -11,46 +11,39 @@ import org.junit.Test;
 
 public class LibraryTest {
     @Test public void libraryMethod() {
-    	String apiKeyId = "";
-    	String apiKey = "";
-    	String branch = "ho";
-    	String versionSchema = "";
-    	String version = "ho.21";
-    	String status = "completed";
-    	String endPoint = "https://github.com/relizaio/reliza-java-client";
-    	String projectId = "";
-    	String commitHash = "b92b48da3779e3807862cf38d56f789e411af577";
-    	String vcsUri = "https://github.com/relizaio/reliza-java-client";
-    	String vcsType = "git";
-    	String vcsTag = "";
-    	String dateActual = "2021-01-11T19:43:32.286086002Z";
-    	List<String> artId = new ArrayList<>(List.of("relizaio/reliza-cli", "relizaio/reliza-cli"));
-    	List<String> artBuildId = null;
-    	List<String> artCiMeta = new ArrayList<>(List.of("Github Actions", "Github Actions"));
-    	List<String> artType = new ArrayList<>(List.of("Docker", "Docker"));
-    	List<String> artVersion = null;
-    	List<String> artPublisher = new ArrayList<>(List.of("Rasa", "Rasa"));
-    	List<String> artPackage = new ArrayList<>(List.of("DOCKER", "DOCKER"));
-    	List<String> artGroup = new ArrayList<>(List.of("io.reliza", "io.reliza"));
-    	List<String> dateStart = new ArrayList<>(List.of("2021-01-11T19:43:32.286086002Z", "2021-01-11T19:43:32.286086002Z"));
-    	List<String> dateEnd = new ArrayList<>(List.of("2021-01-11T19:43:32.286086002Z", "2021-01-11T19:43:32.286086002Z"));;
-    	List<String> artDigests = null;
-    	List<String> tagKeyArr = new ArrayList<>(List.of("prod", "prod"));
-    	List<String> tagValArr = new ArrayList<>(List.of("true", "true"));
-    	String hash = null;
-    	
-    	Flags flags = Flags.builder().apiKey(apiKey).apiKeyId(apiKeyId).artCiMeta(artCiMeta).artDigests(artDigests)
-    			.artGroup(artGroup).artId(artId).artPackage(artPackage).artPublisher(artPublisher).artType(artType)
-    			.branch(branch).commitHash(commitHash).dateActual(dateActual).dateEnd(dateEnd)
-    			.dateStart(dateStart).endPoint(endPoint).hash(hash).status(status).tagKeyArr(tagKeyArr).tagValArr(tagValArr)
-    			.vcsTag(vcsTag).vcsType(vcsType).version(version).versionSchema(versionSchema).vcsUri(vcsUri).build();
-    	Library library = new Library(flags);
+        String apiKeyId = "";
+        String apiKey = "";
+        String branch = "ho";
+        String versionSchema = "";
+        String version = "ho.21";
+        String status = "completed";
+        String endPoint = "https://github.com/relizaio/reliza-java-client";
+        String projectId = "";
+        String commitHash = "b92b48da3779e3807862cf38d56f789e411af577";
+        String vcsUri = "https://github.com/relizaio/reliza-java-client";
+        String vcsType = "git";
+        String vcsTag = "";
+        String dateActual = "2021-01-11T19:43:32.286086002Z";
+        List<String> artId = new ArrayList<>(List.of("relizaio/reliza-cli", "relizaio/reliza-cli"));
+        List<String> artBuildId = null;
+        List<String> artCiMeta = new ArrayList<>(List.of("Github Actions", "Github Actions"));
+        List<String> artType = new ArrayList<>(List.of("Docker", "Docker"));
+        List<String> artVersion = null;
+        List<String> artPublisher = new ArrayList<>(List.of("Rasa", "Rasa"));
+        List<String> artPackage = new ArrayList<>(List.of("DOCKER", "DOCKER"));
+        List<String> artGroup = new ArrayList<>(List.of("io.reliza", "io.reliza"));
+        List<String> dateStart = new ArrayList<>(List.of("2021-01-11T19:43:32.286086002Z", "2021-01-11T19:43:32.286086002Z"));
+        List<String> dateEnd = new ArrayList<>(List.of("2021-01-11T19:43:32.286086002Z", "2021-01-11T19:43:32.286086002Z"));;
+        List<String> artDigests = null;
+        List<String> tagKeyArr = new ArrayList<>(List.of("prod", "prod"));
+        List<String> tagValArr = new ArrayList<>(List.of("true", "true"));
+        String hash = null;
+        
+        Flags flags = Flags.builder().apiKey(apiKey).apiKeyId(apiKeyId).artCiMeta(artCiMeta).artDigests(artDigests)
+                .artGroup(artGroup).artId(artId).artPackage(artPackage).artPublisher(artPublisher).artType(artType)
+                .branch(branch).commitHash(commitHash).dateActual(dateActual).dateEnd(dateEnd)
+                .dateStart(dateStart).endPoint(endPoint).hash(hash).status(status).tagKeyArr(tagKeyArr).tagValArr(tagValArr)
+                .vcsTag(vcsTag).vcsType(vcsType).version(version).versionSchema(versionSchema).vcsUri(vcsUri).build();
+        Library library = new Library(flags);
     }
 }
-
-
-
-
-
-
-
