@@ -5,6 +5,6 @@ import lombok.ToString;
 
 @Getter @ToString
 public class RelizaVersion {
-	private String dockerTagSafeVersion;
-	private String version;
+    private String dockerTagSafeVersion;
+    private String version;
 }
