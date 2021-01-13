@@ -3,47 +3,69 @@
  */
 package reliza.java.client;
 
+import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import org.junit.Test;
 
 public class LibraryTest {
     @Test public void libraryMethod() {
-        String apiKeyId = "";
-        String apiKey = "";
-        String branch = "ho";
-        String versionSchema = "";
-        String version = "ho.21";
-        String status = "completed";
-        String endPoint = "https://github.com/relizaio/reliza-java-client";
-        String projectId = "";
-        String commitHash = "b92b48da3779e3807862cf38d56f789e411af577";
-        String vcsUri = "https://github.com/relizaio/reliza-java-client";
-        String vcsType = "git";
-        String vcsTag = "";
-        String dateActual = "2021-01-11T19:43:32.286086002Z";
-        List<String> artId = new ArrayList<>(List.of("relizaio/reliza-cli", "relizaio/reliza-cli"));
-        List<String> artBuildId = null;
-        List<String> artCiMeta = new ArrayList<>(List.of("Github Actions", "Github Actions"));
-        List<String> artType = new ArrayList<>(List.of("Docker", "Docker"));
-        List<String> artVersion = null;
-        List<String> artPublisher = new ArrayList<>(List.of("Rasa", "Rasa"));
-        List<String> artPackage = new ArrayList<>(List.of("DOCKER", "DOCKER"));
-        List<String> artGroup = new ArrayList<>(List.of("io.reliza", "io.reliza"));
-        List<String> dateStart = new ArrayList<>(List.of("2021-01-11T19:43:32.286086002Z", "2021-01-11T19:43:32.286086002Z"));
-        List<String> dateEnd = new ArrayList<>(List.of("2021-01-11T19:43:32.286086002Z", "2021-01-11T19:43:32.286086002Z"));;
-        List<String> artDigests = null;
-        List<String> tagKeyArr = new ArrayList<>(List.of("prod", "prod"));
-        List<String> tagValArr = new ArrayList<>(List.of("true", "true"));
+        String apiKeyId = null;
+        String apiKey = null;
+        String branch = null;
+        String versionSchema = null;
+        String version = null;
+        String status = null;
+        String endPoint = null;
+        String projectId = null;
+        String commitHash = null;
+        String vcsUri = null;
+        String vcsType = null;
+        String vcsTag = null;
+        String dateActual = null;
+        String[] artId = null;
+        String[] artBuildId = null;
+        String[] artCiMeta = null;
+        String[] artType = null;
+        String[] artVersion = null;
+        String[] artPublisher = null;
+        String[] artPackage = null;
+        String[] artGroup = null;
+        String[] dateStart = null;
+        String[] dateEnd = null;
+        String[] artDigests = null;
+        String[] tagKeyArr = null;
+        String[] tagValArr = null;
         String hash = null;
+        String imageString = null;
+        File imageFilePath = null;
+        String namespace = null;
+        String senderId = null;
         
-        Flags flags = Flags.builder().apiKey(apiKey).apiKeyId(apiKeyId).artCiMeta(artCiMeta).artDigests(artDigests)
-                .artGroup(artGroup).artId(artId).artPackage(artPackage).artPublisher(artPublisher).artType(artType)
-                .branch(branch).commitHash(commitHash).dateActual(dateActual).dateEnd(dateEnd)
-                .dateStart(dateStart).endPoint(endPoint).hash(hash).status(status).tagKeyArr(tagKeyArr).tagValArr(tagValArr)
-                .vcsTag(vcsTag).vcsType(vcsType).version(version).versionSchema(versionSchema).vcsUri(vcsUri).build();
-        Library library = new Library(flags);
+//        Flags apiGetVersionTest1 = Flags.builder().apiKeyId(apiKeyId).apiKey(apiKey).branch(branch).build();
+            
+//        Flags apiGetVersionTest2 = Flags.builder().apiKeyId(apiKeyId).apiKey(apiKey).branch(branch).projectId(projectId).build();
+        
+//        Flags apiAddReleaseTest = Flags.builder().apiKeyId(apiKeyId).apiKey(apiKey).branch(branch).version(version)
+//                .commitHash("b92b48da3779e3807862cf38d56f789e411af577").artCiMeta(Arrays.asList("Github Actions", "Github Actions"))
+//                .artGroup(Arrays.asList("io.reliza", "io.reliza")).artId(Arrays.asList("relizaio/reliza-cli", "relizaio/reliza-cli"))
+//                .artPackage(Arrays.asList("DOCKER", "DOCKER")).artPublisher(Arrays.asList("Rasa", "Rasa")).artType(Arrays.asList("Docker", "Docker"))
+//                .dateActual("2021-01-11T19:43:32.286086002Z").dateEnd(Arrays.asList("2021-01-12T19:43:32.286086002Z", "2021-01-12T19:43:32.286086002Z"))
+//                .dateStart(Arrays.asList("2021-01-11T19:43:32.286086002Z", "2021-01-11T19:43:32.286086002Z"))
+//                .endPoint("https://github.com/relizaio/reliza-java-client").status("completed")
+//                .tagKeyArr(Arrays.asList("prod", "prod")).tagValArr(Arrays.asList("true", "true")).vcsType("git").build();
+        
+//        Flags apiCheckHashTest = Flags.builder().apiKeyId(apiKeyId).apiKey(apiKey).hash(hash).build();
+        
+//        Flags apiInstDataTest1 = Flags.builder().apiKey(apiKey).apiKeyId(apiKeyId).imageString("sha256:poke").build();
+        
+//        Flags apiInstDataTest2 = Flags.builder().apiKey(apiKey).apiKeyId(apiKeyId).imageFilePath(new File("C:\\Users\\welli\\Documents\\Rasa.txt"))
+//                .namespace("spacename").senderId("Idsender").build();
+        
+//        Library library = new Library(flags);
     }
 }

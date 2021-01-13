@@ -7,8 +7,10 @@ import lombok.Getter;
 import lombok.ToString;
 
 @Getter @ToString
-public class RelizaMetadata {
-    // TODO Unknown response types: branch, org, parentReleases, optionalReleases, approvals, timing
+public class ProjectMetadata {
+    // TODO Unknown response types: branch, lastUpdatedBy, org, parentReleases
+    // optionalReleases, approvals, timing, properties, releases, agentData, products
+    // Jacksonconverter cannot convert response string to zoneddatetime
     private UUID uuid;
     private String branch;
     private UUID project;
@@ -27,4 +29,10 @@ public class RelizaMetadata {
     private Map<String, String> approvals;
     private List<Map<String, String>> timing;
     private String endpoint;
+    private String uri;
+    private Map<String, String> properties;
+    private List<String> releases;
+    private String agentData;
+    private String environment;
+    private List<String> products;
 }

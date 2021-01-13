@@ -3,13 +3,17 @@
  */
 package reliza.java.client;
 
+import java.io.File;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.io.FileUtils;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.Credentials;
 import retrofit2.Call;
@@ -18,7 +22,7 @@ import retrofit2.Retrofit;
 import retrofit2.converter.jackson.JacksonConverterFactory;
 
 @Slf4j
-public class Library {
+public class Library {    
     Flags flags;
     Retrofit retrofit = new Retrofit.Builder()
         .baseUrl("https://test.relizahub.com")
@@ -28,17 +32,58 @@ public class Library {
         this.flags = flags;
     }
     
+    public InstanceMetadata instData() {        
+        RHService rhs = retrofit.create(RHService.class);
+        Map<String, Object> body = new HashMap<>();
+        if (StringUtils.isNotEmpty(flags.getImageString())) {
+            body.put("images", Arrays.asList(flags.getImageString().split(" ")));
+        } else if (isNotEmpty(flags.getImageFilePath())){
+            try {
+                byte[] imageBytes = FileUtils.readFileToByteArray(flags.getImageFilePath()); 
+                body.put("images", Arrays.asList(new String(imageBytes, StandardCharsets.UTF_8).split(" ")));
+            } catch (IOException e) {
+                log.error("IO exception", e);
+                return null;
+            } catch (NullPointerException e) {
+                log.error("NullPointerException", e);
+                return null;
+            }
+        }
+        
+        body.put("timeSent", Instant.now().toString());
+        if (StringUtils.isNotEmpty(flags.getNamespace())) {body.put("namespace", flags.getNamespace());}
+        if (StringUtils.isNotEmpty(flags.getSenderId())) {body.put("senderId", flags.getSenderId());}
+        
+        String basicAuth = Credentials.basic(flags.getApiKeyId(), flags.getApiKey());
+        Call<InstanceMetadata> homeResp = rhs.instData(body, basicAuth);
+        System.out.println(body);
+        
+        try {
+            Response<InstanceMetadata> resp = homeResp.execute();
+            if (resp.isSuccessful()) {
+                log.info(resp.body().toString());
+                return resp.body();
+            } else {
+                log.error(resp.errorBody().string());
+                return null;
+            }
+        } catch (IOException e) {
+            log.error("IO exception", e);
+            return null;
+        }
+    }
     
-    public RelizaMetadata checkHash() {
+    
+    public ProjectMetadata checkHash() {
         RHService rhs = retrofit.create(RHService.class);
         Map<String, Object> body = new HashMap<>();
         body.put("hash", flags.getHash());
         
         String basicAuth = Credentials.basic(flags.getApiKeyId(), flags.getApiKey());
-        Call<Map<String,RelizaMetadata>> homeResp = rhs.checkHash(body, basicAuth);
+        Call<Map<String,ProjectMetadata>> homeResp = rhs.checkHash(body, basicAuth);
         
         try {
-            Response<Map<String,RelizaMetadata>> resp = homeResp.execute();
+            Response<Map<String,ProjectMetadata>> resp = homeResp.execute();
             if (resp.isSuccessful()) {
                 log.info(resp.body().toString());
                 return resp.body().get("release");
@@ -53,7 +98,7 @@ public class Library {
     }
     
     
-    public RelizaMetadata addRelease() {
+    public ProjectMetadata addRelease() {
         RHService rhs = retrofit.create(RHService.class);
         Map<String, Object> body = new HashMap<>();
         if (StringUtils.isNotEmpty(flags.getBranch())) {body.put("branch", flags.getBranch());}
@@ -123,8 +168,8 @@ public class Library {
                 return null;
             } else if (isNotEmpty(flags.getTagKeyArr())) {
                 for (int i = 0; i < flags.getTagKeyArr().size(); i++) {
-                    List<String> tagKeys = List.of(flags.getTagKeyArr().get(i).split(","));
-                    List<String> tagVals = List.of(flags.getTagValArr().get(i).split(","));
+                    List<String> tagKeys = Arrays.asList(flags.getTagKeyArr().get(i).split(","));
+                    List<String> tagVals = Arrays.asList(flags.getTagValArr().get(i).split(","));
                     if (isNotEmpty(tagKeys) && isNotEmpty(tagVals) && tagKeys.size() != tagVals.size()) {
                         log.error("number of keys and values per each tagval and tagkey flag must be the same");
                         return null;
@@ -143,10 +188,10 @@ public class Library {
         }
         
         String basicAuth = Credentials.basic(flags.getApiKeyId(), flags.getApiKey());
-        Call<RelizaMetadata> homeResp = rhs.addRelease(body, basicAuth);
+        Call<ProjectMetadata> homeResp = rhs.addRelease(body, basicAuth);
         
         try {
-            Response<RelizaMetadata> resp = homeResp.execute();
+            Response<ProjectMetadata> resp = homeResp.execute();
             if (resp.isSuccessful()) {
                 log.info(resp.body().toString());
                 return resp.body();
@@ -161,7 +206,7 @@ public class Library {
     }
         
     
-    public RelizaVersion getVersion() {
+    public ProjectVersion getVersion() {
         RHService rhs = retrofit.create(RHService.class);
         Map<String, Object> body = new HashMap<>();  
         if (StringUtils.isNotEmpty(flags.getBranch())) {body.put("branch", flags.getBranch());}
@@ -169,10 +214,10 @@ public class Library {
         if (flags.getProjectId() != null) {body.put("project", flags.getProjectId());}
 
         String basicAuth = Credentials.basic(flags.getApiKeyId(), flags.getApiKey());
-        Call<RelizaVersion> homeResp = rhs.getVersion(body, basicAuth);
+        Call<ProjectVersion> homeResp = rhs.getVersion(body, basicAuth);
         
         try {
-            Response<RelizaVersion> resp = homeResp.execute();
+            Response<ProjectVersion> resp = homeResp.execute();
             if (resp.isSuccessful()) {
                 log.info(resp.body().toString());
                 return resp.body();
@@ -185,6 +230,13 @@ public class Library {
             return null;
         }
     }
+    
+    private boolean isNotEmpty(File file) {
+        if (file == null || file.getPath().length() == 0) {
+            return false;
+        }
+        return true;
+    }   
     
     private boolean isNotEmpty(List<String> flag) {
         if (flag == null || flag.size() == 0) {

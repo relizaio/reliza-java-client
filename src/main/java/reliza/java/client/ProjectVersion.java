@@ -4,7 +4,7 @@ import lombok.Getter;
 import lombok.ToString;
 
 @Getter @ToString
-public class RelizaVersion {
+public class ProjectVersion {
     private String dockerTagSafeVersion;
     private String version;
 }

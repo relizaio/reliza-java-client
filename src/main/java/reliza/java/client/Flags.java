@@ -1,5 +1,6 @@
 package reliza.java.client;
 
+import java.io.File;
 import java.util.List;
 import java.util.UUID;
 import lombok.Builder;
@@ -34,4 +35,8 @@ public class Flags{
     private List<String> tagKeyArr;
     private List<String> tagValArr;
     private String hash;
+    private String imageString;
+    @Builder.Default File imageFilePath = new File("/resources/images.txt");
+    @Builder.Default private String namespace= "default";
+    @Builder.Default private String senderId = "default";
 }
