@@ -4,68 +4,88 @@
 package reliza.java.client;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
 import java.util.UUID;
-
 import org.junit.Test;
 
 public class LibraryTest {
-    @Test public void libraryMethod() {
-        String apiKeyId = null;
-        String apiKey = null;
-        String branch = null;
-        String versionSchema = null;
-        String version = null;
-        String status = null;
-        String endPoint = null;
-        String projectId = null;
-        String commitHash = null;
-        String vcsUri = null;
-        String vcsType = null;
-        String vcsTag = null;
-        String dateActual = null;
-        String[] artId = null;
-        String[] artBuildId = null;
-        String[] artCiMeta = null;
-        String[] artType = null;
-        String[] artVersion = null;
-        String[] artPublisher = null;
-        String[] artPackage = null;
-        String[] artGroup = null;
-        String[] dateStart = null;
-        String[] dateEnd = null;
-        String[] artDigests = null;
-        String[] tagKeyArr = null;
-        String[] tagValArr = null;
-        String hash = null;
-        String imageString = null;
-        File imageFilePath = null;
-        String namespace = null;
-        String senderId = null;
-        
-//        Flags apiGetVersionTest1 = Flags.builder().apiKeyId(apiKeyId).apiKey(apiKey).branch(branch).build();
-            
-//        Flags apiGetVersionTest2 = Flags.builder().apiKeyId(apiKeyId).apiKey(apiKey).branch(branch).projectId(projectId).build();
-        
-//        Flags apiAddReleaseTest = Flags.builder().apiKeyId(apiKeyId).apiKey(apiKey).branch(branch).version(version)
-//                .commitHash("b92b48da3779e3807862cf38d56f789e411af577").artCiMeta(Arrays.asList("Github Actions", "Github Actions"))
-//                .artGroup(Arrays.asList("io.reliza", "io.reliza")).artId(Arrays.asList("relizaio/reliza-cli", "relizaio/reliza-cli"))
-//                .artPackage(Arrays.asList("DOCKER", "DOCKER")).artPublisher(Arrays.asList("Rasa", "Rasa")).artType(Arrays.asList("Docker", "Docker"))
-//                .dateActual("2021-01-11T19:43:32.286086002Z").dateEnd(Arrays.asList("2021-01-12T19:43:32.286086002Z", "2021-01-12T19:43:32.286086002Z"))
-//                .dateStart(Arrays.asList("2021-01-11T19:43:32.286086002Z", "2021-01-11T19:43:32.286086002Z"))
-//                .endPoint("https://github.com/relizaio/reliza-java-client").status("completed")
-//                .tagKeyArr(Arrays.asList("prod", "prod")).tagValArr(Arrays.asList("true", "true")).vcsType("git").build();
-        
-//        Flags apiCheckHashTest = Flags.builder().apiKeyId(apiKeyId).apiKey(apiKey).hash(hash).build();
-        
-//        Flags apiInstDataTest1 = Flags.builder().apiKey(apiKey).apiKeyId(apiKeyId).imageString("sha256:poke").build();
-        
-//        Flags apiInstDataTest2 = Flags.builder().apiKey(apiKey).apiKeyId(apiKeyId).imageFilePath(new File("C:\\Users\\welli\\Documents\\Rasa.txt"))
-//                .namespace("spacename").senderId("Idsender").build();
-        
-//        Library library = new Library(flags);
+    //Type @Test on whichever command you want to test
+    @Test public void doAllTests() {
+        getVersionTests();
+        addReleaseTests();
+        checkHashTests();
+        instDataTests();
+        getMyReleaseTests();
     }
+    
+    public void getVersionTests() {    
+        Flags getVersionTest1 = Flags.builder().apiKeyId("PROJECT__6ba5691c-05e3-4ecd-a45a-18b382419f40")
+            .apiKey("2a5e9cd7c008cf70502f186d33d52edf900f3413e172135e622670274053510664ff0112f9cf8ba72b69cfcb200a27bd")
+            .branch("ho").build();
+            
+        Flags getVersionTest2 = Flags.builder().apiKeyId("ORGANIZATION_RW__359e867c-d493-48e3-a6b5-e5a52d259265")
+            .apiKey("83431df3076d2117c8ecb30f9e6fc4dd67cde35f54bb730fab816dfe6dd055ebd2cbd8085e8fe6a5bda9b165370ebbc1")
+            .branch("ho").projectId(UUID.fromString("6ba5691c-05e3-4ecd-a45a-18b382419f40")).build();
+        
+        Library library1 = new Library(getVersionTest1);
+        Library library2 = new Library(getVersionTest2);
+        library1.getVersion();
+        library2.getVersion();
+    }
+    
+    //addRelease only goes through once for a given version
+    public void addReleaseTests() {
+        Flags addReleaseTest1 = Flags.builder().apiKeyId("PROJECT__6ba5691c-05e3-4ecd-a45a-18b382419f40")
+          .apiKey("2a5e9cd7c008cf70502f186d33d52edf900f3413e172135e622670274053510664ff0112f9cf8ba72b69cfcb200a27bd")
+          .branch("ho").version("ho.29")
+          .commitHash("b92b48da3779e3807862cf38d56f789e411af577").artCiMeta(Arrays.asList("Github Actions", "Github Actions"))
+          .artGroup(Arrays.asList("io.reliza", "io.reliza")).artId(Arrays.asList("relizaio/reliza-cli", "relizaio/reliza-cli"))
+          .artPackage(Arrays.asList("DOCKER", "DOCKER")).artPublisher(Arrays.asList("Rasa", "Rasa")).artType(Arrays.asList("Docker", "Docker"))
+          .dateActual("2021-01-11T19:43:32.286086002Z").dateEnd(Arrays.asList("2021-01-12T19:43:32.286086002Z", "2021-01-12T19:43:32.286086002Z"))
+          .dateStart(Arrays.asList("2021-01-11T19:43:32.286086002Z", "2021-01-11T19:43:32.286086002Z"))
+          .endPoint("https://github.com/relizaio/reliza-java-client").status("completed")
+          .tagKeyArr(Arrays.asList("prod", "prod")).tagValArr(Arrays.asList("true", "true")).vcsType("git").build();
+        
+        Library library1 = new Library(addReleaseTest1);
+        library1.addRelease();
+    }
+    
+    public void checkHashTests() {
+        Flags checkHashTest1 = Flags.builder().apiKeyId("PROJECT__6ba5691c-05e3-4ecd-a45a-18b382419f40")
+          .apiKey("2a5e9cd7c008cf70502f186d33d52edf900f3413e172135e622670274053510664ff0112f9cf8ba72b69cfcb200a27bd")
+          .hash("sha256:2").build(); 
+        
+        Library library1 = new Library(checkHashTest1);
+        library1.checkHash();
+    }
+
+    public void instDataTests() {
+      Flags instDataTest1 = Flags.builder().apiKeyId("INSTANCE__ff253dbd-9654-4a39-963b-15f16b003f61")
+          .apiKey("123fc247b6d05254350d5f994b16692b8bcffdcb14787dd466c6dc1bf55add06051b419df5beeb090230de415baf3e5f")
+          .imageString("sha256:poke").build();
+      
+      Flags instDataTest2 = Flags.builder().apiKeyId("INSTANCE__ff253dbd-9654-4a39-963b-15f16b003f61")
+          .apiKey("123fc247b6d05254350d5f994b16692b8bcffdcb14787dd466c6dc1bf55add06051b419df5beeb090230de415baf3e5f")
+          .imageFilePath(new File("C:\\Users\\welli\\Documents\\Rasa.txt")).namespace("spacename").senderId("Idsender").build();
+      
+      Library library1 = new Library(instDataTest1);
+      Library library2 = new Library(instDataTest2);
+      library1.instData();
+      library2.instData();
+    }
+
+    public void getMyReleaseTests() {
+      Flags getMyReleaseTest1 = Flags.builder().apiKeyId("INSTANCE__ff253dbd-9654-4a39-963b-15f16b003f61")
+      .apiKey("123fc247b6d05254350d5f994b16692b8bcffdcb14787dd466c6dc1bf55add06051b419df5beeb090230de415baf3e5f").build();
+      
+      Library library1 = new Library(getMyReleaseTest1);
+      library1.getMyRelease();
+    }
+
+      
+
+        
+
 }
+
+

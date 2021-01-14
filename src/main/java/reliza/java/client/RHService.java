@@ -1,12 +1,15 @@
 package reliza.java.client;
 
+import java.util.List;
 import java.util.Map;
 import retrofit2.Call;
 import retrofit2.http.Body;
+import retrofit2.http.GET;
 import retrofit2.http.Header;
 import retrofit2.http.Headers;
 import retrofit2.http.POST;
 import retrofit2.http.PUT;
+import retrofit2.http.Query;
 
 // retrofit docs - https://square.github.io/retrofit/
 
@@ -17,7 +20,7 @@ public interface RHService {
      * @return
      */
     @Headers({
-        "Accept: application/json",
+        "Content-Type: application/json",
         "User-Agent: Reliza Go Client",
         "Accept-Encoding: gzip, deflate"
     })
@@ -32,5 +35,8 @@ public interface RHService {
     Call<Map<String, ProjectMetadata>> checkHash(@Body Map<String, Object> body, @Header("Authorization") String authorization);
     
     @PUT("/api/programmatic/v1/instance/sendAgentData")
-    Call<InstanceMetadata> instData(@Body Map<String, Object> body, @Header("Authorization") String authorization);   
+    Call<InstanceMetadata> instData(@Body Map<String, Object> body, @Header("Authorization") String authorization);
+    
+    @GET("/api/programmatic/v1/instance/getMyFollowReleases")
+    Call<List<ReleaseMetadata>> getMyRelease(@Header("Authorization") String authorization, @Query("namespace") String namespace);
 }
