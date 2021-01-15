@@ -9,35 +9,27 @@ import java.util.UUID;
 import org.junit.Test;
 
 public class LibraryTest {
-    //Type @Test on whichever command you want to test
-    @Test public void doAllTests() {
-        getVersionTests();
-        addReleaseTests();
-        checkHashTests();
-        instDataTests();
-        getMyReleaseTests();
+    @Test public void testGetProjectVersion() {    
+        Flags flags = Flags.builder().apiKeyId("PROJECT__6ba5691c-05e3-4ecd-a45a-18b382419f40")
+            .apiKey("5b936c784432810f3b39a42c1d129a607bc017952beeaf22acb22f9eecae850391efafaa9ba4a396e535a745c0afd226")
+            .branch("ho").build();
+        Library library = new Library(flags);
+        library.getVersion();
     }
     
-    public void getVersionTests() {    
-        Flags getVersionTest1 = Flags.builder().apiKeyId("PROJECT__6ba5691c-05e3-4ecd-a45a-18b382419f40")
-            .apiKey("2a5e9cd7c008cf70502f186d33d52edf900f3413e172135e622670274053510664ff0112f9cf8ba72b69cfcb200a27bd")
-            .branch("ho").build();
-            
-        Flags getVersionTest2 = Flags.builder().apiKeyId("ORGANIZATION_RW__359e867c-d493-48e3-a6b5-e5a52d259265")
-            .apiKey("83431df3076d2117c8ecb30f9e6fc4dd67cde35f54bb730fab816dfe6dd055ebd2cbd8085e8fe6a5bda9b165370ebbc1")
-            .branch("ho").projectId(UUID.fromString("6ba5691c-05e3-4ecd-a45a-18b382419f40")).build();
-        
-        Library library1 = new Library(getVersionTest1);
-        Library library2 = new Library(getVersionTest2);
-        library1.getVersion();
-        library2.getVersion();
+    @Test public void testGetOrganizationVersion() {
+        Flags flags = Flags.builder().apiKeyId("ORGANIZATION_RW__359e867c-d493-48e3-a6b5-e5a52d259265")
+                .apiKey("cd33ae31b520f3025684877ac9f4405f8d7940984548e65b30a60d719edd392feeaddf2cb9397ae6e7f67dfa7b89388e")
+                .branch("ho").projectId(UUID.fromString("6ba5691c-05e3-4ecd-a45a-18b382419f40")).build();
+        Library library = new Library(flags);
+        library.getVersion();
     }
     
     //addRelease only goes through once for a given version
-    public void addReleaseTests() {
-        Flags addReleaseTest1 = Flags.builder().apiKeyId("PROJECT__6ba5691c-05e3-4ecd-a45a-18b382419f40")
-          .apiKey("2a5e9cd7c008cf70502f186d33d52edf900f3413e172135e622670274053510664ff0112f9cf8ba72b69cfcb200a27bd")
-          .branch("ho").version("ho.29")
+    @Test public void testAddRelease() {
+        Flags flags = Flags.builder().apiKeyId("PROJECT__6ba5691c-05e3-4ecd-a45a-18b382419f40")
+          .apiKey("5b936c784432810f3b39a42c1d129a607bc017952beeaf22acb22f9eecae850391efafaa9ba4a396e535a745c0afd226")
+          .branch("ho").version("ho.31")
           .commitHash("b92b48da3779e3807862cf38d56f789e411af577").artCiMeta(Arrays.asList("Github Actions", "Github Actions"))
           .artGroup(Arrays.asList("io.reliza", "io.reliza")).artId(Arrays.asList("relizaio/reliza-cli", "relizaio/reliza-cli"))
           .artPackage(Arrays.asList("DOCKER", "DOCKER")).artPublisher(Arrays.asList("Rasa", "Rasa")).artType(Arrays.asList("Docker", "Docker"))
@@ -45,47 +37,54 @@ public class LibraryTest {
           .dateStart(Arrays.asList("2021-01-11T19:43:32.286086002Z", "2021-01-11T19:43:32.286086002Z"))
           .endPoint("https://github.com/relizaio/reliza-java-client").status("completed")
           .tagKeyArr(Arrays.asList("prod", "prod")).tagValArr(Arrays.asList("true", "true")).vcsType("git").build();
-        
-        Library library1 = new Library(addReleaseTest1);
-        library1.addRelease();
+        Library library = new Library(flags);
+        library.addRelease();
     }
     
-    public void checkHashTests() {
-        Flags checkHashTest1 = Flags.builder().apiKeyId("PROJECT__6ba5691c-05e3-4ecd-a45a-18b382419f40")
-          .apiKey("2a5e9cd7c008cf70502f186d33d52edf900f3413e172135e622670274053510664ff0112f9cf8ba72b69cfcb200a27bd")
-          .hash("sha256:2").build(); 
-        
-        Library library1 = new Library(checkHashTest1);
-        library1.checkHash();
+    @Test public void testCheckHash() {
+        Flags flags = Flags.builder().apiKeyId("PROJECT__6ba5691c-05e3-4ecd-a45a-18b382419f40")
+          .apiKey("5b936c784432810f3b39a42c1d129a607bc017952beeaf22acb22f9eecae850391efafaa9ba4a396e535a745c0afd226")
+          .hash("sha256:2").build();        
+        Library library = new Library(flags);
+        library.checkHash();
     }
 
-    public void instDataTests() {
-      Flags instDataTest1 = Flags.builder().apiKeyId("INSTANCE__ff253dbd-9654-4a39-963b-15f16b003f61")
-          .apiKey("123fc247b6d05254350d5f994b16692b8bcffdcb14787dd466c6dc1bf55add06051b419df5beeb090230de415baf3e5f")
+    @Test public void testInstDataImageString() {
+      Flags flags = Flags.builder().apiKeyId("INSTANCE__ff253dbd-9654-4a39-963b-15f16b003f61")
+          .apiKey("538ab3bc422bd214ca803c2d4d40004455be7593eb34fe55da9282d670433b38a1938f97e53d63bc220a864c052b0be8")
           .imageString("sha256:poke").build();
-      
-      Flags instDataTest2 = Flags.builder().apiKeyId("INSTANCE__ff253dbd-9654-4a39-963b-15f16b003f61")
-          .apiKey("123fc247b6d05254350d5f994b16692b8bcffdcb14787dd466c6dc1bf55add06051b419df5beeb090230de415baf3e5f")
+      Library library = new Library(flags);
+      library.instData();
+    }
+    
+    @Test public void testInstDataImageFile() {
+      Flags flags = Flags.builder().apiKeyId("INSTANCE__ff253dbd-9654-4a39-963b-15f16b003f61")
+          .apiKey("538ab3bc422bd214ca803c2d4d40004455be7593eb34fe55da9282d670433b38a1938f97e53d63bc220a864c052b0be8")
           .imageFilePath(new File("C:\\Users\\welli\\Documents\\Rasa.txt")).namespace("spacename").senderId("Idsender").build();
-      
-      Library library1 = new Library(instDataTest1);
-      Library library2 = new Library(instDataTest2);
-      library1.instData();
-      library2.instData();
+      Library library = new Library(flags);
+      library.instData();
     }
 
-    public void getMyReleaseTests() {
-      Flags getMyReleaseTest1 = Flags.builder().apiKeyId("INSTANCE__ff253dbd-9654-4a39-963b-15f16b003f61")
-      .apiKey("123fc247b6d05254350d5f994b16692b8bcffdcb14787dd466c6dc1bf55add06051b419df5beeb090230de415baf3e5f").build();
-      
-      Library library1 = new Library(getMyReleaseTest1);
-      library1.getMyRelease();
+    @Test public void testGetMyRelease() {
+      Flags flags = Flags.builder().apiKeyId("INSTANCE__ff253dbd-9654-4a39-963b-15f16b003f61")
+          .apiKey("538ab3bc422bd214ca803c2d4d40004455be7593eb34fe55da9282d670433b38a1938f97e53d63bc220a864c052b0be8").build();
+      Library library = new Library(flags);
+      library.getMyRelease();
     }
-
-      
-
-        
-
+    
+    @Test public void testGetLatestRelease() {
+        Flags flags = Flags.builder().apiKeyId("PROJECT__6ba5691c-05e3-4ecd-a45a-18b382419f40")
+            .apiKey("5b936c784432810f3b39a42c1d129a607bc017952beeaf22acb22f9eecae850391efafaa9ba4a396e535a745c0afd226")
+            .projectId(UUID.fromString("6ba5691c-05e3-4ecd-a45a-18b382419f40")).branch("ho").build();
+        Library library = new Library(flags);
+        library.getLatestRelease();
+    }
+    
+    @Test public void testApproveRelease() {
+        Flags flags = Flags.builder().apiKeyId("APPROVAL__dc5e0755-1286-409a-94e6-04f0690eadbb")
+            .apiKey("0ef4347fd215411d989b511a60fd99500560632cb72f93e9d04559028697e56fed9f0fed4d670c46faddd823d822f378")
+            .projectId(UUID.fromString("02a5d83a-0897-48da-9caa-378888574354")).approvalType("DEV").build();
+        Library library = new Library(flags);
+        library.approveRelease();
+    }
 }
-
-

@@ -37,6 +37,15 @@ public class Flags{
     private String hash;
     private String imageString;
     @Builder.Default File imageFilePath = new File("/resources/images.txt");
-    @Builder.Default private String namespace= "default";
+    @Builder.Default private String namespace = "default";
     @Builder.Default private String senderId = "default";
+    private UUID product;
+    private String environment;
+    private String instance;
+    private String tagKey;
+    private String tagVal;
+    private UUID releaseId;
+    private String releaseVersion;
+    private String approvalType;
+    @Builder.Default private Boolean disapprove = false;
 }

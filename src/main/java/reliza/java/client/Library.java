@@ -12,10 +12,17 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import org.apache.commons.lang3.StringUtils;
+
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import org.apache.commons.io.FileUtils;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.Credentials;
+import okhttp3.OkHttpClient;
+import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Call;
 import retrofit2.Response;
 import retrofit2.Retrofit;
@@ -23,14 +30,60 @@ import retrofit2.converter.jackson.JacksonConverterFactory;
 
 @Slf4j
 public class Library {
+    public static HttpLoggingInterceptor getClient() {
+        HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
+        logging.level(HttpLoggingInterceptor.Level.BODY);
+        return logging;
+    }
+    static HttpLoggingInterceptor dog = getClient();
+    static OkHttpClient client = new OkHttpClient.Builder().addInterceptor(dog).build();
+    
     Flags flags;
-    Retrofit retrofit = new Retrofit.Builder()
-        .baseUrl("https://test.relizahub.com")
-        .addConverterFactory(JacksonConverterFactory.create())
-        .build();
-    RHService rhs = retrofit.create(RHService.class);
+    RHService rhs;
+    
     public Library(Flags flags) {
         this.flags = flags;
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.setSerializationInclusion(JsonInclude.Include.NON_EMPTY);
+        Retrofit retrofit = new Retrofit.Builder()
+            .baseUrl("https://test.relizahub.com")
+            .addConverterFactory(JacksonConverterFactory.create(objectMapper))
+            .client(client)
+            .build();
+        this.rhs = retrofit.create(RHService.class);
+    }
+    
+    
+    public Object approveRelease() {
+        Map<String, Object> body = new HashMap<>();
+        Map<String, Boolean> approvalMap = new HashMap<>();
+        approvalMap.put(flags.getApprovalType(), !flags.getDisapprove());
+        body.put("approvals", approvalMap);
+        if (isNotEmpty(flags.getReleaseId())) {body.put("uuid", flags.getReleaseId());}
+        if (StringUtils.isNotEmpty(flags.getReleaseVersion())) {body.put("version", flags.getReleaseVersion());}
+        if (isNotEmpty(flags.getProjectId())) {body.put("project", flags.getProjectId());}
+        System.out.println(body);
+        
+        String basicAuth = Credentials.basic(flags.getApiKeyId(), flags.getApiKey());
+        Call<Object> homeResp = rhs.getLatestRelease(body, basicAuth);
+        return execute(homeResp);
+    }
+    
+    
+    public Object getLatestRelease() {
+        Map<String, Object> body = new HashMap<>();
+        body.put("project", flags.getProjectId());
+        if (StringUtils.isNotEmpty(flags.getEnvironment())) {body.put("environment", flags.getEnvironment());}
+        if (isNotEmpty(flags.getProduct())) {body.put("product", flags.getEnvironment());}
+        if (StringUtils.isNotEmpty(flags.getTagKey()) && StringUtils.isNotEmpty(flags.getTagVal())) {
+            body.put("tags", flags.getTagKey() + " " + flags.getTagVal());}
+        if (StringUtils.isNotEmpty(flags.getBranch())) {body.put("branch", flags.getBranch());}
+        if (StringUtils.isNotEmpty(flags.getInstance())) {body.put("instance", flags.getInstance());}
+        if (StringUtils.isNotEmpty(flags.getNamespace())) {body.put("namespace", flags.getNamespace());}
+
+        String basicAuth = Credentials.basic(flags.getApiKeyId(), flags.getApiKey());
+        Call<Object> homeResp = rhs.getLatestRelease(body, basicAuth);
+        return execute(homeResp);
     }
     
     
@@ -76,20 +129,11 @@ public class Library {
         
         String basicAuth = Credentials.basic(flags.getApiKeyId(), flags.getApiKey());
         Call<Map<String,ProjectMetadata>> homeResp = rhs.checkHash(body, basicAuth);
-        
-        try {
-            Response<Map<String,ProjectMetadata>> resp = homeResp.execute();
-            if (resp.isSuccessful()) {
-                log.info(resp.body().toString());
-                return resp.body().get("release");
-            } else {
-                log.error(resp.errorBody().string());
-                return null;
-            }
-        } catch (IOException e) {
-            log.error("IO exception", e);
+        Map<String,ProjectMetadata> response = execute(homeResp);
+        if (response == null) {
             return null;
         }
+        return response.get("release");
     }
     
     
@@ -207,12 +251,17 @@ public class Library {
                 return resp.body();
             } else {
                 log.error(resp.errorBody().string());
+                System.out.println(resp.code());
                 return null;
             }
         } catch (IOException e) {
             log.error("IO exception", e);
             return null;
         }
+    }
+    
+    private static boolean isNotEmpty(UUID uuid) {
+        return uuid != null && uuid.toString().length() > 0; 
     }
     
     private static boolean isNotEmpty(File file) {

@@ -39,4 +39,10 @@ public interface RHService {
     
     @GET("/api/programmatic/v1/instance/getMyFollowReleases")
     Call<List<ReleaseMetadata>> getMyRelease(@Header("Authorization") String authorization, @Query("namespace") String namespace);
+    
+    @POST("/api/programmatic/v1/release/getLatestProjectRelease")
+    Call<Object> getLatestRelease(@Body Map<String, Object> body, @Header("Authorization") String authorization);
+    
+    @PUT("/api/programmatic/v1/release/approve")
+    Call<Object> approveRelease(@Body Map<String, Object> body, @Header("Authorization") String authorization);
 }
