@@ -1,4 +1,4 @@
-package reliza.java.client;
+package reliza.java.client.responses;
 
 import java.util.List;
 import java.util.Map;
@@ -15,10 +15,10 @@ public class InstanceMetadata {
     private String uri;
     private String org;
     private Map<String, String> properties;
-    private List<Map<String, Object>> releases;
-    private String agentData;
+    private List<ReleaseDetails> releases;
+    private Object agentData;
     private String environment;
-    private List<Map<String, String>> products;
+    private List<ProductDetails> products;
     private String type;
     private String notes;
 }

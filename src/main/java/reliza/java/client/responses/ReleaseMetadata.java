@@ -1,4 +1,4 @@
-package reliza.java.client;
+package reliza.java.client.responses;
 
 import java.util.List;
 import java.util.Map;
@@ -8,10 +8,12 @@ import lombok.ToString;
 
 @Getter @ToString
 public class ReleaseMetadata {
+    //TODO Unknown response types parentReleases, optionalReleases, and agentData currently substituted by type Object
+    //All other unknown response types are either Date's or UUID's substituted by type String
     private UUID uuid;
     private String projectName;
     private String namespace;
-    private String branch;
+    private UUID branch;
     private UUID project;
     private String type;
     private String createdType;
@@ -25,10 +27,10 @@ public class ReleaseMetadata {
     private String sourceCodeEntry;
     private List<UUID> artifacts;
     private String notes;
-    private Map<String, Object> approvals;
-    private List<Map<String, String>> timing;
+    private Map<String, Boolean> approvals;
+    private List<TimingDetails> timing;
     private String endpoint;
-    private String sourceCodeEntryDetails;
-    private String vcsRepository;
-    private List<Map<String, Object>> artifactDetails;
+    private SourceCodeEntryDetails sourceCodeEntryDetails;
+    private VcsRepositoryDetails vcsRepository;
+    private List<ArtifactDetails> artifactDetails;
 }

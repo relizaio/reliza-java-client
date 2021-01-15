@@ -3,7 +3,6 @@
  */
 package reliza.java.client;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
@@ -12,32 +11,24 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 import org.apache.commons.lang3.StringUtils;
-
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import org.apache.commons.io.FileUtils;
 import lombok.extern.slf4j.Slf4j;
-import okhttp3.Credentials;
 import okhttp3.OkHttpClient;
-import okhttp3.logging.HttpLoggingInterceptor;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import retrofit2.Call;
 import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.jackson.JacksonConverterFactory;
+import reliza.java.client.interceptors.BasicAuthInterceptor;
+import reliza.java.client.responses.InstanceMetadata;
+import reliza.java.client.responses.ProjectMetadata;
+import reliza.java.client.responses.ProjectVersion;
+import reliza.java.client.responses.ReleaseMetadata;
 
 @Slf4j
-public class Library {
-    public static HttpLoggingInterceptor getClient() {
-        HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
-        logging.level(HttpLoggingInterceptor.Level.BODY);
-        return logging;
-    }
-    static HttpLoggingInterceptor dog = getClient();
-    static OkHttpClient client = new OkHttpClient.Builder().addInterceptor(dog).build();
-    
+public class Library {  
     Flags flags;
     RHService rhs;
     
@@ -45,6 +36,9 @@ public class Library {
         this.flags = flags;
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.setSerializationInclusion(JsonInclude.Include.NON_EMPTY);
+        OkHttpClient client = new OkHttpClient.Builder()
+            .addInterceptor(new BasicAuthInterceptor(flags.getApiKeyId(), flags.getApiKey()))
+            .build();
         Retrofit retrofit = new Retrofit.Builder()
             .baseUrl("https://test.relizahub.com")
             .addConverterFactory(JacksonConverterFactory.create(objectMapper))
@@ -54,45 +48,38 @@ public class Library {
     }
     
     
-    public Object approveRelease() {
+    public ReleaseMetadata approveRelease() {
         Map<String, Object> body = new HashMap<>();
         Map<String, Boolean> approvalMap = new HashMap<>();
         approvalMap.put(flags.getApprovalType(), !flags.getDisapprove());
         body.put("approvals", approvalMap);
-        if (isNotEmpty(flags.getReleaseId())) {body.put("uuid", flags.getReleaseId());}
-        if (StringUtils.isNotEmpty(flags.getReleaseVersion())) {body.put("version", flags.getReleaseVersion());}
-        if (isNotEmpty(flags.getProjectId())) {body.put("project", flags.getProjectId());}
-        System.out.println(body);
-        
-        String basicAuth = Credentials.basic(flags.getApiKeyId(), flags.getApiKey());
-        Call<Object> homeResp = rhs.getLatestRelease(body, basicAuth);
-        return execute(homeResp);
+        body.put("uuid", flags.getReleaseId());
+        body.put("version", flags.getReleaseVersion());
+        body.put("project", flags.getProjectId());    
+        Call<ReleaseMetadata> call = rhs.approveRelease(body);
+        return execute(call);
     }
     
     
-    public Object getLatestRelease() {
+    public ReleaseMetadata getLatestRelease() {
         Map<String, Object> body = new HashMap<>();
         body.put("project", flags.getProjectId());
-        if (StringUtils.isNotEmpty(flags.getEnvironment())) {body.put("environment", flags.getEnvironment());}
-        if (isNotEmpty(flags.getProduct())) {body.put("product", flags.getEnvironment());}
+        body.put("environment", flags.getEnvironment());
+        body.put("product", flags.getEnvironment());
         if (StringUtils.isNotEmpty(flags.getTagKey()) && StringUtils.isNotEmpty(flags.getTagVal())) {
-            body.put("tags", flags.getTagKey() + " " + flags.getTagVal());}
-        if (StringUtils.isNotEmpty(flags.getBranch())) {body.put("branch", flags.getBranch());}
-        if (StringUtils.isNotEmpty(flags.getInstance())) {body.put("instance", flags.getInstance());}
-        if (StringUtils.isNotEmpty(flags.getNamespace())) {body.put("namespace", flags.getNamespace());}
-
-        String basicAuth = Credentials.basic(flags.getApiKeyId(), flags.getApiKey());
-        Call<Object> homeResp = rhs.getLatestRelease(body, basicAuth);
-        return execute(homeResp);
+            body.put("tags", flags.getTagKey() + " " + flags.getTagVal());
+        }
+        body.put("branch", flags.getBranch());
+        body.put("instance", flags.getInstance());
+        body.put("namespace", flags.getNamespace());
+        Call<ReleaseMetadata> call = rhs.getLatestRelease(body);
+        return execute(call);
     }
     
     
     public List<ReleaseMetadata> getMyRelease() {
-        String basicAuth = Credentials.basic(flags.getApiKeyId(), flags.getApiKey());
-        String namespace = "";
-        if (StringUtils.isNotEmpty(flags.getNamespace())) {namespace = flags.getNamespace();}
-        Call<List<ReleaseMetadata>> homeResp = rhs.getMyRelease(basicAuth, namespace);
-        return execute(homeResp);
+        Call<List<ReleaseMetadata>> call = rhs.getMyRelease(flags.getNamespace());
+        return execute(call);
     }
     
     
@@ -100,7 +87,7 @@ public class Library {
         Map<String, Object> body = new HashMap<>();
         if (StringUtils.isNotEmpty(flags.getImageString())) {
             body.put("images", Arrays.asList(flags.getImageString().split(" ")));
-        } else if (isNotEmpty(flags.getImageFilePath())){
+        } else {
             try {
                 byte[] imageBytes = FileUtils.readFileToByteArray(flags.getImageFilePath()); 
                 body.put("images", Arrays.asList(new String(imageBytes, StandardCharsets.UTF_8).split(" ")));
@@ -111,25 +98,20 @@ public class Library {
                 log.error("NullPointerException", e);
                 return null;
             }
-        }
-        
+        }       
         body.put("timeSent", Instant.now().toString());
-        if (StringUtils.isNotEmpty(flags.getNamespace())) {body.put("namespace", flags.getNamespace());}
-        if (StringUtils.isNotEmpty(flags.getSenderId())) {body.put("senderId", flags.getSenderId());}
-        
-        String basicAuth = Credentials.basic(flags.getApiKeyId(), flags.getApiKey());
-        Call<InstanceMetadata> homeResp = rhs.instData(body, basicAuth);
-        return execute(homeResp);
+        body.put("namespace", flags.getNamespace());
+        body.put("senderId", flags.getSenderId());       
+        Call<InstanceMetadata> call = rhs.instData(body);
+        return execute(call);
     }
     
     
     public ProjectMetadata checkHash() {
         Map<String, Object> body = new HashMap<>();
-        body.put("hash", flags.getHash());
-        
-        String basicAuth = Credentials.basic(flags.getApiKeyId(), flags.getApiKey());
-        Call<Map<String,ProjectMetadata>> homeResp = rhs.checkHash(body, basicAuth);
-        Map<String,ProjectMetadata> response = execute(homeResp);
+        body.put("hash", flags.getHash());    
+        Call<Map<String,ProjectMetadata>> call = rhs.checkHash(body);
+        Map<String,ProjectMetadata> response = execute(call);
         if (response == null) {
             return null;
         }
@@ -139,29 +121,28 @@ public class Library {
     
     public ProjectMetadata addRelease() {
         Map<String, Object> body = new HashMap<>();
-        if (StringUtils.isNotEmpty(flags.getBranch())) {body.put("branch", flags.getBranch());}
-        if (StringUtils.isNotEmpty(flags.getVersion())) {body.put("version", flags.getVersion());}
-        if (StringUtils.isNotEmpty(flags.getStatus())) {body.put("status", flags.getStatus());}
-        if (StringUtils.isNotEmpty(flags.getEndPoint())) {body.put("endpoint", flags.getEndPoint());}
-        if (flags.getProjectId() != null) {body.put("project", flags.getProjectId());}
+        body.put("branch", flags.getBranch());
+        body.put("version", flags.getVersion());
+        body.put("status", flags.getStatus());
+        body.put("endpoint", flags.getEndPoint());
+        body.put("project", flags.getProjectId());
         
         if (StringUtils.isNotEmpty(flags.getCommitHash())) {
             Map<String, String> commitMap = new HashMap<>();
             commitMap.put("commit", flags.getCommitHash());
             commitMap.put("uri", flags.getVcsUri());
             commitMap.put("type", flags.getVcsType());
-            if (StringUtils.isNotEmpty(flags.getBranch())) {commitMap.put("vcsTag", flags.getVcsTag());}
-            if (StringUtils.isNotEmpty(flags.getBranch())) {commitMap.put("dateActual", flags.getDateActual());}
+            commitMap.put("vcsTag", flags.getVcsTag());
+            commitMap.put("dateActual", flags.getDateActual());
             body.put("sourceCodeEntry", commitMap);
         }
         
         if (isNotEmpty(flags.getArtId())) {
-            List<Map<String, Object>> artifacts = new ArrayList<Map<String, Object>>();
-            
+            List<Map<String, Object>> artifacts = new ArrayList<Map<String, Object>>();   
             for (int i = 0; i < flags.getArtId().size(); i++) {
                 Map<String, Object> artifact = new HashMap<>();
                 artifact.put("identifier", flags.getArtId().get(i));
-                artifacts.add(i, artifact);
+                artifacts.add(artifact);
             }
             
             Map<String, List<String>> artFlags = new HashMap<String, List<String>>();
@@ -211,37 +192,29 @@ public class Library {
                     if (isNotEmpty(tagKeys) && isNotEmpty(tagVals) && tagKeys.size() != tagVals.size()) {
                         log.error("number of keys and values per each tagval and tagkey flag must be the same");
                         return null;
-                    }
-                    
+                    }    
                     Map<String, String> tagKeyToVal = new HashMap<>();
                     for (int j = 0; j < tagKeys.size(); j++) {
                         tagKeyToVal.put(tagKeys.get(j), tagVals.get(j));
                     }
-                   
                     artifacts.get(i).put("tags", tagKeyToVal);        
                 }
-                
             }
             body.put("artifacts", artifacts);
-        }
-        
-        String basicAuth = Credentials.basic(flags.getApiKeyId(), flags.getApiKey());
-        Call<ProjectMetadata> homeResp = rhs.addRelease(body, basicAuth);
-        return execute(homeResp);
+        }   
+        Call<ProjectMetadata> call = rhs.addRelease(body);
+        return execute(call);
     }
         
     
     public ProjectVersion getVersion() {
         Map<String, Object> body = new HashMap<>();  
-        if (StringUtils.isNotEmpty(flags.getBranch())) {body.put("branch", flags.getBranch());}
-        if (StringUtils.isNotEmpty(flags.getVersionSchema())) {body.put("versionSchema", flags.getVersionSchema());}
-        if (flags.getProjectId() != null) {body.put("project", flags.getProjectId());}
-
-        String basicAuth = Credentials.basic(flags.getApiKeyId(), flags.getApiKey());
-        Call<ProjectVersion> homeResp = rhs.getVersion(body, basicAuth);
-        return execute(homeResp);
-    }
-    
+        body.put("branch", flags.getBranch());
+        body.put("versionSchema", flags.getVersionSchema());
+        body.put("project", flags.getProjectId());
+        Call<ProjectVersion> call = rhs.getVersion(body);
+        return execute(call);
+    }  
     
     private static <T> T execute(Call<T> call) {
         try {
@@ -251,7 +224,6 @@ public class Library {
                 return resp.body();
             } else {
                 log.error(resp.errorBody().string());
-                System.out.println(resp.code());
                 return null;
             }
         } catch (IOException e) {
@@ -260,14 +232,6 @@ public class Library {
         }
     }
     
-    private static boolean isNotEmpty(UUID uuid) {
-        return uuid != null && uuid.toString().length() > 0; 
-    }
-    
-    private static boolean isNotEmpty(File file) {
-        return file != null && file.getPath().length() > 0;
-    }
-
     private static <T> boolean isNotEmpty(List<T> flag) {
         return flag != null && flag.size() > 0;
     }

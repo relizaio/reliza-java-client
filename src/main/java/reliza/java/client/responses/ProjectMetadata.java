@@ -1,4 +1,4 @@
-package reliza.java.client;
+package reliza.java.client.responses;
 
 import java.util.List;
 import java.util.Map;
@@ -8,9 +8,8 @@ import lombok.ToString;
 
 @Getter @ToString
 public class ProjectMetadata {
-    // TODO Most response types currently assumed to be Strings or Objects, todo applies to all response classes
     private UUID uuid;
-    private String branch;
+    private UUID branch;
     private UUID project;
     private String type;
     private String createdType;
@@ -21,16 +20,16 @@ public class ProjectMetadata {
     private String org;
     private List<Object> parentReleases;
     private List<Object> optionalReleases;
-    private UUID sourceCodeEntry;
+    private String sourceCodeEntry;
     private List<UUID> artifacts;
     private String notes;
-    private Map<String, Object> approvals;
-    private List<Map<String, String>> timing;
+    private Map<String, Boolean> approvals;
+    private List<TimingDetails> timing;
     private String endpoint;
     private String uri;
-    private Map<String, Object> properties;
-    private List<Object> releases;
-    private String agentData;
+    private Map<String, String> properties;
+    private List<ReleaseDetails> releases;
+    private Object agentData;
     private String environment;
-    private List<String> products;
+    private List<ProductDetails> products;
 }

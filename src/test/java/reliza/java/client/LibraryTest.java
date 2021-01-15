@@ -11,7 +11,7 @@ import org.junit.Test;
 public class LibraryTest {
     @Test public void testGetProjectVersion() {    
         Flags flags = Flags.builder().apiKeyId("PROJECT__6ba5691c-05e3-4ecd-a45a-18b382419f40")
-            .apiKey("5b936c784432810f3b39a42c1d129a607bc017952beeaf22acb22f9eecae850391efafaa9ba4a396e535a745c0afd226")
+            .apiKey("0828b0fabf663fc17a604b527992965ee2abeb4831319125f1692d9ec111ea078dcc8261ed0b9aaf353ce2d003b823b7")
             .branch("ho").build();
         Library library = new Library(flags);
         library.getVersion();
@@ -19,7 +19,7 @@ public class LibraryTest {
     
     @Test public void testGetOrganizationVersion() {
         Flags flags = Flags.builder().apiKeyId("ORGANIZATION_RW__359e867c-d493-48e3-a6b5-e5a52d259265")
-                .apiKey("cd33ae31b520f3025684877ac9f4405f8d7940984548e65b30a60d719edd392feeaddf2cb9397ae6e7f67dfa7b89388e")
+                .apiKey("98b6ff3ac04df3ce5325b9a8b188a9bdafcb21a9ba220ec683d7c783235abddb1e92f600ad157ebc00aee9dab3e9fccd")
                 .branch("ho").projectId(UUID.fromString("6ba5691c-05e3-4ecd-a45a-18b382419f40")).build();
         Library library = new Library(flags);
         library.getVersion();
@@ -28,8 +28,8 @@ public class LibraryTest {
     //addRelease only goes through once for a given version
     @Test public void testAddRelease() {
         Flags flags = Flags.builder().apiKeyId("PROJECT__6ba5691c-05e3-4ecd-a45a-18b382419f40")
-          .apiKey("5b936c784432810f3b39a42c1d129a607bc017952beeaf22acb22f9eecae850391efafaa9ba4a396e535a745c0afd226")
-          .branch("ho").version("ho.31")
+          .apiKey("0828b0fabf663fc17a604b527992965ee2abeb4831319125f1692d9ec111ea078dcc8261ed0b9aaf353ce2d003b823b7")
+          .branch("ho").version("ho.36")
           .commitHash("b92b48da3779e3807862cf38d56f789e411af577").artCiMeta(Arrays.asList("Github Actions", "Github Actions"))
           .artGroup(Arrays.asList("io.reliza", "io.reliza")).artId(Arrays.asList("relizaio/reliza-cli", "relizaio/reliza-cli"))
           .artPackage(Arrays.asList("DOCKER", "DOCKER")).artPublisher(Arrays.asList("Rasa", "Rasa")).artType(Arrays.asList("Docker", "Docker"))
@@ -43,7 +43,7 @@ public class LibraryTest {
     
     @Test public void testCheckHash() {
         Flags flags = Flags.builder().apiKeyId("PROJECT__6ba5691c-05e3-4ecd-a45a-18b382419f40")
-          .apiKey("5b936c784432810f3b39a42c1d129a607bc017952beeaf22acb22f9eecae850391efafaa9ba4a396e535a745c0afd226")
+          .apiKey("0828b0fabf663fc17a604b527992965ee2abeb4831319125f1692d9ec111ea078dcc8261ed0b9aaf353ce2d003b823b7")
           .hash("sha256:2").build();        
         Library library = new Library(flags);
         library.checkHash();
@@ -51,7 +51,7 @@ public class LibraryTest {
 
     @Test public void testInstDataImageString() {
       Flags flags = Flags.builder().apiKeyId("INSTANCE__ff253dbd-9654-4a39-963b-15f16b003f61")
-          .apiKey("538ab3bc422bd214ca803c2d4d40004455be7593eb34fe55da9282d670433b38a1938f97e53d63bc220a864c052b0be8")
+          .apiKey("f6350246a5e450cf918f134435542d9af70e90d9f57d09072a5a13f464a33c2751da6c2c9a034c8dd1d7bbf5f945ac8a")
           .imageString("sha256:poke").build();
       Library library = new Library(flags);
       library.instData();
@@ -59,7 +59,7 @@ public class LibraryTest {
     
     @Test public void testInstDataImageFile() {
       Flags flags = Flags.builder().apiKeyId("INSTANCE__ff253dbd-9654-4a39-963b-15f16b003f61")
-          .apiKey("538ab3bc422bd214ca803c2d4d40004455be7593eb34fe55da9282d670433b38a1938f97e53d63bc220a864c052b0be8")
+          .apiKey("f6350246a5e450cf918f134435542d9af70e90d9f57d09072a5a13f464a33c2751da6c2c9a034c8dd1d7bbf5f945ac8a")
           .imageFilePath(new File("C:\\Users\\welli\\Documents\\Rasa.txt")).namespace("spacename").senderId("Idsender").build();
       Library library = new Library(flags);
       library.instData();
@@ -67,23 +67,23 @@ public class LibraryTest {
 
     @Test public void testGetMyRelease() {
       Flags flags = Flags.builder().apiKeyId("INSTANCE__ff253dbd-9654-4a39-963b-15f16b003f61")
-          .apiKey("538ab3bc422bd214ca803c2d4d40004455be7593eb34fe55da9282d670433b38a1938f97e53d63bc220a864c052b0be8").build();
+          .apiKey("f6350246a5e450cf918f134435542d9af70e90d9f57d09072a5a13f464a33c2751da6c2c9a034c8dd1d7bbf5f945ac8a").build();
       Library library = new Library(flags);
       library.getMyRelease();
     }
     
     @Test public void testGetLatestRelease() {
         Flags flags = Flags.builder().apiKeyId("PROJECT__6ba5691c-05e3-4ecd-a45a-18b382419f40")
-            .apiKey("5b936c784432810f3b39a42c1d129a607bc017952beeaf22acb22f9eecae850391efafaa9ba4a396e535a745c0afd226")
+            .apiKey("0828b0fabf663fc17a604b527992965ee2abeb4831319125f1692d9ec111ea078dcc8261ed0b9aaf353ce2d003b823b7")
             .projectId(UUID.fromString("6ba5691c-05e3-4ecd-a45a-18b382419f40")).branch("ho").build();
         Library library = new Library(flags);
         library.getLatestRelease();
     }
     
     @Test public void testApproveRelease() {
-        Flags flags = Flags.builder().apiKeyId("APPROVAL__dc5e0755-1286-409a-94e6-04f0690eadbb")
-            .apiKey("0ef4347fd215411d989b511a60fd99500560632cb72f93e9d04559028697e56fed9f0fed4d670c46faddd823d822f378")
-            .projectId(UUID.fromString("02a5d83a-0897-48da-9caa-378888574354")).approvalType("DEV").build();
+        Flags flags = Flags.builder().apiKeyId("APPROVAL__6b9019d6-f437-46a3-b56f-62cca6382372")
+            .apiKey("d4a2501e431f5360b0499988981401f0380869c839dcfc5363cac714f0188ddfe9fb00fdeb4f6e3248ddc5fe0a225c27")
+            .projectId(UUID.fromString("6ba5691c-05e3-4ecd-a45a-18b382419f40")).releaseVersion("ho.26").approvalType("PM").build();
         Library library = new Library(flags);
         library.approveRelease();
     }

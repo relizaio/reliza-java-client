@@ -2,10 +2,14 @@ package reliza.java.client;
 
 import java.util.List;
 import java.util.Map;
+
+import reliza.java.client.responses.InstanceMetadata;
+import reliza.java.client.responses.ProjectMetadata;
+import reliza.java.client.responses.ProjectVersion;
+import reliza.java.client.responses.ReleaseMetadata;
 import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.GET;
-import retrofit2.http.Header;
 import retrofit2.http.Headers;
 import retrofit2.http.POST;
 import retrofit2.http.PUT;
@@ -26,23 +30,23 @@ public interface RHService {
     })
 
     @POST("/api/programmatic/v1/project/getNewVersion")
-    Call<ProjectVersion> getVersion(@Body Map<String, Object> body, @Header("Authorization") String authorization);
+    Call<ProjectVersion> getVersion(@Body Map<String, Object> body);
     
     @POST("/api/programmatic/v1/release/create")
-    Call<ProjectMetadata> addRelease(@Body Map<String, Object> body, @Header("Authorization") String authorization);
+    Call<ProjectMetadata> addRelease(@Body Map<String, Object> body);
     
     @POST("/api/programmatic/v1/release/getByHash")
-    Call<Map<String, ProjectMetadata>> checkHash(@Body Map<String, Object> body, @Header("Authorization") String authorization);
+    Call<Map<String, ProjectMetadata>> checkHash(@Body Map<String, Object> body);
     
     @PUT("/api/programmatic/v1/instance/sendAgentData")
-    Call<InstanceMetadata> instData(@Body Map<String, Object> body, @Header("Authorization") String authorization);
+    Call<InstanceMetadata> instData(@Body Map<String, Object> body);
     
     @GET("/api/programmatic/v1/instance/getMyFollowReleases")
-    Call<List<ReleaseMetadata>> getMyRelease(@Header("Authorization") String authorization, @Query("namespace") String namespace);
+    Call<List<ReleaseMetadata>> getMyRelease(@Query("namespace") String namespace);
     
     @POST("/api/programmatic/v1/release/getLatestProjectRelease")
-    Call<Object> getLatestRelease(@Body Map<String, Object> body, @Header("Authorization") String authorization);
+    Call<ReleaseMetadata> getLatestRelease(@Body Map<String, Object> body);
     
     @PUT("/api/programmatic/v1/release/approve")
-    Call<Object> approveRelease(@Body Map<String, Object> body, @Header("Authorization") String authorization);
+    Call<ReleaseMetadata> approveRelease(@Body Map<String, Object> body);
 }

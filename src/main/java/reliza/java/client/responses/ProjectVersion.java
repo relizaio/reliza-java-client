@@ -1,4 +1,4 @@
-package reliza.java.client;
+package reliza.java.client.responses;
 
 import lombok.Getter;
 import lombok.ToString;
