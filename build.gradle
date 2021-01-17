@@ -10,12 +10,29 @@ plugins {
     // Apply the java-library plugin to add support for Java Library
     id 'java-library'
     id "io.freefair.lombok" version "5.3.0"
+    id 'maven-publish'
 }
 
 repositories {
     // Use jcenter for resolving dependencies.
     // You can declare any Maven/Ivy/file repository here.
     jcenter()
+}
+
+apply plugin: 'java'
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+group = 'io.reliza'
+version = '0.1.0'
+
+publishing {
+	publications {
+		relizaJavaClient(MavenPublication) {
+			from components.java
+		}
+	}
 }
 
 dependencies {
