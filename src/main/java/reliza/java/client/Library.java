@@ -11,8 +11,9 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.StringUtils;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.OkHttpClient;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -40,7 +41,7 @@ public class Library {
             .addInterceptor(new BasicAuthInterceptor(flags.getApiKeyId(), flags.getApiKey()))
             .build();
         Retrofit retrofit = new Retrofit.Builder()
-            .baseUrl("https://test.relizahub.com")
+            .baseUrl(flags.getBaseUrl())
             .addConverterFactory(JacksonConverterFactory.create(objectMapper))
             .client(client)
             .build();
@@ -66,8 +67,8 @@ public class Library {
         body.put("project", flags.getProjectId());
         body.put("environment", flags.getEnvironment());
         body.put("product", flags.getEnvironment());
-        if (StringUtils.isNotEmpty(flags.getTagKey()) && StringUtils.isNotEmpty(flags.getTagVal())) {
-            body.put("tags", flags.getTagKey() + " " + flags.getTagVal());
+        if (CollectionUtils.isNotEmpty(flags.getTagKeyArr()) && CollectionUtils.isNotEmpty(flags.getTagValArr())) {
+            body.put("tags", flags.getTagKeyArr().get(0) + " " + flags.getTagValArr().get(0));
         }
         body.put("branch", flags.getBranch());
         body.put("instance", flags.getInstance());
@@ -85,8 +86,8 @@ public class Library {
     
     public InstanceMetadata instData() {        
         Map<String, Object> body = new HashMap<>();
-        if (StringUtils.isNotEmpty(flags.getImageString())) {
-            body.put("images", Arrays.asList(flags.getImageString().split(" ")));
+        if (StringUtils.isNotEmpty(flags.getImagesString())) {
+            body.put("images", Arrays.asList(flags.getImagesString().split(" ")));
         } else {
             try {
                 byte[] imageBytes = FileUtils.readFileToByteArray(flags.getImageFilePath()); 
@@ -118,7 +119,38 @@ public class Library {
         return response.get("release");
     }
     
-    
+    /**
+     * addRelease() - method that denotes we are sending Release Metadata of a Project to Reliza Hub.
+     * apiKeyId() - flag for project api id or organization-wide read-write api id (required).
+     * apiKey() - flag for project api key or organization-wide read-write api key (required).
+     * branch() - flag to denote branch (required). If branch is not recorded yet, Reliza Hub will attempt to create it.
+     * version() - version (required). Note that Reliza Hub will reject the call if a release with this exact version is already present for this project.
+     * endPoint() - flag to denote test endpoint URI (optional). This would be useful for systems where every release gets test URI.
+     * projectId() - flag to denote project uuid (optional). Required if organization-wide read-write key is used, ignored if project specific api key is used.
+     * vcsUri() - flag to denote vcs uri (optional). Currently this flag is needed if we want to set a commit for the release. However, soon it will be needed only if the vcs uri is not yet set for the project.
+     * vcsType() - flag to denote vcs type (optional). Supported values: git, svn, mercurial. As with vcsuri, this flag is needed if we want to set a commit for the release. However, soon it will be needed only if the vcs uri is not yet set for the project.
+     * commitHash() - flag to denote vcs commit id or hash (optional). This is needed to provide source code entry metadata into the release.
+     * dateActual() - flag to denote date time with timezone when commit was made, iso strict formatting with timezone is required, i.e. for git use git log --date=iso-strict (optional).
+     * vcsTag() - flag to denote vcs tag (optional). This is needed to include vcs tag into commit, if present.
+     * status() - flag to denote release status (optional). Supply "rejected" for failed releases, otherwise "completed" is used.
+     * artId() - flag to denote artifact identifier (optional). This is required to add artifact metadata into release.
+     * artBuildId() - flag to denote artifact build id (optional). This flag is optional and may be used to indicate build system id of the release (i.e., this could be circleci build number).
+     * artCiMeta() - flag to denote artifact CI metadata (optional). This flag is optional and like artbuildid may be used to indicate build system metadata in free form.
+     * artType() - flag to denote artifact type (optional). This flag is used to denote artifact type. Types are based on CycloneDX spec. Supported values: Docker, File, Image, Font, Library, Application, Framework, OS, Device, Firmware.
+     * dateStart() - flag to denote artifact build start date and time, must conform to ISO strict date (in bash, use date -Iseconds, if used there must be one datestart flag entry per artifact, optional).
+     * dateEnd() - flag to denote artifact build end date and time, must conform to ISO strict date (in bash, use date -Iseconds, if used there must be one datestart flag entry per artifact, optional).
+     * publisher() - flag to denote artifact publisher (if used there must be one publisher flag entry per artifact, optional).
+     * version() - flag to denote artifact version if different from release version (if used there must be one publisher flag entry per artifact, optional).
+     * package() - flag to denote artifact package type according to CycloneDX spec: MAVEN, NPM, NUGET, GEM, PYPI, DOCKER (if used there must be one publisher flag entry per artifact, optional).
+     * group() - flag to denote artifact group (if used there must be one group flag entry per artifact, optional).
+     * artDigests() - flag to denote artifact digests (optional). This flag is used to indicate artifact digests. By convention, digests must be prefixed with type followed by colon and then actual digest hash,
+     *                  i.e. sha256:4e8b31b19ef16731a6f82410f9fb929da692aa97b71faeb1596c55fbf663dcdd - here type is sha256 and digest is 4e8b31b19ef16731a6f82410f9fb929da692aa97b71faeb1596c55fbf663dcdd. Multiple digests are supported and must be comma separated.
+     *                  I.e.: sha256:4e8b31b19ef16731a6f82410f9fb929da692aa97b71faeb1596c55fbf663dcdd,sha1:fe4165996a41501715ea0662b6a906b55e34a2a1
+     * tagKeyArr() - flag to denote keys of artifact tags (optional, but every tag key must have corresponding tag value). Multiple tag keys per artifact are supported and must be comma separated. I.e.:tagKeyArr(key1,key2)
+     * tagvalArr - flag to denote values of artifact tags (optional, but every tag value must have corresponding tag key). Multiple tag values per artifact are supported and must be comma separated. I.e.:tagValArr(val1,val2)
+     * Note that multiple artifacts per release are supported. In which case artifact specific flags (artid, arbuildid, artcimeta, arttype, artdigests, tagkey and tagval must be repeated for each artifact).
+     * For sample of how to use workflow in CI, refer to the GitHub Actions build yaml of this project here (https://github.com/relizaio/reliza-cli/blob/master/.github/workflows/dockerimage.yml).
+     */
     public ProjectMetadata addRelease() {
         Map<String, Object> body = new HashMap<>();
         body.put("branch", flags.getBranch());
@@ -137,7 +169,7 @@ public class Library {
             body.put("sourceCodeEntry", commitMap);
         }
         
-        if (isNotEmpty(flags.getArtId())) {
+        if (CollectionUtils.isNotEmpty(flags.getArtId())) {
             List<Map<String, Object>> artifacts = new ArrayList<Map<String, Object>>();   
             for (int i = 0; i < flags.getArtId().size(); i++) {
                 Map<String, Object> artifact = new HashMap<>();
@@ -157,39 +189,39 @@ public class Library {
             artFlags.put("dateTo", flags.getDateEnd());
 
             for (String key : artFlags.keySet()) {
-                if (isNotEmpty(artFlags.get(key)) && artFlags.get(key).size() != flags.getArtId().size()) {
+                if (CollectionUtils.isNotEmpty(artFlags.get(key)) && artFlags.get(key).size() != flags.getArtId().size()) {
                     log.error("number of art" + key.toLowerCase() + " flags must be either zero or match number of artid flags");
                     return null;
-                } else if (isNotEmpty(artFlags.get(key))) {
+                } else if (CollectionUtils.isNotEmpty(artFlags.get(key))) {
                     for (int j = 0; j < flags.getArtId().size(); j++) {
                         artifacts.get(j).put(key, artFlags.get(key).get(j));
                     }
                 }
             }
             
-            if (isNotEmpty(flags.getArtDigests()) && flags.getArtDigests().size() != flags.getArtId().size()) {
+            if (CollectionUtils.isNotEmpty(flags.getArtDigests()) && flags.getArtDigests().size() != flags.getArtId().size()) {
                 log.error("number of artdigests flags must be either zero or match number of artid flags");
                 return null;
-            } else if (isNotEmpty(flags.getArtDigests())) {
+            } else if (CollectionUtils.isNotEmpty(flags.getArtDigests())) {
                 for (int i = 0; i < flags.getArtId().size(); i++) {
                     artifacts.get(i).put("digests", Arrays.asList(flags.getArtDigests().get(i).split(",")));
                 }
             }
             
-            if (isNotEmpty(flags.getTagKeyArr()) && flags.getTagKeyArr().size() != flags.getArtId().size()) {
+            if (CollectionUtils.isNotEmpty(flags.getTagKeyArr()) && flags.getTagKeyArr().size() != flags.getArtId().size()) {
                 log.error("number of tagkey flags must be either zero or match number of artid flags");
                 return null;
-            } else if (isNotEmpty(flags.getTagValArr()) && flags.getTagValArr().size() != flags.getArtId().size()) {
+            } else if (CollectionUtils.isNotEmpty(flags.getTagValArr()) && flags.getTagValArr().size() != flags.getArtId().size()) {
                 log.error("number of tagval flags must be either zero or match number of artid flags");
                 return null;
-            } else if (isNotEmpty(flags.getTagKeyArr()) && !isNotEmpty(flags.getTagValArr())) {
+            } else if (CollectionUtils.isNotEmpty(flags.getTagKeyArr()) && CollectionUtils.isEmpty(flags.getTagValArr())) {
                 log.error("number of tagval and tagkey flags must be the same and must match number of artid flags");
                 return null;
-            } else if (isNotEmpty(flags.getTagKeyArr())) {
+            } else if (CollectionUtils.isNotEmpty(flags.getTagKeyArr())) {
                 for (int i = 0; i < flags.getTagKeyArr().size(); i++) {
                     List<String> tagKeys = Arrays.asList(flags.getTagKeyArr().get(i).split(","));
                     List<String> tagVals = Arrays.asList(flags.getTagValArr().get(i).split(","));
-                    if (isNotEmpty(tagKeys) && isNotEmpty(tagVals) && tagKeys.size() != tagVals.size()) {
+                    if (CollectionUtils.isNotEmpty(tagKeys) && CollectionUtils.isNotEmpty(tagVals) && tagKeys.size() != tagVals.size()) {
                         log.error("number of keys and values per each tagval and tagkey flag must be the same");
                         return null;
                     }    
@@ -204,9 +236,17 @@ public class Library {
         }   
         Call<ProjectMetadata> call = rhs.addRelease(body);
         return execute(call);
-    }
-        
+    }  
     
+    /**
+     * Method that denotes we are obtaining the next available release version for the branch.
+     * Note that if the call succeeds, version assignment will be recorded and not given again by Reliza Hub, even if not consumed.
+     * apiKeyId - flag for project api id (required).
+     * apiKey - flag for project api key (required).
+     * branch - flag to denote branch (required). If branch is not recorded yet, Reliza Hub will attempt to create it.
+     * projectId - flag to denote project uuid (optional). Required if organization-wide read-write key is used, ignored if project specific api key is used.
+     * versionSchema - flag to denote branch pin (optional for existing branches, required for new branches). If supplied for an existing branch and pin is different from current, it will override current pin.
+     */
     public ProjectVersion getVersion() {
         Map<String, Object> body = new HashMap<>();  
         body.put("branch", flags.getBranch());
@@ -230,9 +270,5 @@ public class Library {
             log.error("IO exception", e);
             return null;
         }
-    }
-    
-    private static <T> boolean isNotEmpty(List<T> flag) {
-        return flag != null && flag.size() > 0;
     }
 }

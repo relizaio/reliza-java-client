@@ -25,11 +25,11 @@ public interface RHService {
      */
     @Headers({
         "Content-Type: application/json",
-        "User-Agent: Reliza Go Client",
+        "User-Agent: Reliza Java Client",
         "Accept-Encoding: gzip, deflate"
     })
 
-    @POST("/api/programmatic/v1/project/getNewVersion")
+    @POST("/api/programmatic/v2/project/getNewVersion")
     Call<ProjectVersion> getVersion(@Body Map<String, Object> body);
     
     @POST("/api/programmatic/v1/release/create")
