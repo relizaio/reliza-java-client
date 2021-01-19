@@ -19,13 +19,13 @@ This use case requests Version from Reliza Hub for our project. Note that projec
 Sample method for semver version schema:
 
 ```bash
-        Flags flags = Flags.builder().apiKeyId("project_or_organization_wide_rw_api_id")
-            .apiKey("project_or_organization_wide_rw_api_key")
-            .branch("master")
-            .versionSchema("1.2.patch")
-            .build();
-        Library library = new Library(flags);
-        ProjectVersion projectVersion = library.getVersion();
+	Flags flags = Flags.builder().apiKeyId("project_or_organization_wide_rw_api_id")
+		.apiKey("project_or_organization_wide_rw_api_key")
+		.branch("master")
+		.versionSchema("1.2.patch")
+		.build();
+	Library library = new Library(flags);
+	ProjectVersion projectVersion = library.getVersion();
 ```
 
 ## 2. Use Case: Send Release Metadata to Reliza Hub
@@ -35,24 +35,24 @@ This use case is commonly used in the CI workflow to stream Release metadata to 
 Sample command to send release details:
 
 ```bash
-    Flags flags = Flags.builder().apiKeyId("project_or_organization_wide_rw_api_id")
-            .apiKey("project_or_organization_wide_rw_api_key")
-            .branch("master")
-            .version("20.02.3")
-            .vcsUri("github.com/relizaio/reliza-cli")
-            .vcsType("git")
-            .commitHash("7bfc5ce7b0da277d139f7993f90761223fa54442")
-            .vcsTag("20.02.3")
-            .artId(Arrays.asList("relizaio/reliza-cli"))
-            .artBuildId(Arrays.asList("1"))
-            .artCiMeta(Arrays.asList("Github Actions"))
-            .artType(Arrays.asList("Docker"))
-            .artDigests(Arrays.asList("sha256:4e8b31b19ef16731a6f82410f9fb929da692aa97b71faeb1596c55fbf663dcdd"))
-            .tagKeyArr(Arrays.asList("key1"))
-            .tagValArr(Arrays.asList("val1"))
-            .build();
-    Library library = new Library(Flags);
-    ProjectMetadata projectMetadata = addRelease(library);
+	Flags flags = Flags.builder().apiKeyId("project_or_organization_wide_rw_api_id")
+		.apiKey("project_or_organization_wide_rw_api_key")
+		.branch("master")
+		.version("20.02.3")
+		.vcsUri("github.com/relizaio/reliza-cli")
+		.vcsType("git")
+		.commitHash("7bfc5ce7b0da277d139f7993f90761223fa54442")
+		.vcsTag("20.02.3")
+		.artId(Arrays.asList("relizaio/reliza-cli"))
+		.artBuildId(Arrays.asList("1"))
+		.artCiMeta(Arrays.asList("Github Actions"))
+		.artType(Arrays.asList("Docker"))
+		.artDigests(Arrays.asList("sha256:4e8b31b19ef16731a6f82410f9fb929da692aa97b71faeb1596c55fbf663dcdd"))
+		.tagKeyArr(Arrays.asList("key1"))
+		.tagValArr(Arrays.asList("val1"))
+		.build();
+	Library library = new Library(Flags);
+	ProjectMetadata projectMetadata = addRelease(library);
 ```
 
 ## 3. Use Case: Check If Artifact Hash Already Present In Some Release
@@ -62,12 +62,12 @@ This is particularly useful for monorepos to see if there was a change in sub-pr
 Sample command:
 
 ```bash
-    Flags flags = Flags.builder().apiKeyId("project_api_id")
-            .apiKey("project_api_key")
-            .hash(sha256:hash)
-            .build();
-    Library library = new Library(Flags);
-    ProjectMetadata projectMetadata = checkHash(library);
+	Flags flags = Flags.builder().apiKeyId("project_api_id")
+		.apiKey("project_api_key")
+		.hash(sha256:hash)
+		.build();
+	Library library = new Library(Flags);
+	ProjectMetadata projectMetadata = checkHash(library);
 ```
 
 
@@ -79,13 +79,13 @@ Sample command:
 
 ```bash
     Flags flags = Flags.builder().apiKeyId("instance_api_id")
-            .apiKey("instance_api_key")
-            .imagesString("sha256:c10779b369c6f2638e4c7483a3ab06f13b3f57497154b092c87e1b15088027a5 sha256:e6c2bcd817beeb94f05eaca2ca2fce5c9a24dc29bde89fbf839b652824304703")
-            .namespace("default")
-            .sender("sender1")
-            .build();
-    Library library = new Library(Flags);
-    InstanceMetadata instanceMetadata = instData(library);
+		.apiKey("instance_api_key")
+		.imagesString("sha256:c10779b369c6f2638e4c7483a3ab06f13b3f57497154b092c87e1b15088027a5 sha256:e6c2bcd817beeb94f05eaca2ca2fce5c9a24dc29bde89fbf839b652824304703")
+		.namespace("default")
+		.sender("sender1")
+		.build();
+	Library library = new Library(Flags);
+	InstanceMetadata instanceMetadata = instData(library);
 ```
 
 ## 5. Use Case: Request What Releases Must Be Deployed On This Instance From Reliza Hub
@@ -95,12 +95,12 @@ This use case is when instance queries Reliza Hub to receive infromation about w
 Sample command:
 
 ```bash
-    Flags flags = Flags.builder().apiKeyId("instance_api_id")
-            .apiKey("instance_api_key")
-            .namespace("default")
-            .build();
-    Library library = new Library(Flags);
-    ReleaseMetadata releaseMetadata = getMyRelease(library);
+	Flags flags = Flags.builder().apiKeyId("instance_api_id")
+		.apiKey("instance_api_key")
+		.namespace("default")
+		.build();
+	Library library = new Library(Flags);
+	ReleaseMetadata releaseMetadata = getMyRelease(library);
 ```
 
 ## 6. Use Case: Request Latest Release Per Project Or Product
@@ -110,14 +110,14 @@ This use case is when Reliza Hub is queried either by CI or CD environment or by
 Sample command:
 
 ```bash
-    Flags flags = Flags.builder().apiKeyId("api_id")
-            .apiKey("api_key")
-            .projectId("b4534a29-3309-4074-8a3a-34c92e1a168b")
-            .branch("master")
-            .environment("TEST")
-            .build();
-    Library library = new Library(Flags);
-    ReleaseMetadata releaseMetadata = getLatestRelease(library);
+	Flags flags = Flags.builder().apiKeyId("api_id")
+		.apiKey("api_key")
+		.projectId("b4534a29-3309-4074-8a3a-34c92e1a168b")
+		.branch("master")
+		.environment("TEST")
+		.build();
+	Library library = new Library(Flags);
+	ReleaseMetadata releaseMetadata = getLatestRelease(library);
 ```
 
 ## 7. Use Case: Programmatic Approvals of Releases on Reliza Hub
@@ -127,11 +127,11 @@ This use case is for the case when we have configured an API key in Org settings
 Sample command:
 
 ```bash
-    Flags flags = Flags.builder().apiKeyId("api_id")
-            .apiKey("api_key")
-            .releaseId("release_uuid")
-            .approval("approval_type")
-            .build();
-    Library library = new Library(Flags);
-    ReleaseMetadata releaseMetadata = approveRelease(library);
+	Flags flags = Flags.builder().apiKeyId("api_id")
+		.apiKey("api_key")
+		.releaseId("release_uuid")
+		.approval("approval_type")
+		.build();
+	Library library = new Library(Flags);
+	ReleaseMetadata releaseMetadata = approveRelease(library);
 ```

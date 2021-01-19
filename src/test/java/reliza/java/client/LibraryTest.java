@@ -6,6 +6,8 @@ package reliza.java.client;
 import java.io.File;
 import java.util.Arrays;
 import java.util.UUID;
+
+import org.junit.Assert;
 import org.junit.Test;
 import reliza.java.client.responses.InstanceMetadata;
 import reliza.java.client.responses.ProjectMetadata;
@@ -15,7 +17,6 @@ import reliza.java.client.responses.ReleaseMetadata;
 /**
  * Class for testing Library.java methods
  */
-//TODO Make tests fail when http request errors instead of just logging the errors
 public class LibraryTest {
     /**
      * Test for getVersion using project api key and id
@@ -26,6 +27,7 @@ public class LibraryTest {
             .branch("ho").baseUrl("https://test.relizahub.com").build();
         Library library = new Library(flags);
         ProjectVersion projectVersion = library.getVersion();
+        Assert.assertNotNull(projectVersion);
     }
     
     /**
@@ -37,6 +39,7 @@ public class LibraryTest {
                 .branch("ho").projectId(UUID.fromString("6ba5691c-05e3-4ecd-a45a-18b382419f40")).baseUrl("https://test.relizahub.com").build();
         Library library = new Library(flags);
         ProjectVersion projectVersion = library.getVersion();
+        Assert.assertNotNull(projectVersion);
     } 
     
     /**
@@ -64,6 +67,7 @@ public class LibraryTest {
             .vcsType("git").baseUrl("https://test.relizahub.com").build();
         Library library = new Library(flags);
         ProjectMetadata projectMetadata = library.addRelease();
+        Assert.assertNotNull(projectMetadata);
     }
     
     /**
@@ -75,6 +79,7 @@ public class LibraryTest {
             .hash("sha256:2").baseUrl("https://test.relizahub.com").build();        
         Library library = new Library(flags);
         ProjectMetadata projectMetadata = library.checkHash();
+        Assert.assertNotNull(projectMetadata);
     }
     
     /**
@@ -86,6 +91,7 @@ public class LibraryTest {
           .imagesString("sha256:poke").baseUrl("https://test.relizahub.com").build();
       Library library = new Library(flags);
       InstanceMetadata instanceMetadata = library.instData();
+      Assert.assertNotNull(instanceMetadata);
     }
     
     /**
@@ -99,6 +105,7 @@ public class LibraryTest {
           .senderId("Idsender").baseUrl("https://test.relizahub.com").build();
       Library library = new Library(flags);
       InstanceMetadata instanceMetadata = library.instData();
+      Assert.assertNotNull(instanceMetadata);
     }
 
     /**
@@ -110,6 +117,7 @@ public class LibraryTest {
           .baseUrl("https://test.relizahub.com").build();
       Library library = new Library(flags);
       ReleaseMetadata releaseMetadata = library.getMyRelease();
+      Assert.assertNotNull(releaseMetadata);
     }
     
     /**
@@ -122,6 +130,7 @@ public class LibraryTest {
             .branch("ho").baseUrl("https://test.relizahub.com").build();
         Library library = new Library(flags);
         ReleaseMetadata releaseMetadata = library.getLatestRelease();
+        Assert.assertNotNull(releaseMetadata);
     }
     
     /**
@@ -135,5 +144,6 @@ public class LibraryTest {
             .approvalType("PM").baseUrl("https://test.relizahub.com").build();
         Library library = new Library(flags);
         ReleaseMetadata releaseMetadata = library.approveRelease();
+        Assert.assertNotNull(releaseMetadata);
     }
 }

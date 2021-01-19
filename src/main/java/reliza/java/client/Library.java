@@ -29,6 +29,7 @@ import reliza.java.client.responses.ProjectVersion;
 import reliza.java.client.responses.ReleaseMetadata;
 
 @Slf4j
+//TODO Return http request errors instead of just logging the errors
 public class Library {  
     Flags flags;
     RHService rhs;
