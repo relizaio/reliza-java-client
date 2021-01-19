@@ -10,6 +10,9 @@ import lombok.ToString;
 public class ReleaseMetadata {
     //TODO Unknown response types parentReleases, optionalReleases, and agentData currently substituted by type Object
     //All other unknown response types are either Date's or UUID's substituted by type String
+    /**
+     * Response class for methods getMyRelease, getLatestRelease, and approveRelease in Library.java
+     */
     private UUID uuid;
     private String projectName;
     private String namespace;

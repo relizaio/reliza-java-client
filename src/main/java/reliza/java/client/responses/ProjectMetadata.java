@@ -6,6 +6,9 @@ import java.util.UUID;
 import lombok.Getter;
 import lombok.ToString;
 
+/**
+ * Response class of methods addRelease and checkHash in Library.java
+ */
 @Getter @ToString
 public class ProjectMetadata {
     private UUID uuid;

@@ -6,6 +6,9 @@ import java.util.UUID;
 import lombok.Getter;
 import lombok.ToString;
 
+/**
+ * Response class of method instData in Library.java
+ */
 @Getter @ToString
 public class InstanceMetadata {
     private UUID uuid;

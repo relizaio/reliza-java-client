@@ -7,6 +7,11 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Singular;
 
+//lombok docs - https://projectlombok.org/features/all
+/**
+ * Class for storing all flags for use in Library.java methods
+ * Base url is https://app.relizahub.com and can be modified in builder
+ */
 @Builder @Getter
 public class Flags{
     @Builder.Default private String baseUrl =  "https://app.relizahub.com";
@@ -34,8 +39,8 @@ public class Flags{
     @Singular("dateStart") private List<String> dateStart;
     @Singular("dateEnd") private List<String> dateEnd;
     @Singular("artDigests") private List<String> artDigests;
-    @Singular("tagKeyArr") private List<String> tagKeyArr;
-    @Singular("tagValArr") private List<String> tagValArr;
+    @Singular("tagKeys") private List<String> tagKeys;
+    @Singular("tagVals") private List<String> tagVals;
     private String hash;
     private String imagesString;
     @Builder.Default File imageFilePath = new File("/resources/images.txt");

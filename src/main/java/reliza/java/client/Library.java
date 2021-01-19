@@ -33,6 +33,10 @@ public class Library {
     Flags flags;
     RHService rhs;
     
+    /**
+     * Initializing Flags and RHService to call API
+     * @param flags     Class flags which contains all the flags specified in the builder
+     */   
     public Library(Flags flags) {
         this.flags = flags;
         ObjectMapper objectMapper = new ObjectMapper();
@@ -48,7 +52,17 @@ public class Library {
         this.rhs = retrofit.create(RHService.class);
     }
     
-    
+    /**
+     * approveRelease - command that denotes that we are approving release programmatically for the specific type
+     * Must grant permission for approvalType beforehand
+     * apiKeyId - flag for api id (required).
+     * apiKey - flag for api key (required).
+     * releaseId - flag to specify release uuid, which can be obtained from the release view or programmatically (either this flag or project id and release version is required).
+     * projectId - flag to specify project uuid, which can be obtained from the project settings on Reliza Hub UI (either this flag and release version or releaseid must be provided).
+     * releaseVersion - flag to specify release string version with the project flag above (either this flag and project or releaseid must be provided).
+     * approvalType - approval type as per approval matrix on the Organization Settings page in Reliza Hub (required).
+     * disapprove - flag to indicate disapproval event instead of approval (optional).
+     */
     public ReleaseMetadata approveRelease() {
         Map<String, Object> body = new HashMap<>();
         Map<String, Boolean> approvalMap = new HashMap<>();
@@ -61,14 +75,26 @@ public class Library {
         return execute(call);
     }
     
-    
+    /**
+     * getLatestRelease - command that denotes we are requesting latest release data for Project or Product from Reliza Hub
+     * apiKeyId - flag for api id which can be either api id for this project or organization-wide read API (required).
+     * apiKey - flag for api key which can be either api key for this project or organization-wide read API (required).
+     * projectId - flag to denote UUID of specific Project or Product, UUID must be obtained from Reliza Hub (required).
+     * product - flag to denote UUID of Product which packages Project or Product for which we inquiry about its version via --project flag, UUID must be obtained from Reliza Hub (optional).
+     * branch - flag to denote required branch of chosen Project or Product (optional, if not supplied settings from Reliza Hub UI are used).
+     * environment - flag to denote environment to which release approvals should match. Environment can be one of: DEV, BUILD, TEST, SIT, UAT, PAT, STAGING, PRODUCTION. If not supplied, latest release will be returned regardless of approvals (optional).
+     * tagKeys - flag to denote tag key to use as a selector for artifact (optional, if provided tagval flag must also be supplied). Note that currently only single tag is supported.
+     * tagVals - flag to denote tag value to use as a selector for artifact (optional, if provided tagkey flag must also be supplied).
+     * instance - flag to denote specific instance for which release should match (optional, if supplied namespace flag is also used and env flag gets overrided by instance's environment).
+     * namespace - flag to denote specific namespace within instance, if instance is supplied (optional).
+     */ 
     public ReleaseMetadata getLatestRelease() {
         Map<String, Object> body = new HashMap<>();
         body.put("project", flags.getProjectId());
         body.put("environment", flags.getEnvironment());
         body.put("product", flags.getEnvironment());
-        if (CollectionUtils.isNotEmpty(flags.getTagKeyArr()) && CollectionUtils.isNotEmpty(flags.getTagValArr())) {
-            body.put("tags", flags.getTagKeyArr().get(0) + " " + flags.getTagValArr().get(0));
+        if (CollectionUtils.isNotEmpty(flags.getTagKeys()) && CollectionUtils.isNotEmpty(flags.getTagVals())) {
+            body.put("tags", flags.getTagKeys().get(0) + " " + flags.getTagVals().get(0));
         }
         body.put("branch", flags.getBranch());
         body.put("instance", flags.getInstance());
@@ -77,12 +103,31 @@ public class Library {
         return execute(call);
     }
     
-    
-    public List<ReleaseMetadata> getMyRelease() {
+    /**
+     * getMyRelease - command that denotes we are requesting release data for instance from Reliza Hub.
+     * apiKeyId - flag for instance api id (required).
+     * apiKey - flag for instance api key (required).
+     * namespace - flag to denote namespace for which we are requesting release data (optional, if not sent "default" namespace is used). Namespaces are useful to separate different products deployed on the same instance.
+     */
+    public ReleaseMetadata getMyRelease() {
         Call<List<ReleaseMetadata>> call = rhs.getMyRelease(flags.getNamespace());
-        return execute(call);
+        //TODO verify if response is supposed to be a singleton list if successful
+        List<ReleaseMetadata> response = execute(call);
+        if (response == null) {
+            return null;
+        } else {
+            return response.get(0);
+        }
     }
     
+    /**
+     * instData - command that denotes we sending digest data from instance.
+     * apiKeyId - flag for instance api id (required).
+     * apiKey - flag for instance api key (required).
+     * imagesString - flag which lists sha256 digests of images sent from the instances (required). Images must be white space separated. Note that sending full docker image URIs with digests is also accepted, i.e. it's ok to send images as relizaio/reliza-cli:latest@sha256:ebe68a0427bf88d748a4cad0a419392c75c867a216b70d4cd9ef68e8031fe7af
+     * namespace - flag to denote namespace where we are sending images (optional, if not sent "default" namespace is used). Namespaces are useful to separate different products deployed on the same instance.
+     * senderId - flag to denote unique sender within a single namespace (optional). This is useful if say there are different nodes where each streams only part of application deployment data. In this case such nodes need to use same namespace but different senders so that their data does not stomp on each other.
+     */
     
     public InstanceMetadata instData() {        
         Map<String, Object> body = new HashMap<>();
@@ -107,7 +152,12 @@ public class Library {
         return execute(call);
     }
     
-    
+    /**
+     * checkHash - command that denotes we are checking artifact hash.
+     * apiKeyId - flag for project api id (required).
+     * apiKey - flag for project api key (required).
+     * hash - flag to denote actual hash (required). By convention, hash must include hashing algorithm as its first part, i.e. sha256: or sha512:
+     */  
     public ProjectMetadata checkHash() {
         Map<String, Object> body = new HashMap<>();
         body.put("hash", flags.getHash());    
@@ -116,38 +166,40 @@ public class Library {
         if (response == null) {
             return null;
         }
+        //TODO verify if response is supposed to be a singleton map with key "release"
         return response.get("release");
     }
     
     /**
-     * addRelease() - method that denotes we are sending Release Metadata of a Project to Reliza Hub.
-     * apiKeyId() - flag for project api id or organization-wide read-write api id (required).
-     * apiKey() - flag for project api key or organization-wide read-write api key (required).
-     * branch() - flag to denote branch (required). If branch is not recorded yet, Reliza Hub will attempt to create it.
-     * version() - version (required). Note that Reliza Hub will reject the call if a release with this exact version is already present for this project.
-     * endPoint() - flag to denote test endpoint URI (optional). This would be useful for systems where every release gets test URI.
-     * projectId() - flag to denote project uuid (optional). Required if organization-wide read-write key is used, ignored if project specific api key is used.
-     * vcsUri() - flag to denote vcs uri (optional). Currently this flag is needed if we want to set a commit for the release. However, soon it will be needed only if the vcs uri is not yet set for the project.
-     * vcsType() - flag to denote vcs type (optional). Supported values: git, svn, mercurial. As with vcsuri, this flag is needed if we want to set a commit for the release. However, soon it will be needed only if the vcs uri is not yet set for the project.
-     * commitHash() - flag to denote vcs commit id or hash (optional). This is needed to provide source code entry metadata into the release.
-     * dateActual() - flag to denote date time with timezone when commit was made, iso strict formatting with timezone is required, i.e. for git use git log --date=iso-strict (optional).
-     * vcsTag() - flag to denote vcs tag (optional). This is needed to include vcs tag into commit, if present.
-     * status() - flag to denote release status (optional). Supply "rejected" for failed releases, otherwise "completed" is used.
-     * artId() - flag to denote artifact identifier (optional). This is required to add artifact metadata into release.
-     * artBuildId() - flag to denote artifact build id (optional). This flag is optional and may be used to indicate build system id of the release (i.e., this could be circleci build number).
-     * artCiMeta() - flag to denote artifact CI metadata (optional). This flag is optional and like artbuildid may be used to indicate build system metadata in free form.
-     * artType() - flag to denote artifact type (optional). This flag is used to denote artifact type. Types are based on CycloneDX spec. Supported values: Docker, File, Image, Font, Library, Application, Framework, OS, Device, Firmware.
-     * dateStart() - flag to denote artifact build start date and time, must conform to ISO strict date (in bash, use date -Iseconds, if used there must be one datestart flag entry per artifact, optional).
-     * dateEnd() - flag to denote artifact build end date and time, must conform to ISO strict date (in bash, use date -Iseconds, if used there must be one datestart flag entry per artifact, optional).
-     * publisher() - flag to denote artifact publisher (if used there must be one publisher flag entry per artifact, optional).
-     * version() - flag to denote artifact version if different from release version (if used there must be one publisher flag entry per artifact, optional).
-     * package() - flag to denote artifact package type according to CycloneDX spec: MAVEN, NPM, NUGET, GEM, PYPI, DOCKER (if used there must be one publisher flag entry per artifact, optional).
-     * group() - flag to denote artifact group (if used there must be one group flag entry per artifact, optional).
-     * artDigests() - flag to denote artifact digests (optional). This flag is used to indicate artifact digests. By convention, digests must be prefixed with type followed by colon and then actual digest hash,
+     * addRelease - method that denotes we are sending Release Metadata of a Project to Reliza Hub.
+     * Note that Reliza Hub will only send release data once per project version
+     * apiKeyId - flag for project api id or organization-wide read-write api id (required).
+     * apiKey - flag for project api key or organization-wide read-write api key (required).
+     * branch - flag to denote branch (required). If branch is not recorded yet, Reliza Hub will attempt to create it.
+     * version - version (required). Note that Reliza Hub will reject the call if a release with this exact version is already present for this project.
+     * endPoint - flag to denote test endpoint URI (optional). This would be useful for systems where every release gets test URI.
+     * projectId - flag to denote project uuid (optional). Required if organization-wide read-write key is used, ignored if project specific api key is used.
+     * vcsUri - flag to denote vcs uri (optional). Currently this flag is needed if we want to set a commit for the release. However, soon it will be needed only if the vcs uri is not yet set for the project.
+     * vcsType - flag to denote vcs type (optional). Supported values: git, svn, mercurial. As with vcsuri, this flag is needed if we want to set a commit for the release. However, soon it will be needed only if the vcs uri is not yet set for the project.
+     * commitHash - flag to denote vcs commit id or hash (optional). This is needed to provide source code entry metadata into the release.
+     * dateActual - flag to denote date time with timezone when commit was made, iso strict formatting with timezone is required, i.e. for git use git log --date=iso-strict (optional).
+     * vcsTag - flag to denote vcs tag (optional). This is needed to include vcs tag into commit, if present.
+     * status - flag to denote release status (optional). Supply "rejected" for failed releases, otherwise "completed" is used.
+     * artId - flag to denote artifact identifier (optional). This is required to add artifact metadata into release.
+     * artBuildId - flag to denote artifact build id (optional). This flag is optional and may be used to indicate build system id of the release (i.e., this could be circleci build number).
+     * artCiMeta - flag to denote artifact CI metadata (optional). This flag is optional and like artbuildid may be used to indicate build system metadata in free form.
+     * artType - flag to denote artifact type (optional). This flag is used to denote artifact type. Types are based on CycloneDX spec. Supported values: Docker, File, Image, Font, Library, Application, Framework, OS, Device, Firmware.
+     * dateStart - flag to denote artifact build start date and time, must conform to ISO strict date (in bash, use date -Iseconds, if used there must be one datestart flag entry per artifact, optional).
+     * dateEnd - flag to denote artifact build end date and time, must conform to ISO strict date (in bash, use date -Iseconds, if used there must be one datestart flag entry per artifact, optional).
+     * publisher - flag to denote artifact publisher (if used there must be one publisher flag entry per artifact, optional).
+     * version - flag to denote artifact version if different from release version (if used there must be one publisher flag entry per artifact, optional).
+     * package - flag to denote artifact package type according to CycloneDX spec: MAVEN, NPM, NUGET, GEM, PYPI, DOCKER (if used there must be one publisher flag entry per artifact, optional).
+     * group - flag to denote artifact group (if used there must be one group flag entry per artifact, optional).
+     * artDigests - flag to denote artifact digests (optional). This flag is used to indicate artifact digests. By convention, digests must be prefixed with type followed by colon and then actual digest hash,
      *                  i.e. sha256:4e8b31b19ef16731a6f82410f9fb929da692aa97b71faeb1596c55fbf663dcdd - here type is sha256 and digest is 4e8b31b19ef16731a6f82410f9fb929da692aa97b71faeb1596c55fbf663dcdd. Multiple digests are supported and must be comma separated.
      *                  I.e.: sha256:4e8b31b19ef16731a6f82410f9fb929da692aa97b71faeb1596c55fbf663dcdd,sha1:fe4165996a41501715ea0662b6a906b55e34a2a1
-     * tagKeyArr() - flag to denote keys of artifact tags (optional, but every tag key must have corresponding tag value). Multiple tag keys per artifact are supported and must be comma separated. I.e.:tagKeyArr(key1,key2)
-     * tagvalArr - flag to denote values of artifact tags (optional, but every tag value must have corresponding tag key). Multiple tag values per artifact are supported and must be comma separated. I.e.:tagValArr(val1,val2)
+     * tagKeys - flag to denote keys of artifact tags (optional, but every tag key must have corresponding tag value). Multiple tag keys per artifact are supported and must be comma separated. I.e.:tagKeyArr(key1,key2)
+     * tagVals - flag to denote values of artifact tags (optional, but every tag value must have corresponding tag key). Multiple tag values per artifact are supported and must be comma separated. I.e.:tagValArr(val1,val2)
      * Note that multiple artifacts per release are supported. In which case artifact specific flags (artid, arbuildid, artcimeta, arttype, artdigests, tagkey and tagval must be repeated for each artifact).
      * For sample of how to use workflow in CI, refer to the GitHub Actions build yaml of this project here (https://github.com/relizaio/reliza-cli/blob/master/.github/workflows/dockerimage.yml).
      */
@@ -208,26 +260,26 @@ public class Library {
                 }
             }
             
-            if (CollectionUtils.isNotEmpty(flags.getTagKeyArr()) && flags.getTagKeyArr().size() != flags.getArtId().size()) {
+            if (CollectionUtils.isNotEmpty(flags.getTagKeys()) && flags.getTagKeys().size() != flags.getArtId().size()) {
                 log.error("number of tagkey flags must be either zero or match number of artid flags");
                 return null;
-            } else if (CollectionUtils.isNotEmpty(flags.getTagValArr()) && flags.getTagValArr().size() != flags.getArtId().size()) {
+            } else if (CollectionUtils.isNotEmpty(flags.getTagVals()) && flags.getTagVals().size() != flags.getArtId().size()) {
                 log.error("number of tagval flags must be either zero or match number of artid flags");
                 return null;
-            } else if (CollectionUtils.isNotEmpty(flags.getTagKeyArr()) && CollectionUtils.isEmpty(flags.getTagValArr())) {
+            } else if (CollectionUtils.isNotEmpty(flags.getTagKeys()) && CollectionUtils.isEmpty(flags.getTagVals())) {
                 log.error("number of tagval and tagkey flags must be the same and must match number of artid flags");
                 return null;
-            } else if (CollectionUtils.isNotEmpty(flags.getTagKeyArr())) {
-                for (int i = 0; i < flags.getTagKeyArr().size(); i++) {
-                    List<String> tagKeys = Arrays.asList(flags.getTagKeyArr().get(i).split(","));
-                    List<String> tagVals = Arrays.asList(flags.getTagValArr().get(i).split(","));
-                    if (CollectionUtils.isNotEmpty(tagKeys) && CollectionUtils.isNotEmpty(tagVals) && tagKeys.size() != tagVals.size()) {
+            } else if (CollectionUtils.isNotEmpty(flags.getTagKeys())) {
+                for (int i = 0; i < flags.getTagKeys().size(); i++) {
+                    List<String> keys = Arrays.asList(flags.getTagKeys().get(i).split(","));
+                    List<String> vals = Arrays.asList(flags.getTagVals().get(i).split(","));
+                    if (CollectionUtils.isNotEmpty(keys) && CollectionUtils.isNotEmpty(vals) && keys.size() != vals.size()) {
                         log.error("number of keys and values per each tagval and tagkey flag must be the same");
                         return null;
                     }    
                     Map<String, String> tagKeyToVal = new HashMap<>();
-                    for (int j = 0; j < tagKeys.size(); j++) {
-                        tagKeyToVal.put(tagKeys.get(j), tagVals.get(j));
+                    for (int j = 0; j < keys.size(); j++) {
+                        tagKeyToVal.put(keys.get(j), vals.get(j));
                     }
                     artifacts.get(i).put("tags", tagKeyToVal);        
                 }
@@ -254,8 +306,14 @@ public class Library {
         body.put("project", flags.getProjectId());
         Call<ProjectVersion> call = rhs.getVersion(body);
         return execute(call);
-    }  
+    }
     
+    /**
+     * Method for executing call and logging results
+     * @param <T>       The response class of our call
+     * @param call      The call which we send to the API
+     * @return If call is successful return API response and return null otherwise
+     */ 
     private static <T> T execute(Call<T> call) {
         try {
             Response<T> resp = call.execute();

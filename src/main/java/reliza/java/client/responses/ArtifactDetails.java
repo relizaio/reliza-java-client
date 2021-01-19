@@ -7,6 +7,9 @@ import lombok.Getter;
 import lombok.ToString;
 
 @Getter @ToString
+/**
+ * Response subclass for ReleaseMetadata
+ */
 public class ArtifactDetails {
     private UUID uuid;
     private UUID branch;

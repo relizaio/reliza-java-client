@@ -5,6 +5,9 @@ import java.util.UUID;
 import lombok.Getter;
 import lombok.ToString;
 
+/**
+ * Response subclass for ReleaseMetadata
+ */
 @Getter @ToString
 public class VcsRepositoryDetails {
     private UUID uuid;

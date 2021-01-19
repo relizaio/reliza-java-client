@@ -5,6 +5,10 @@ import lombok.Getter;
 import lombok.ToString;
 
 @Getter @ToString
+
+/**
+ * Response subclass for ReleaseMetadata
+ */
 public class SourceCodeEntryDetails {
     private UUID uuid;
     private String createdType;

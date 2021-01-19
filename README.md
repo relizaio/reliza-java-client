@@ -47,8 +47,7 @@ Sample command to send release details:
             .artBuildId(Arrays.asList("1"))
             .artCiMeta(Arrays.asList("Github Actions"))
             .artType(Arrays.asList("Docker"))
-            .artDigests(Arrays.asList(
-                "sha256:4e8b31b19ef16731a6f82410f9fb929da692aa97b71faeb1596c55fbf663dcdd"))
+            .artDigests(Arrays.asList("sha256:4e8b31b19ef16731a6f82410f9fb929da692aa97b71faeb1596c55fbf663dcdd"))
             .tagKeyArr(Arrays.asList("key1"))
             .tagValArr(Arrays.asList("val1"))
             .build();

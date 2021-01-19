@@ -2,7 +2,6 @@ package reliza.java.client;
 
 import java.util.List;
 import java.util.Map;
-
 import reliza.java.client.responses.InstanceMetadata;
 import reliza.java.client.responses.ProjectMetadata;
 import reliza.java.client.responses.ProjectVersion;
@@ -16,13 +15,10 @@ import retrofit2.http.PUT;
 import retrofit2.http.Query;
 
 // retrofit docs - https://square.github.io/retrofit/
-
-public interface RHService {
-    
-    /**
-     * This is just to bootstrap the project - no use in real life
-     * @return
-     */
+/**
+ * Class for making http requests using retrofit
+ */
+public interface RHService {   
     @Headers({
         "Content-Type: application/json",
         "User-Agent: Reliza Java Client",
