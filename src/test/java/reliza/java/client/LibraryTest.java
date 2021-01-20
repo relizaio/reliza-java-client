@@ -15,11 +15,11 @@ import reliza.java.client.responses.ProjectVersion;
 import reliza.java.client.responses.ReleaseMetadata;
 
 /**
- * Class for testing Library.java methods
+ * Class for testing Library.java methods.
  */
 public class LibraryTest {
     /**
-     * Test for getVersion using project api key and id
+     * Test for getVersion using project api key and id.
      */
     @Test public void testGetProjectVersion() {    
         Flags flags = Flags.builder().apiKeyId("PROJECT__6ba5691c-05e3-4ecd-a45a-18b382419f40")
@@ -31,7 +31,7 @@ public class LibraryTest {
     }
     
     /**
-     * Separate test for getVersion using org wide api key and id
+     * Separate test for getVersion using org wide api key and id with project UUID.
      */
     @Test public void testGetOrganizationVersion() {
         Flags flags = Flags.builder().apiKeyId("ORGANIZATION_RW__359e867c-d493-48e3-a6b5-e5a52d259265")
@@ -43,7 +43,7 @@ public class LibraryTest {
     } 
     
     /**
-     * Test for addRelease method, can only use addRelease once per project version
+     * Test for addRelease method.
      */
     @Test public void testAddRelease() {
         Flags flags = Flags.builder().apiKeyId("PROJECT__6ba5691c-05e3-4ecd-a45a-18b382419f40")
@@ -71,7 +71,7 @@ public class LibraryTest {
     }
     
     /**
-     * Test for checkHash method
+     * Test for checkHash method.
      */
     @Test public void testCheckHash() {
         Flags flags = Flags.builder().apiKeyId("PROJECT__6ba5691c-05e3-4ecd-a45a-18b382419f40")
@@ -83,7 +83,7 @@ public class LibraryTest {
     }
     
     /**
-     * Test for instData method with an image sha256
+     * Test for instData method with an image sha256.
      */
     @Test public void testInstDataImagesString() {
       Flags flags = Flags.builder().apiKeyId("INSTANCE__ff253dbd-9654-4a39-963b-15f16b003f61")
@@ -95,7 +95,7 @@ public class LibraryTest {
     }
     
     /**
-     * Test for instData method using file path
+     * Test for instData method using file path.
      */
     @Test public void testInstDataImageFile() {
       Flags flags = Flags.builder().apiKeyId("INSTANCE__ff253dbd-9654-4a39-963b-15f16b003f61")
@@ -109,7 +109,7 @@ public class LibraryTest {
     }
 
     /**
-     * Test for getMyRelease method
+     * Test for getMyRelease method.
      */
     @Test public void testGetMyRelease() {
       Flags flags = Flags.builder().apiKeyId("INSTANCE__ff253dbd-9654-4a39-963b-15f16b003f61")
@@ -121,7 +121,7 @@ public class LibraryTest {
     }
     
     /**
-     * Test for getLatestRelease method
+     * Test for getLatestRelease method.
      */
     @Test public void testGetLatestRelease() {
         Flags flags = Flags.builder().apiKeyId("PROJECT__6ba5691c-05e3-4ecd-a45a-18b382419f40")
@@ -134,7 +134,7 @@ public class LibraryTest {
     }
     
     /**
-     * Test for approveRelease method
+     * Test for approveRelease method.
      */
     @Test public void testApproveRelease() {
         Flags flags = Flags.builder().apiKeyId("APPROVAL__6b9019d6-f437-46a3-b56f-62cca6382372")

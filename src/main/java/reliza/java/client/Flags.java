@@ -5,14 +5,14 @@ import java.util.List;
 import java.util.UUID;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.Setter;
 import lombok.Singular;
 
-//lombok docs - https://projectlombok.org/features/all
 /**
- * Class for storing all flags for use in Library.java methods
- * Base url is https://app.relizahub.com and can be modified in builder
+ * Class for storing all flags for use in Library.java methods. Base url for API calls is "https://app.relizahub.com" and can be modified in builder. <p>
+ * Class is initialized using builder pattern, see <a href="https://projectlombok.org/features/all" target="_top">https://projectlombok.org/features/all</a>.
  */
-@Builder @Getter
+@Builder @Setter @Getter
 public class Flags{
     @Builder.Default private String baseUrl =  "https://app.relizahub.com";
     private String apiKeyId;

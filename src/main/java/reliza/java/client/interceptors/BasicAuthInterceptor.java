@@ -13,16 +13,16 @@ public class BasicAuthInterceptor implements Interceptor {
     private String credentials;
 
     /**
-     * Uses apiKeyId and apiKey to create basic authentication
-     * @param apiKeyId  apiKeyId flag specified in builder
-     * @param apiKey    apiKey flag specified in builder
+     * Uses apiKeyId and apiKey to create a basic authentication string
+     * @param apiKeyId - apiKeyId flag specified in builder
+     * @param apiKey - apiKey flag specified in builder
      */
     public BasicAuthInterceptor(String apiKeyId, String apiKey) {
         this.credentials = Credentials.basic(apiKeyId, apiKey);
     }
 
     /**
-     * Method automatically called when API call is made to intercept it and put in the basic authentication
+     * Method automatically called when API call is made to intercept it and put in the basic authentication string
      */
     @Override
     public Response intercept(Chain chain) throws IOException {
