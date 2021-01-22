@@ -43,7 +43,7 @@ public class Flags{
     @Singular("tagVals") private List<String> tagVals;
     private String hash;
     private String imagesString;
-    @Builder.Default File imageFilePath = new File("/resources/images.txt");
+    @Builder.Default private File imageFilePath = new File("/resources/images.txt");
     @Builder.Default private String namespace = "default";
     @Builder.Default private String senderId = "default";
     private UUID product;

@@ -52,7 +52,7 @@ dependencies {
     
     implementation 'org.apache.commons:commons-lang3:3.0'
     
-    implementation 'commons-io:commons-io:2.6'
+    implementation 'commons-io:commons-io:2.8.0'
  
     // Use JUnit test framework
     testImplementation 'junit:junit:4.12'
