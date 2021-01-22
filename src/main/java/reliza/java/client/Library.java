@@ -248,7 +248,7 @@ public class Library {
         }       
         body.put("timeSent", Instant.now().toString());
         body.put("namespace", flags.getNamespace());
-        body.put("senderId", flags.getSenderId());       
+        body.put("senderId", flags.getSenderId());      
         Call<InstanceMetadata> call = rhs.instData(body);
         return execute(call);
     }   
@@ -261,15 +261,10 @@ public class Library {
      * @param namespace (optional, if not sent "default" namespace is used) - flag to denote namespace for which we are requesting release data. Namespaces are useful to separate different products deployed on the same instance.
      * @return returns class ReleaseMetadata if successful API call and null otherwise.
      */
-    public ReleaseMetadata getMyRelease() {
+    public List<ReleaseMetadata> getMyRelease() {
         Call<List<ReleaseMetadata>> call = rhs.getMyRelease(flags.getNamespace());
         //TODO verify if response is supposed to be a singleton list if successful
-        List<ReleaseMetadata> response = execute(call);
-        if (response == null) {
-            return null;
-        } else {
-            return response.get(0);
-        }
+        return execute(call);
     }
       
     /**

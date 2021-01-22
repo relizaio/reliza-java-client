@@ -5,8 +5,8 @@ package reliza.java.client;
 
 import java.io.File;
 import java.util.Arrays;
+import java.util.List;
 import java.util.UUID;
-
 import org.junit.Assert;
 import org.junit.Test;
 import reliza.java.client.responses.InstanceMetadata;
@@ -116,7 +116,7 @@ public class LibraryTest {
           .apiKey("f6350246a5e450cf918f134435542d9af70e90d9f57d09072a5a13f464a33c2751da6c2c9a034c8dd1d7bbf5f945ac8a")
           .baseUrl("https://test.relizahub.com").build();
       Library library = new Library(flags);
-      ReleaseMetadata releaseMetadata = library.getMyRelease();
+      List<ReleaseMetadata> releaseMetadata = library.getMyRelease();
       Assert.assertNotNull(releaseMetadata);
     }
     

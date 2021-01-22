@@ -32,7 +32,7 @@ public class ProjectMetadata {
     private String uri;
     private Map<String, String> properties;
     private List<ReleaseDetails> releases;
-    private Object agentData;
+    private String agentData;
     private String environment;
     private List<ProductDetails> products;
 }

@@ -19,7 +19,7 @@ public class InstanceMetadata {
     private String org;
     private Map<String, String> properties;
     private List<ReleaseDetails> releases;
-    private Object agentData;
+    private String agentData;
     private String environment;
     private List<ProductDetails> products;
     private String type;
