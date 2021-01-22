@@ -31,7 +31,6 @@ import reliza.java.client.responses.ReleaseMetadata;
 /**
  * Defines a library which holds all the parameters from Flags and uses it to make API calls
  */
-//TODO Return http request errors instead of just logging the errors
 @Slf4j
 public class Library {  
     Flags flags;
@@ -216,7 +215,6 @@ public class Library {
         if (response == null) {
             return null;
         }
-        //TODO verify if response is supposed to be a singleton map with key "release"
         return response.get("release");
     }  
     
@@ -263,7 +261,6 @@ public class Library {
      */
     public List<ReleaseMetadata> getMyRelease() {
         Call<List<ReleaseMetadata>> call = rhs.getMyRelease(flags.getNamespace());
-        //TODO verify if response is supposed to be a singleton list if successful
         return execute(call);
     }
       
