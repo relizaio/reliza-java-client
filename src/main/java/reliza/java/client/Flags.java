@@ -5,16 +5,18 @@ import java.util.List;
 import java.util.UUID;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.Setter;
 import lombok.Singular;
+import lombok.ToString;
 
 /**
  * Class for storing all flags for use in Library.java methods. Base url for API calls is "https://app.relizahub.com" and can be modified in builder. <p>
  * Class is initialized using builder pattern, see <a href="https://projectlombok.org/features/all" target="_top">https://projectlombok.org/features/all</a>.
  */
-@Builder @Setter @Getter
+@Builder @Setter @Getter @ToString
 public class Flags{
-    @Builder.Default private String baseUrl =  "https://app.relizahub.com";
+    @Builder.Default @NonNull private String baseUrl = "https://app.relizahub.com";
     private String apiKeyId;
     private String apiKey;
     private String branch;
@@ -43,14 +45,14 @@ public class Flags{
     @Singular("tagVals") private List<String> tagVals;
     private String hash;
     private String imagesString;
-    @Builder.Default private File imageFilePath = new File("/resources/images.txt");
-    @Builder.Default private String namespace = "default";
-    @Builder.Default private String senderId = "default";
+    @Builder.Default @NonNull private File imageFilePath = new File("/resources/images.txt");
+    @Builder.Default @NonNull private String namespace = "default";
+    @Builder.Default @NonNull private String senderId = "default";
     private UUID product;
     private String environment;
     private String instance;
     private UUID releaseId;
     private String releaseVersion;
     private String approvalType;
-    @Builder.Default private Boolean disapprove = false;
+    @Builder.Default @NonNull private Boolean disapprove = false;
 }

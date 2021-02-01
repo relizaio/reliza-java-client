@@ -35,8 +35,8 @@ public class LibraryTest {
      */
     @Test public void testGetOrganizationVersion() {
         Flags flags = Flags.builder().apiKeyId("ORGANIZATION_RW__359e867c-d493-48e3-a6b5-e5a52d259265")
-                .apiKey("98b6ff3ac04df3ce5325b9a8b188a9bdafcb21a9ba220ec683d7c783235abddb1e92f600ad157ebc00aee9dab3e9fccd")
-                .branch("ho").projectId(UUID.fromString("6ba5691c-05e3-4ecd-a45a-18b382419f40")).baseUrl("https://test.relizahub.com").build();
+            .apiKey("98b6ff3ac04df3ce5325b9a8b188a9bdafcb21a9ba220ec683d7c783235abddb1e92f600ad157ebc00aee9dab3e9fccd")
+            .branch("ho").projectId(UUID.fromString("6ba5691c-05e3-4ecd-a45a-18b382419f40")).baseUrl("https://test.relizahub.com").build();
         Library library = new Library(flags);
         ProjectVersion projectVersion = library.getVersion();
         Assert.assertNotNull(projectVersion);
