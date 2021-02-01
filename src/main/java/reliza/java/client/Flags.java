@@ -29,6 +29,7 @@ public class Flags{
     private String vcsType;
     private String vcsUri;
     private String vcsTag;
+    @Builder.Default @NonNull private Boolean manual = false;
     private String dateActual;
     @Singular("artId") private List<String> artId;
     @Singular("artBuildId") private List<String> artBuildId;

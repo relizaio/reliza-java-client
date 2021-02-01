@@ -23,6 +23,10 @@ Sample method for semver version schema:
 		.apiKey("project_or_organization_wide_rw_api_key")
 		.branch("master")
 		.versionSchema("1.2.patch")
+		.vcsType("git")
+		.commitHash(CI_COMMIT_SHA)
+		.vcsUri(CI_PROJECT_URL)
+		.date("2021-02-01T13:27:02-05:00")
 		.build();
 	Library library = new Library(flags);
 	ProjectVersion projectVersion = library.getVersion();

@@ -58,13 +58,19 @@ public class Library {
     
     /**
      * Method that denotes we are obtaining the next available release version for the branch.
-     * Note that if the call succeeds, version assignment will be recorded and not given again by Reliza Hub, even if not consumed. <p>
+     * Note that if the call succeeds, version assignment will be recorded and not given again by Reliza Hub, even if not consumed. It also creates a release in pending status.<p>
      * Method itself does not require parameters but requires that the Flags class passed during library initialization contains these parameters.
      * @param apiKeyId (required) - flag for project api id or organization-wide read-write api id.
      * @param apiKey (required) - flag for project api key or organization-wide read-write api key.
      * @param branch (required) - flag to denote branch. If branch is not recorded yet, Reliza Hub will attempt to create it.
      * @param projectId (optional) - flag to denote project uuid. Required if organization-wide read-write key is used, ignored if project specific api key is used.
      * @param versionSchema (optional for existing branches, required for new branches) - flag to denote branch versionSchema. If supplied for an existing branch and versionSchema is different from current, it will override current versionSchema.
+     * @param vcsUri (optional) - flag to denote vcs uri. Currently this flag is needed if we want to set a commit for the release. However, soon it will be needed only if the vcs uri is not yet set for the project.
+     * @param vcsType (optional) - flag to denote vcs type. Supported values: git, svn, mercurial. As with vcsuri, this flag is needed if we want to set a commit for the release. However, soon it will be needed only if the vcs uri is not yet set for the project.
+     * @param commitHash (optional) - flag to denote vcs commit id or hash. This is needed to provide source code entry metadata into the release.
+     * @param dateActual (optional) - flag to denote date time with timezone when commit was made, iso strict formatting with timezone is required, i.e. for git use git log --date=iso-strict.
+     * @param vcsTag (optional) - flag to denote vcs tag. This is needed to include vcs tag into commit, if present.
+     * @param manual (optional) - flag to indicate a manual release. Sets status as "draft", otherwise "pending" status is used.
      * @return returns class ProjectVersion if successful API call and null otherwise.
      */
     public ProjectVersion getVersion() {
@@ -72,6 +78,17 @@ public class Library {
         body.put("branch", flags.getBranch());
         body.put("versionSchema", flags.getVersionSchema());
         body.put("project", flags.getProjectId());
+        
+        if (StringUtils.isNotEmpty(flags.getCommitHash())) {
+            Map<String, String> commitMap = new HashMap<>();
+            commitMap.put("commit", flags.getCommitHash());
+            commitMap.put("uri", flags.getVcsUri());
+            commitMap.put("type", flags.getVcsType());
+            commitMap.put("vcsTag", flags.getVcsTag());
+            commitMap.put("dateActual", flags.getDateActual());
+            body.put("sourceCodeEntry", commitMap);
+        }
+        if (flags.getManual()) {body.put("status", "draft");}
         Call<ProjectVersion> call = rhs.getVersion(body);
         return execute(call);
     }  
