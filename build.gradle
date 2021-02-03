@@ -11,6 +11,8 @@ plugins {
     id 'java-library'
     id "io.freefair.lombok" version "5.3.0"
     id 'maven-publish'
+    id 'signing'
+    id 'java'
 }
 
 repositories {
@@ -19,7 +21,6 @@ repositories {
     jcenter()
 }
 
-apply plugin: 'java'
 
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
@@ -27,12 +28,57 @@ targetCompatibility = 1.8
 group = 'io.reliza'
 version = '0.1.0'
 
+java {
+    withJavadocJar()
+    withSourcesJar()
+}
+
 publishing {
 	publications {
 		relizaJavaClient(MavenPublication) {
+			artifactId = 'reliza-java-client'
 			from components.java
+            pom {
+                name = 'reliza-java-client'
+                description = 'Java Client SDK for Reliza Hub'
+                url = 'https://relizahub.com'
+                licenses {
+                    license {
+                        name = 'MIT License'
+                        url = 'https://github.com/relizaio/reliza-java-client/blob/main/LICENSE'
+                    }
+                }
+                developers {
+                    developer {
+                        id = 'Xenogents'
+                        name = 'Xenogents'
+                        email = 'info@reliza.io'
+                    }
+                    developer {
+                        id = 'taleodor'
+                        name = 'taleodor'
+                        email = 'info@reliza.io'
+                    }
+                }
+                scm {
+                    connection = 'scm:git:git://github.com/relizaio/reliza-java-client.git'
+                    developerConnection = 'scm:git:ssh://github.com/relizaio/reliza-java-client.git'
+                    url = 'https://github.com/relizaio/reliza-java-client/'
+                }
+            }
+        }
+	}
+	
+	repositories {
+		maven {
+			name = 'central'
+			url = 'https://oss.sonatype.org/service/local/staging/deploy/maven2/'
 		}
 	}
+}
+
+signing {
+    sign publishing.publications.relizaJavaClient
 }
 
 dependencies {
