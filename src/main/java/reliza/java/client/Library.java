@@ -54,7 +54,7 @@ public class Library {
             .client(client)
             .build();
         this.rhs = retrofit.create(RHService.class);
-    }   
+    }
     
     /**
      * Method that denotes we are obtaining the next available release version for the branch.
@@ -91,7 +91,7 @@ public class Library {
         if (flags.getManual()) {body.put("status", "draft");}
         Call<ProjectVersion> call = rhs.getVersion(body);
         return execute(call);
-    }  
+    }
     
     /**
      * Method that denotes we are sending Release Metadata of a Project to Reliza Hub.
@@ -182,6 +182,7 @@ public class Library {
                 return null;
             } else if (CollectionUtils.isNotEmpty(flags.getArtDigests())) {
                 for (int i = 0; i < flags.getArtId().size(); i++) {
+                    if (flags.getArtDigests().get(i) == null) { continue; }
                     artifacts.get(i).put("digests", Arrays.asList(flags.getArtDigests().get(i).split(",")));
                 }
             }
@@ -197,12 +198,13 @@ public class Library {
                 return null;
             } else if (CollectionUtils.isNotEmpty(flags.getTagKeys())) {
                 for (int i = 0; i < flags.getTagKeys().size(); i++) {
+                    if (flags.getTagKeys().get(i) == null || flags.getTagVals().get(i) == null) { continue; }
                     List<String> keys = Arrays.asList(flags.getTagKeys().get(i).split(","));
                     List<String> vals = Arrays.asList(flags.getTagVals().get(i).split(","));
                     if (CollectionUtils.isNotEmpty(keys) && CollectionUtils.isNotEmpty(vals) && keys.size() != vals.size()) {
                         log.error("number of keys and values per each tagval and tagkey flag must be the same");
                         return null;
-                    }    
+                    }
                     Map<String, String> tagKeyToVal = new HashMap<>();
                     for (int j = 0; j < keys.size(); j++) {
                         tagKeyToVal.put(keys.get(j), vals.get(j));
@@ -211,10 +213,10 @@ public class Library {
                 }
             }
             body.put("artifacts", artifacts);
-        }   
+        }
         Call<ProjectMetadata> call = rhs.addRelease(body);
         return execute(call);
-    }      
+    }
     
     /**
      * Method that denotes we are checking artifact hash. <p>
@@ -233,7 +235,7 @@ public class Library {
             return null;
         }
         return response.get("release");
-    }  
+    }
     
     /**
      * Method that denotes that we are sending digest data from instance. <p>
@@ -266,7 +268,7 @@ public class Library {
         body.put("senderId", flags.getSenderId());      
         Call<InstanceMetadata> call = rhs.instData(body);
         return execute(call);
-    }   
+    }
     
     /**
      * Method that denotes we are requesting release data for instance from Reliza Hub. <p>
