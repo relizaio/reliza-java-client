@@ -58,19 +58,19 @@ public class Library {
     
     /**
      * Method that denotes we are obtaining the next available release version for the branch.
-     * Note that if the call succeeds, version assignment will be recorded and not given again by Reliza Hub, even if not consumed. It also creates a release in pending status.<p>
-     * Method itself does not require parameters but requires that the Flags class passed during library initialization contains these parameters.
-     * @param apiKeyId (required) - flag for project api id or organization-wide read-write api id.
-     * @param apiKey (required) - flag for project api key or organization-wide read-write api key.
-     * @param branch (required) - flag to denote branch. If branch is not recorded yet, Reliza Hub will attempt to create it.
-     * @param projectId (optional) - flag to denote project uuid. Required if organization-wide read-write key is used, ignored if project specific api key is used.
-     * @param versionSchema (optional for existing branches, required for new branches) - flag to denote branch versionSchema. If supplied for an existing branch and versionSchema is different from current, it will override current versionSchema.
-     * @param vcsUri (optional) - flag to denote vcs uri. Currently this flag is needed if we want to set a commit for the release. However, soon it will be needed only if the vcs uri is not yet set for the project.
-     * @param vcsType (optional) - flag to denote vcs type. Supported values: git, svn, mercurial. As with vcsuri, this flag is needed if we want to set a commit for the release. However, soon it will be needed only if the vcs uri is not yet set for the project.
-     * @param commitHash (optional) - flag to denote vcs commit id or hash. This is needed to provide source code entry metadata into the release.
-     * @param dateActual (optional) - flag to denote date time with timezone when commit was made, iso strict formatting with timezone is required, i.e. for git use git log --date=iso-strict.
-     * @param vcsTag (optional) - flag to denote vcs tag. This is needed to include vcs tag into commit, if present.
-     * @param manual (optional) - flag to indicate a manual release. Sets status as "draft", otherwise "pending" status is used.
+     * Note that if the call succeeds, version assignment will be recorded and not given again by Reliza Hub, even if not consumed. It also creates a release in pending status. <p>
+     * Method itself does not require parameters but requires that the Flags class passed during library initialization contains these parameters. <p>
+     * - apiKeyId (required) - flag for project api id or organization-wide read-write api id. <br> 
+     * - apiKey (required) - flag for project api key or organization-wide read-write api key. <br>
+     * - branch (required) - flag to denote branch. If branch is not recorded yet, Reliza Hub will attempt to create it. <br>
+     * - projectId (optional) - flag to denote project uuid. Required if organization-wide read-write key is used, ignored if project specific api key is used. <br>
+     * - versionSchema (optional for existing branches, required for new branches) - flag to denote branch versionSchema. If supplied for an existing branch and versionSchema is different from current, it will override current versionSchema. <br>
+     * - vcsUri (optional) - flag to denote vcs uri. Currently this flag is needed if we want to set a commit for the release. However, soon it will be needed only if the vcs uri is not yet set for the project. <br>
+     * - vcsType (optional) - flag to denote vcs type. Supported values: git, svn, mercurial. As with vcsuri, this flag is needed if we want to set a commit for the release. However, soon it will be needed only if the vcs uri is not yet set for the project. <br>
+     * - commitHash (optional) - flag to denote vcs commit id or hash. This is needed to provide source code entry metadata into the release. <br>
+     * - dateActual (optional) - flag to denote date time with timezone when commit was made, iso strict formatting with timezone is required, i.e. for git use git log --date=iso-strict. <br>
+     * - vcsTag (optional) - flag to denote vcs tag. This is needed to include vcs tag into commit, if present. <br>
+     * - manual (optional) - flag to indicate a manual release. Sets status as "draft", otherwise "pending" status is used.
      * @return returns class ProjectVersion if successful API call and null otherwise.
      */
     public ProjectVersion getVersion() {
@@ -99,34 +99,34 @@ public class Library {
      * Multiple artifacts per release are supported. In which case artifact specific flags (artid, arbuildid, artcimeta, arttype, artdigests, tagkey and tagval must be repeated for each artifact). <p>
      * For sample of how to use workflow in CI, refer to the GitHub Actions build yaml of this project here
      * <a href="https://github.com/relizaio/reliza-cli/blob/master/.github/workflows/dockerimage.yml" target="_top">https://github.com/relizaio/reliza-cli/blob/master/.github/workflows/dockerimage.yml</a> <p>
-     * Method itself does not require parameters but requires that the Flags class passed during library initialization contains these parameters.
-     * @param apiKeyId (required) - flag for project api id or organization-wide read-write api id.
-     * @param apiKey (required) - flag for project api key or organization-wide read-write api key.
-     * @param branch (required) - flag to denote branch. If branch is not recorded yet, Reliza Hub will attempt to create it.
-     * @param version (required) - version. Note that Reliza Hub will reject the call if a release with this exact version is already present for this project.
-     * @param endPoint (optional) - flag to denote test endpoint URI. This would be useful for systems where every release gets test URI.
-     * @param projectId (optional) - flag to denote project uuid. Required if organization-wide read-write key is used, ignored if project specific api key is used.
-     * @param vcsUri (optional) - flag to denote vcs uri. Currently this flag is needed if we want to set a commit for the release. However, soon it will be needed only if the vcs uri is not yet set for the project.
-     * @param vcsType (optional) - flag to denote vcs type. Supported values: git, svn, mercurial. As with vcsuri, this flag is needed if we want to set a commit for the release. However, soon it will be needed only if the vcs uri is not yet set for the project.
-     * @param commitHash (optional) - flag to denote vcs commit id or hash. This is needed to provide source code entry metadata into the release.
-     * @param dateActual (optional) - flag to denote date time with timezone when commit was made, iso strict formatting with timezone is required, i.e. for git use git log --date=iso-strict.
-     * @param vcsTag (optional) - flag to denote vcs tag. This is needed to include vcs tag into commit, if present.
-     * @param status (optional) - flag to denote release status. Supply "rejected" for failed releases, otherwise "completed" is used.
-     * @param artId (optional) - flag to denote artifact identifier. This is required to add artifact metadata into release.
-     * @param artBuildId (optional) - flag to denote artifact build id. This flag is optional and may be used to indicate build system id of the release (i.e., this could be circleci build number).
-     * @param artCiMeta (optional) - flag to denote artifact CI metadata. This flag is optional and like artbuildid may be used to indicate build system metadata in free form.
-     * @param artType (optional) - flag to denote artifact type. This flag is used to denote artifact type. Types are based on CycloneDX spec. Supported values: Docker, File, Image, Font, Library, Application, Framework, OS, Device, Firmware.
-     * @param dateStart (optional, if used there must be one datestart flag entry per artifact) - flag to denote artifact build start date and time, must conform to ISO strict date, i.e. "2021-01-12T19:43:32Z".
-     * @param dateEnd (optional, if used there must be one datestart flag entry per artifact) - flag to denote artifact build end date and time, must conform to ISO strict date, i.e. "2021-01-12T19:43:32Z".
-     * @param publisher (optional, if used there must be one publisher flag entry per artifact) - flag to denote artifact publisher.
-     * @param version (optional, if used there must be one version flag entry per artifact) - flag to denote artifact version if different from release version.
-     * @param package (optional, if used there must be one package flag entry per artifact) - flag to denote artifact package type according to CycloneDX spec: MAVEN, NPM, NUGET, GEM, PYPI, DOCKER.
-     * @param group (optional, if used there must be one group flag entry per artifact) - flag to denote artifact group.
-     * @param artDigests (optional) - flag to denote artifact digests. This flag is used to indicate artifact digests. By convention, digests must be prefixed with type followed by colon and then actual digest hash, i.e.<p>
-     *                  sha256:4e8b31b19ef16731a6f82410f9fb929da692aa97b71faeb1596c55fbf663dcdd - here type is sha256 and digest is 4e8b31b19ef16731a6f82410f9fb929da692aa97b71faeb1596c55fbf663dcdd. Multiple digests are supported and must be comma separated. i.e.<p>
-     *                  sha256:4e8b31b19ef16731a6f82410f9fb929da692aa97b71faeb1596c55fbf663dcdd,sha1:fe4165996a41501715ea0662b6a906b55e34a2a1
-     * @param tagKeys (optional, but every tag key must have corresponding tag value) - flag to denote keys of artifact tags. Multiple tag keys per artifact are supported and must be comma separated. I.e.:tagKeyArr(key1,key2)
-     * @param tagVals (optional, but every tag value must have corresponding tag key) - flag to denote values of artifact tags. Multiple tag values per artifact are supported and must be comma separated. I.e.:tagValArr(val1,val2)
+     * Method itself does not require parameters but requires that the Flags class passed during library initialization contains these parameters. <p>
+     * - apiKeyId (required) - flag for project api id or organization-wide read-write api id. <br>
+     * - apiKey (required) - flag for project api key or organization-wide read-write api key. <br>
+     * - branch (required) - flag to denote branch. If branch is not recorded yet, Reliza Hub will attempt to create it. <br>
+     * - version (required) - version. Note that Reliza Hub will reject the call if a release with this exact version is already present for this project. <br>
+     * - endPoint (optional) - flag to denote test endpoint URI. This would be useful for systems where every release gets test URI. <br>
+     * - projectId (optional) - flag to denote project uuid. Required if organization-wide read-write key is used, ignored if project specific api key is used. <br>
+     * - vcsUri (optional) - flag to denote vcs uri. Currently this flag is needed if we want to set a commit for the release. However, soon it will be needed only if the vcs uri is not yet set for the project. <br>
+     * - vcsType (optional) - flag to denote vcs type. Supported values: git, svn, mercurial. As with vcsuri, this flag is needed if we want to set a commit for the release. However, soon it will be needed only if the vcs uri is not yet set for the project. <br>
+     * - commitHash (optional) - flag to denote vcs commit id or hash. This is needed to provide source code entry metadata into the release. <br>
+     * - dateActual (optional) - flag to denote date time with timezone when commit was made, iso strict formatting with timezone is required, i.e. for git use git log --date=iso-strict. <br>
+     * - vcsTag (optional) - flag to denote vcs tag. This is needed to include vcs tag into commit, if present. <br>
+     * - status (optional) - flag to denote release status. Supply "rejected" for failed releases, otherwise "completed" is used. <br>
+     * - artId (optional) - flag to denote artifact identifier. This is required to add artifact metadata into release. <br>
+     * - artBuildId (optional) - flag to denote artifact build id. This flag is optional and may be used to indicate build system id of the release (i.e., this could be circleci build number). <br>
+     * - artCiMeta (optional) - flag to denote artifact CI metadata. This flag is optional and like artbuildid may be used to indicate build system metadata in free form. <br>
+     * - artType (optional) - flag to denote artifact type. This flag is used to denote artifact type. Types are based on CycloneDX spec. Supported values: Docker, File, Image, Font, Library, Application, Framework, OS, Device, Firmware. <br>
+     * - dateStart (optional, if used there must be one datestart flag entry per artifact) - flag to denote artifact build start date and time, must conform to ISO strict date, i.e. "2021-01-12T19:43:32Z". <br>
+     * - dateEnd (optional, if used there must be one datestart flag entry per artifact) - flag to denote artifact build end date and time, must conform to ISO strict date, i.e. "2021-01-12T19:43:32Z". <br>
+     * - publisher (optional, if used there must be one publisher flag entry per artifact) - flag to denote artifact publisher. <br>
+     * - version (optional, if used there must be one version flag entry per artifact) - flag to denote artifact version if different from release version. <br>
+     * - package (optional, if used there must be one package flag entry per artifact) - flag to denote artifact package type according to CycloneDX spec: MAVEN, NPM, NUGET, GEM, PYPI, DOCKER. <br>
+     * - group (optional, if used there must be one group flag entry per artifact) - flag to denote artifact group. <br>
+     * - artDigests (optional) - flag to denote artifact digests. This flag is used to indicate artifact digests. By convention, digests must be prefixed with type followed by colon and then actual digest hash, i.e. <br>
+     *                  sha256:4e8b31b19ef16731a6f82410f9fb929da692aa97b71faeb1596c55fbf663dcdd - here type is sha256 and digest is 4e8b31b19ef16731a6f82410f9fb929da692aa97b71faeb1596c55fbf663dcdd. Multiple digests are supported and must be comma separated. i.e. <br>
+     *                  sha256:4e8b31b19ef16731a6f82410f9fb929da692aa97b71faeb1596c55fbf663dcdd,sha1:fe4165996a41501715ea0662b6a906b55e34a2a1 <br>
+     * - tagKeys (optional, but every tag key must have corresponding tag value) - flag to denote keys of artifact tags. Multiple tag keys per artifact are supported and must be comma separated. I.e.:tagKeyArr(key1,key2) <br>
+     * - tagVals (optional, but every tag value must have corresponding tag key) - flag to denote values of artifact tags. Multiple tag values per artifact are supported and must be comma separated. I.e.:tagValArr(val1,val2)
      * @return returns class ProjectMetadata if successful API call and null otherwise.
      */
     public ProjectMetadata addRelease() {
@@ -218,10 +218,10 @@ public class Library {
     
     /**
      * Method that denotes we are checking artifact hash. <p>
-     * Method itself does not require parameters but requires that the Flags class passed during library initialization contains these parameters.
-     * @param apiKeyId (required) - flag for project api id.
-     * @param apiKey (required) - flag for project api key.
-     * @param hash (required) - flag to denote actual hash. By convention, hash must include hashing algorithm as its first part, i.e. sha256: or sha512:
+     * Method itself does not require parameters but requires that the Flags class passed during library initialization contains these parameters. <p>
+     * - apiKeyId (required) - flag for project api id. <br>
+     * - apiKey (required) - flag for project api key. <br>
+     * - hash (required) - flag to denote actual hash. By convention, hash must include hashing algorithm as its first part, i.e. sha256: or sha512:
      * @return returns class ProjectMetadata if successful API call and null otherwise.
      */  
     public ProjectMetadata checkHash() {
@@ -237,12 +237,12 @@ public class Library {
     
     /**
      * Method that denotes that we are sending digest data from instance. <p>
-     * Method itself does not require parameters but requires that the Flags class passed during library initialization contains these parameters.
-     * @param apiKeyId (required) - flag for instance api id.
-     * @param apiKey (required) - flag for instance api key.
-     * @param imagesString (required) - flag which lists sha256 digests of images sent from the instances. Images must be white space separated. Note that sending full docker image URIs with digests is also accepted, i.e. it's ok to send images as relizaio/reliza-cli:latest@sha256:ebe68a0427bf88d748a4cad0a419392c75c867a216b70d4cd9ef68e8031fe7af
-     * @param namespace (optional, if not sent "default" namespace is used) - flag to denote namespace where we are sending images. Namespaces are useful to separate different products deployed on the same instance.
-     * @param senderId (optional) - flag to denote unique sender within a single namespace. This is useful if say there are different nodes where each streams only part of application deployment data. In this case such nodes need to use same namespace but different senders so that their data does not stomp on each other.
+     * Method itself does not require parameters but requires that the Flags class passed during library initialization contains these parameters. <p>
+     * - apiKeyId (required) - flag for instance api id. <br>
+     * - apiKey (required) - flag for instance api key. <br>
+     * - imagesString (required) - flag which lists sha256 digests of images sent from the instances. Images must be white space separated. Note that sending full docker image URIs with digests is also accepted, i.e. it's ok to send images as relizaio/reliza-cli:latest@sha256:ebe68a0427bf88d748a4cad0a419392c75c867a216b70d4cd9ef68e8031fe7af  <br>
+     * - namespace (optional, if not sent "default" namespace is used) - flag to denote namespace where we are sending images. Namespaces are useful to separate different products deployed on the same instance. <br>
+     * - senderId (optional) - flag to denote unique sender within a single namespace. This is useful if say there are different nodes where each streams only part of application deployment data. In this case such nodes need to use same namespace but different senders so that their data does not stomp on each other. <br>
      * @return returns class InstanceMetadata if successful API call and null otherwise.
      */ 
     public InstanceMetadata instData() {        
@@ -270,10 +270,10 @@ public class Library {
     
     /**
      * Method that denotes we are requesting release data for instance from Reliza Hub. <p>
-     * Method itself does not require parameters but requires that the Flags class passed during library initialization contains these parameters.
-     * @param apiKeyId (required) - flag for instance api id.
-     * @param apiKey (required) - flag for instance api key.
-     * @param namespace (optional, if not sent "default" namespace is used) - flag to denote namespace for which we are requesting release data. Namespaces are useful to separate different products deployed on the same instance.
+     * Method itself does not require parameters but requires that the Flags class passed during library initialization contains these parameters. <p>
+     * - apiKeyId (required) - flag for instance api id. <br>
+     * - apiKey (required) - flag for instance api key. <br>
+     * - namespace (optional, if not sent "default" namespace is used) - flag to denote namespace for which we are requesting release data. Namespaces are useful to separate different products deployed on the same instance.
      * @return returns class ReleaseMetadata if successful API call and null otherwise.
      */
     public List<ReleaseMetadata> getMyRelease() {
@@ -283,17 +283,17 @@ public class Library {
       
     /**
      * Method that denotes we are requesting latest release data for Project or Product from Reliza Hub. <p>
-     * Method itself does not require parameters but requires that the Flags class passed during library initialization contains these parameters.
-     * @param apiKeyId (required) - flag for api id which can be either api id for this project or organization-wide read API.
-     * @param apiKey (required) - flag for api key which can be either api key for this project or organization-wide read API.
-     * @param projectId (required) - flag to denote UUID of specific Project or Product, UUID must be obtained from Reliza Hub.
-     * @param product (optional) - flag to denote UUID of Product which packages Project or Product for which we inquiry about its version via --project flag, UUID must be obtained from Reliza Hub.
-     * @param branch (optional, if not supplied settings from Reliza Hub UI are used) - flag to denote required branch of chosen Project or Product.
-     * @param environment (optional) - flag to denote environment to which release approvals should match. Environment can be one of: DEV, BUILD, TEST, SIT, UAT, PAT, STAGING, PRODUCTION. If not supplied, latest release will be returned regardless of approvals.
-     * @param tagKeys (optional, if provided tagval flag must also be supplied) - flag to denote tag key to use as a selector for artifact. Note that currently only single tag is supported.
-     * @param tagVals (optional, if provided tagkey flag must also be supplied) - flag to denote tag value to use as a selector for artifact.
-     * @param instance (optional, if supplied namespace flag is also used and env flag gets overrided by instance's environment) - flag to denote specific instance for which release should match.
-     * @param namespace (optional) - flag to denote specific namespace within instance, if instance is supplied.
+     * Method itself does not require parameters but requires that the Flags class passed during library initialization contains these parameters. <p>
+     * - apiKeyId (required) - flag for api id which can be either api id for this project or organization-wide read API. <br>
+     * - apiKey (required) - flag for api key which can be either api key for this project or organization-wide read API. <br>
+     * - projectId (required) - flag to denote UUID of specific Project or Product, UUID must be obtained from Reliza Hub. <br>
+     * - product (optional) - flag to denote UUID of Product which packages Project or Product for which we inquiry about its version via --project flag, UUID must be obtained from Reliza Hub. <br>
+     * - branch (optional, if not supplied settings from Reliza Hub UI are used) - flag to denote required branch of chosen Project or Product. <br>
+     * - environment (optional) - flag to denote environment to which release approvals should match. Environment can be one of: DEV, BUILD, TEST, SIT, UAT, PAT, STAGING, PRODUCTION. If not supplied, latest release will be returned regardless of approvals. <br>
+     * - tagKeys (optional, if provided tagval flag must also be supplied) - flag to denote tag key to use as a selector for artifact. Note that currently only single tag is supported. <br>
+     * - tagVals (optional, if provided tagkey flag must also be supplied) - flag to denote tag value to use as a selector for artifact. <br>
+     * - instance (optional, if supplied namespace flag is also used and env flag gets overrided by instance's environment) - flag to denote specific instance for which release should match. <br>
+     * - namespace (optional) - flag to denote specific namespace within instance, if instance is supplied.
      * @return returns class ReleaseMetadata if successful API call and null otherwise.
      */ 
     public ReleaseMetadata getLatestRelease() {
@@ -313,14 +313,14 @@ public class Library {
     
     /**
      * Method that denotes that we are approving release programmatically for the specific type. Must grant permission for approvalType beforehand. <p>
-     * Method itself does not require parameters but requires that the Flags class passed during library initialization contains these parameters.
-     * @param apiKeyId (required) - flag for api id.
-     * @param apiKey (required) - flag for api key.
-     * @param releaseId (either this flag or project id and release version is required) - flag to specify release uuid, which can be obtained from the release view or programmatically.
-     * @param projectId (either this flag and release version or releaseid must be provided) - flag to specify project uuid, which can be obtained from the project settings on Reliza Hub UI.
-     * @param releaseVersion (either this flag and project or releaseid must be provided) - flag to specify release string version with the project flag above.
-     * @param approvalType (required) - approval type as per approval matrix on the Organization Settings page in Reliza Hub.
-     * @param disapprove (optional) - flag to indicate disapproval event instead of approval.
+     * Method itself does not require parameters but requires that the Flags class passed during library initialization contains these parameters. <p>
+     * - apiKeyId (required) - flag for api id. <br>
+     * - apiKey (required) - flag for api key. <br>
+     * - releaseId (either this flag or project id and release version is required) - flag to specify release uuid, which can be obtained from the release view or programmatically. <br>
+     * - projectId (either this flag and release version or releaseid must be provided) - flag to specify project uuid, which can be obtained from the project settings on Reliza Hub UI. <br>
+     * - releaseVersion (either this flag and project or releaseid must be provided) - flag to specify release string version with the project flag above. <br>
+     * - approvalType (required) - approval type as per approval matrix on the Organization Settings page in Reliza Hub. <br>
+     * - disapprove (optional) - flag to indicate disapproval event instead of approval.
      * @return returns class ReleaseMetadata if successful API call and null otherwise.
      */
     public ReleaseMetadata approveRelease() {
