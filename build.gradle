@@ -36,10 +36,10 @@ java {
 }
 
 publishing {
-	publications {
-		relizaJavaClient(MavenPublication) {
-			artifactId = 'reliza-java-client'
-			from components.java
+    publications {
+        relizaJavaClient(MavenPublication) {
+            artifactId = 'reliza-java-client'
+            from components.java
             pom {
                 name = 'reliza-java-client'
                 description = 'Java Client SDK for Reliza Hub'
@@ -69,18 +69,18 @@ publishing {
                 }
             }
         }
-	}
-	
-	repositories {
-		maven {
-			name = 'central'
-			url = 'https://oss.sonatype.org/service/local/staging/deploy/maven2/'
-		}
-	}
+    }
+    
+    repositories {
+        maven {
+            name = 'central'
+            url = 'https://oss.sonatype.org/service/local/staging/deploy/maven2/'
+        }
+    }
 }
 
 signing {
-	required { isReleaseVersion && gradle.taskGraph.hasTask("publish") }
+    required { isReleaseVersion && gradle.taskGraph.hasTask("publish") }
     sign publishing.publications.relizaJavaClient
 }
 

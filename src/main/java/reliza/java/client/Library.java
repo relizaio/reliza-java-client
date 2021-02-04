@@ -165,7 +165,7 @@ public class Library {
             artFlags.put("group", flags.getArtGroup());
             artFlags.put("dateFrom", flags.getDateStart());
             artFlags.put("dateTo", flags.getDateEnd());
-
+            
             for (String key : artFlags.keySet()) {
                 if (CollectionUtils.isNotEmpty(artFlags.get(key)) && artFlags.get(key).size() != flags.getArtId().size()) {
                     log.error("number of art" + key.toLowerCase() + " flags must be either zero or match number of artid flags");
@@ -282,7 +282,7 @@ public class Library {
         Call<List<ReleaseMetadata>> call = rhs.getMyRelease(flags.getNamespace());
         return execute(call);
     }
-      
+    
     /**
      * Method that denotes we are requesting latest release data for Project or Product from Reliza Hub. <p>
      * Method itself does not require parameters but requires that the Flags class passed during library initialization contains these parameters. <p>
@@ -336,7 +336,7 @@ public class Library {
         Call<ReleaseMetadata> call = rhs.approveRelease(body);
         return execute(call);
     }
-        
+    
     /**
      * Method for executing call and logging results
      * @param <T> - The response class of our call.
