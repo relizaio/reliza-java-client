@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.OkHttpClient;
@@ -251,9 +251,9 @@ public class Library {
         Map<String, Object> body = new HashMap<>();
         if (StringUtils.isNotEmpty(flags.getImagesString())) {
             body.put("images", Arrays.asList(flags.getImagesString().split(" ")));
-        } else {
+        } else if (flags.getImageInputStream() != null) {
             try {
-                byte[] imageBytes = FileUtils.readFileToByteArray(flags.getImageFilePath());
+                byte[] imageBytes = IOUtils.toByteArray(flags.getImageInputStream());
                 body.put("images", Arrays.asList(new String(imageBytes, StandardCharsets.UTF_8).split(" ")));
             } catch (IOException e) {
                 log.error("IO exception", e);
@@ -331,7 +331,7 @@ public class Library {
         approvalMap.put(flags.getApprovalType(), !flags.getDisapprove());
         body.put("approvals", approvalMap);
         body.put("uuid", flags.getReleaseId());
-        body.put("version", flags.getReleaseVersion());
+        body.put("version", flags.getVersion());
         body.put("project", flags.getProjectId());
         Call<ReleaseMetadata> call = rhs.approveRelease(body);
         return execute(call);

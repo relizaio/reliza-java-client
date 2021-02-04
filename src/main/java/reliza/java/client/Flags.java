@@ -1,6 +1,7 @@
 package reliza.java.client;
 
 import java.io.File;
+import java.io.InputStream;
 import java.util.List;
 import java.util.UUID;
 
@@ -47,14 +48,13 @@ public class Flags{
     @Singular("tagVals") private List<String> tagVals;
     private String hash;
     private String imagesString;
-    @Builder.Default @NonNull private File imageFilePath = new File("/resources/images.txt");
+    private InputStream imageInputStream;
     @Builder.Default @NonNull private String namespace = "default";
     @Builder.Default @NonNull private String senderId = "default";
     private UUID product;
     private String environment;
     private String instance;
     private UUID releaseId;
-    private String releaseVersion;
     private String approvalType;
     @Builder.Default @NonNull private Boolean disapprove = false;
 }
