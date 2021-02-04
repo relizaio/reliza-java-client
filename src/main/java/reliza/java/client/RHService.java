@@ -2,10 +2,12 @@ package reliza.java.client;
 
 import java.util.List;
 import java.util.Map;
+
 import reliza.java.client.responses.InstanceMetadata;
 import reliza.java.client.responses.ProjectMetadata;
 import reliza.java.client.responses.ProjectVersion;
 import reliza.java.client.responses.ReleaseMetadata;
+
 import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.GET;
