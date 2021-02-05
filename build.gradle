@@ -26,7 +26,7 @@ sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
 group = 'io.reliza'
-version = '0.1.0-SNAPSHOT'
+version = '0.1.3-SNAPSHOT'
 
 ext.isReleaseVersion = !version.endsWith("SNAPSHOT")
 
@@ -53,12 +53,12 @@ publishing {
                 developers {
                     developer {
                         id = 'Xenogents'
-                        name = 'Xenogents'
+                        name = 'Rasa Rahnema'
                         email = 'info@reliza.io'
                     }
                     developer {
                         id = 'taleodor'
-                        name = 'taleodor'
+                        name = 'Pavel Shukhman'
                         email = 'info@reliza.io'
                     }
                 }
@@ -75,8 +75,13 @@ publishing {
         maven {
             name = 'central'
             url = 'https://oss.sonatype.org/service/local/staging/deploy/maven2/'
+            credentials {
+                username "$centralUser"
+                password "$centralPassword"
+            }
         }
     }
+
 }
 
 signing {

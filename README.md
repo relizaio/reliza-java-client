@@ -12,6 +12,13 @@ To build and publish to local Maven Repository, use:
 gradle publishToMavenLocal
 ```
 
+### Publishing to Maven Central
+To build and publish to Maven Central Repository, use:
+
+```
+gradle publishAllPublicationsToCentralRepository -PcentralUser=username -PcentralPassword=password
+```
+
 ## 1. Use Case: Get Version Assignment From Reliza Hub
 
 This use case requests Version from Reliza Hub for our project. Note that project schema must be preset on Reliza Hub prior to using this API. API key must also be generated for the project from Reliza Hub.
