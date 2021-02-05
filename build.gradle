@@ -26,9 +26,16 @@ sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
 group = 'io.reliza'
-version = '0.1.3-SNAPSHOT'
+version = '0.1.5-SNAPSHOT'
 
 ext.isReleaseVersion = !version.endsWith("SNAPSHOT")
+
+if (!project.hasProperty("centralUser")) {
+    ext.centralUser = 'test'
+}
+if (!project.hasProperty("centralPassword")) {
+    ext.centralPassword = 'test'
+}
 
 java {
     withJavadocJar()
