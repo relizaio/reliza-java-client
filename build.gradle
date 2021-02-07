@@ -26,7 +26,7 @@ sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
 group = 'io.reliza'
-version = '0.1.5-SNAPSHOT'
+version = '0.1.7'
 
 ext.isReleaseVersion = !version.endsWith("SNAPSHOT")
 
@@ -93,6 +93,10 @@ publishing {
 
 signing {
     required { isReleaseVersion && gradle.taskGraph.hasTask("publish") }
+    // def signingKeyId = findProperty("signingKeyId")
+    def signingKey = GPG_SIGNING_KEY
+    def signingPassword = GPG_SIGNING_PASSWORD
+    useInMemoryPgpKeys(signingKey, signingPassword)
     sign publishing.publications.relizaJavaClient
 }
 
