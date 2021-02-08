@@ -45,7 +45,7 @@ public class LibraryTest {
         ProjectVersion projectVersion = getVersionLibrary.getVersion();
         Assert.assertNotNull(projectVersion);
     }
-
+    
     /**
      * Test for setting a new release and pushing project details.
      */
@@ -121,7 +121,7 @@ public class LibraryTest {
       InstanceMetadata instanceMetadata = library.instData();
       Assert.assertNotNull(instanceMetadata);
     }
-
+    
     /**
      * Test for getMyRelease method.
      */

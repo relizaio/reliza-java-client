@@ -26,7 +26,7 @@ public interface RHService {
         "User-Agent: Reliza Java Client",
         "Accept-Encoding: gzip, deflate"
     })
-
+    
     /**
      * POST request corresponding to getVersion method.
      * @param body - request payload.
