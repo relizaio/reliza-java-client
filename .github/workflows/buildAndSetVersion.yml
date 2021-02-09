@@ -21,4 +21,4 @@ jobs:
         echo "RLZ_SHORT_VER=$short_ver" >> $GITHUB_ENV
         echo $full_ver
         echo $short_ver
-        echo $GITHUB_ENV
+        cat $GITHUB_ENV
