@@ -9,5 +9,7 @@ jobs:
     - name: Get version
       run: |
         reliza_ver=$(docker run --rm relizaio/reliza-cli getversion -i PROJECT__8d06445c-fc02-4748-9eda-a8822082c539 -k f7db60e1e6521c5558ab62fe8234765b3496a1410e98ca89b327bbcf6bf70f4d540673f195f15c5d0f5d3720f97760bb -b master)
+        full_ver=$(echo reliza_ver | jq -r ".version")
         echo "completed getting ver"
         echo $reliza_ver
+        echo $full_ver
