@@ -23,6 +23,8 @@ jobs:
         gradle printVersion
     - name: Commit and push
       run: |
+        git config --global user.name 'RelizaBot'
+        git config --global user.email 'info@reliza.io'
         git commit -am "chore: update project version to $RLZ_FULL_VER"
         git push
         
