@@ -19,5 +19,9 @@ jobs:
         echo $full_ver
     - name: Set build.gradle version
       run: |
-        gradle changeVersion -Pversion="BONGO"
+        gradle changeVersion -Pversion="$RLZ_FULL_VER"
         gradle printVersion
+        gradle printVersion
+        gradle printVersion
+        gradle printVersion
+        
