@@ -103,14 +103,14 @@ publishing {
 
 }
 
-signing {
-    required { isReleaseVersion && gradle.taskGraph.hasTask("publish") }
+//signing {
+    //required { isReleaseVersion && gradle.taskGraph.hasTask("publish") }
     // def signingKeyId = findProperty("signingKeyId")
-    def signingKey = GPG_SIGNING_KEY
-    def signingPassword = GPG_SIGNING_PASSWORD
-    useInMemoryPgpKeys(signingKey, signingPassword)
-    sign publishing.publications.relizaJavaClient
-}
+    //def signingKey = GPG_SIGNING_KEY
+    //def signingPassword = GPG_SIGNING_PASSWORD
+    //useInMemoryPgpKeys(signingKey, signingPassword)
+    //sign publishing.publications.relizaJavaClient
+//}
 
 dependencies {
     // This dependency is exported to consumers, that is to say found on their compile classpath.
