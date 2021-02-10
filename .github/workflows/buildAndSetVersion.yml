@@ -19,5 +19,6 @@ jobs:
         echo $full_ver
     - name: Set build.gradle version
       run: |
+        echo $full_ver
         gradle changeVersion -Pversion="$full_ver"
         gradle printVersion
