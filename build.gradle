@@ -26,7 +26,19 @@ sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
 group = 'io.reliza'
-version = '0.1.8-SNAPSHOT'
+task changeVersion {
+    doLast {
+        Properties props = new Properties()
+        File propsFile = new File('gradle.properties')
+        props.load(propsFile.newDataInputStream())
+        props.setProperty('version', project.version)
+        props.store(propsFile.newWriter(), null)
+    }
+}
+
+task printVersion {
+  println project.version
+}
 
 ext.isReleaseVersion = !version.endsWith("SNAPSHOT")
 

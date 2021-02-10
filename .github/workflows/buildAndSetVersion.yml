@@ -15,10 +15,9 @@ jobs:
     - name: Extract Actual Version From JSON
       run: |
         full_ver=$(echo $RLZ_VER_JSON | jq -r ".version")
-        # version without meta for docker registry, since plus sign is not allowed there
-        short_ver=$(echo $RLZ_VER_JSON | jq -r ".dockerTagSafeVersion")
         echo "RLZ_FULL_VER=$full_ver" >> $GITHUB_ENV
-        echo "RLZ_SHORT_VER=$short_ver" >> $GITHUB_ENV
         echo $full_ver
-        echo $short_ver
-        cat $GITHUB_ENV
+    - name: Set build.gradle version
+      run: |
+        gradle changeVersion -Pversion=$full_ver
+        gradle printVersion
