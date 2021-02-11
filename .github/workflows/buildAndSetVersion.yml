@@ -21,7 +21,6 @@ jobs:
     - name: Set build.gradle version
       run: |
         gradle changeVersion -Pversion="$RLZ_FULL_VER"
-        gradle printVersion
     - name: Commit and push
       run: |
         git config --global user.name 'Reliza'
