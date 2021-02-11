@@ -20,12 +20,12 @@ jobs:
         echo $full_ver
     - name: Set build.gradle version
       run: |
-        gradle changeVersion -Pversion="$RLZ_FULL_VER"
+        gradle changeVersion -Pversion="${RLZ_FULL_VER}-SNAPSHOT"
     - name: Commit and push
       run: |
         git config --global user.name 'Reliza'
         git config --global user.email 'info@reliza.io'
-        git commit -am "chore: update project version to $RLZ_FULL_VER"
+        git commit -am "chore: update project version to ${RLZ_FULL_VER}-SNAPSHOT"
         git push
     - name: Run tests
       run: gradle test
