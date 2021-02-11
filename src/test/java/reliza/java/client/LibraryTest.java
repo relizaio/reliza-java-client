@@ -25,7 +25,7 @@ public class LibraryTest {
     private final String TEST_PROJECT_API_ID = "PROJECT__b4d6324f-4985-49a8-afba-bdcffec32b03";
     private final String TEST_PROJECT_API_KEY = "1367ff3aa5a38ef626607a7b38613e4913ac732775444a26db4bc6d8344ad626aab1f7801ff9b51a8cd76a2dd61d8dc4";
     private final String TEST_ORG_API_ID = "ORGANIZATION_RW__cb78b7e4-f38e-4b6f-b92d-214b0626e497";
-    private final String TEST_ORG_API_KEY= "1b576f5836923017f23b37a28ec6ea314e46b0c6ac721b5c884d4d535c61485b4f518eea11e9a34704a58d807ac214d4";
+    private final String TEST_ORG_API_KEY = "1b576f5836923017f23b37a28ec6ea314e46b0c6ac721b5c884d4d535c61485b4f518eea11e9a34704a58d807ac214d4";
     private final String TEST_INSTANCE_API_ID = "INSTANCE__a4b578b7-9094-4f81-a9dd-dc3116384300";
     private final String TEST_INSTANCE_API_KEY = "59cea9abbf10c24c500072274816cbe53da2c5344a414490047d8967276aa56cf02ee750c3b4ae7ac2075497e378f1cf";
     private final String TEST_APPROVAL_API_ID = "APPROVAL__dad681e9-c4f8-4631-b299-c852e1975392";
