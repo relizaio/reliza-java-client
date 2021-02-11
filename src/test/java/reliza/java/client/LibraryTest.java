@@ -35,7 +35,7 @@ public class LibraryTest {
      * Test for getVersion using org wide api key and id
      */
     @Test public void testGetVersion() {
-          Flags getVersionFlags = Flags.builder().apiKeyId(TEST_ORG_API_ID)
+          Flags getVersionFlags = Flags.builder().apiKeyId("")
               .apiKey(TEST_ORG_API_KEY)
               .branch("master")
               .projectId(UUID.fromString(TEST_PROJECT_UUID))
