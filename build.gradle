@@ -36,10 +36,6 @@ task changeVersion {
     }
 }
 
-task printVersion {
-  println project.version
-}
-
 ext.isReleaseVersion = !version.endsWith("SNAPSHOT")
 
 if (!project.hasProperty("centralUser")) {
