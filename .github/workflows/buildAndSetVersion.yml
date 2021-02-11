@@ -31,7 +31,7 @@ jobs:
       run: gradle test
       continue-on-error: true
     - name: If tests fail
-      if: ${{ failure() }}
+      if: ${{ success() }}
       run: echo "--status rejected " > reliza_command
     - name: Send release metadata
       run: |
