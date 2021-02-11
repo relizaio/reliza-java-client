@@ -29,7 +29,6 @@ jobs:
         git push
     - name: Run tests
       run: gradle test
-      continue-on-error: true
     - name: If tests fail
       if: failure()
       run: echo "--status rejected " > reliza_command
