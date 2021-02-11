@@ -23,7 +23,7 @@ jobs:
         gradle changeVersion -Pversion="${RLZ_FULL_VER}-SNAPSHOT"
     - name: Commit and push
       run: |
-        git config --global user.name 'Reliza'
+        git config --global user.name 'reliza-auto'
         git config --global user.email 'info@reliza.io'
         git commit -am "chore: update project version to ${RLZ_FULL_VER}-SNAPSHOT"
         git push
