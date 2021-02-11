@@ -40,7 +40,7 @@ jobs:
         -b $GITHUB_REF --vcstype git --date $(git log -1 --date=iso-strict --pretty="%ad") --commit $(git rev-parse HEAD)
         --vcsuri github.com/$GITHUB_REPOSITORY -v $RLZ_FULL_VER" > reliza_command
         echo $(cat reliza_command)
-        #send data
+        #send datas
         reliza_metadata=$(docker run --rm relizaio/reliza-cli addrelease $(cat reliza_command))
         echo $reliza_metadata
            
