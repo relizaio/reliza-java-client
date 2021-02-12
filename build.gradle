@@ -26,6 +26,7 @@ sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
 group = 'io.reliza'
+// version = 'github_actions_cli.36-SNAPSHOT'
 
 task changeVersion {
     doLast {
@@ -100,11 +101,17 @@ publishing {
 
 }
 
+
+
+tasks.withType(Sign) {
+    onlyIf { isReleaseVersion }
+}
+
 signing {
-    required { isReleaseVersion && gradle.taskGraph.hasTask("publish") }
+    // required { !version.endsWith("SNAPSHOT") && gradle.taskGraph.hasTask("publish") }
     // def signingKeyId = findProperty("signingKeyId")
-    def signingKey = findProperty("signingKey")
-    def signingPassword = findProperty("signingPassword")
+    def signingKey = GPG_SIGNING_KEY
+    def signingPassword = GPG_SIGNING_PASSWORD
     useInMemoryPgpKeys(signingKey, signingPassword)
     sign publishing.publications.relizaJavaClient
 }
