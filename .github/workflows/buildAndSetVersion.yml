@@ -6,12 +6,14 @@ jobs:
   update:
     name: Update
     runs-on: ubuntu-latest
+    env:
+      RELIZA_API_ID: ${{ secrets.RELIZA_API_ID }}
+      RELIZA_API_KEY: ${{ secrets.RELIZA_API_KEY }}
     steps:
     - uses: actions/checkout@v2
     - name: Get version
       run: |
-        reliza_ver=$(docker run --rm relizaio/reliza-cli getversion -i PROJECT__8d06445c-fc02-4748-9eda-a8822082c539 \
-        -k f7db60e1e6521c5558ab62fe8234765b3496a1410e98ca89b327bbcf6bf70f4d540673f195f15c5d0f5d3720f97760bb -b $GITHUB_REF)
+        reliza_ver=$(docker run --rm relizaio/reliza-cli getversion -i $RELIZA_API_ID -k $RELIZA_API_KEY -b $GITHUB_REF)
           echo "RLZ_VER_JSON=$reliza_ver" >> $GITHUB_ENV
           echo "completed getting ver"
           echo $reliza_ver
@@ -31,13 +33,13 @@ jobs:
         git push
     - name: Run tests
       run: gradle test
-    - name: If tests fail
+    - name: If build fails
       if: failure()
       run: echo "--status rejected " > reliza_command
     - name: Send release metadata
       if: always()
       run: |
-        echo "-i PROJECT__8d06445c-fc02-4748-9eda-a8822082c539 -k f7db60e1e6521c5558ab62fe8234765b3496a1410e98ca89b327bbcf6bf70f4d540673f195f15c5d0f5d3720f97760bb \
-        -b $GITHUB_REF --vcstype git --date $(git log -1 --date=iso-strict --pretty="%ad") --commit $(git rev-parse HEAD)
+        echo "-i $RELIZA_API_ID -k $RELIZA_API_KEY -b $GITHUB_REF --vcstype git 
+        --date $(git log -1 --date=iso-strict --pretty="%ad") --commit $(git rev-parse HEAD)
         --vcsuri github.com/$GITHUB_REPOSITORY -v $RLZ_FULL_VER" >> reliza_command
         docker run --rm relizaio/reliza-cli addrelease $(cat reliza_command)
