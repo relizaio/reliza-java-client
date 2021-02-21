@@ -1,4 +1,4 @@
-# reliza-java-client
+# Reliza Java Client (SDK)
 This tool is a Java client for [Reliza Hub at relizahub.com](https://app.relizahub.com). Particularly, this library can stream metadata about instances, releases, artifacts, and resolve bundles based on Reliza Hub data.
 
 Video tutorial about key functionality of Reliza Hub is available on [YouTube](https://www.youtube.com/watch?v=yDlf5fMBGuI).
