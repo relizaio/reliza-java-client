@@ -22,6 +22,7 @@ public class Flags{
     private String apiKey;
     private String branch;
     private String versionSchema;
+    @Builder.Default @NonNull private Boolean onlyVersion = false;
     private String version;
     private String status;
     private String endPoint;

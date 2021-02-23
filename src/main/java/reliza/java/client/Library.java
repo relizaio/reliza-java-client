@@ -71,6 +71,7 @@ public class Library {
      * - dateActual (optional) - flag to denote date time with timezone when commit was made, iso strict formatting with timezone is required, i.e. for git use git log --date=iso-strict. <br>
      * - vcsTag (optional) - flag to denote vcs tag. This is needed to include vcs tag into commit, if present. <br>
      * - manual (optional) - flag to indicate a manual release. Sets status as "draft", otherwise "pending" status is used.
+     * - onlyVersion (optional) - boolean flag to skip creation of the release. Default is false.
      * @return returns class ProjectVersion if successful API call and null otherwise.
      */
     public ProjectVersion getVersion() {
@@ -78,6 +79,7 @@ public class Library {
         body.put("branch", flags.getBranch());
         body.put("versionSchema", flags.getVersionSchema());
         body.put("project", flags.getProjectId());
+        body.put("onlyVersion", flags.getOnlyVersion());
         
         if (StringUtils.isNotEmpty(flags.getCommitHash())) {
             Map<String, String> commitMap = new HashMap<>();

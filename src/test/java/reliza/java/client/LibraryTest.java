@@ -41,8 +41,8 @@ public class LibraryTest {
               .projectId(UUID.fromString(TEST_PROJECT_UUID))
               .baseUrl("https://test.relizahub.com")
               .build();
-        Library getVersionLibrary = new Library(getVersionFlags);
-        ProjectVersion projectVersion = getVersionLibrary.getVersion();
+        Library library = new Library(getVersionFlags);
+        ProjectVersion projectVersion = library.getVersion();
         Assert.assertNotNull(projectVersion);
     }
     
