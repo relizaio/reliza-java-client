@@ -26,7 +26,7 @@ sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
 group = 'io.reliza'
-version = '0.1.15-SNAPSHOT'
+version = '0.1.16'
 
 task changeVersion {
 	doLast {
