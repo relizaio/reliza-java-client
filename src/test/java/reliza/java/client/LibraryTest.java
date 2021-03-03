@@ -21,15 +21,15 @@ import reliza.java.client.responses.ReleaseMetadata;
  * Class for testing Library.java methods.
  */
 public class LibraryTest {
-    private final String TEST_PROJECT_UUID = "b4d6324f-4985-49a8-afba-bdcffec32b03";
-    private final String TEST_PROJECT_API_ID = "PROJECT__b4d6324f-4985-49a8-afba-bdcffec32b03";
-    private final String TEST_PROJECT_API_KEY = "1367ff3aa5a38ef626607a7b38613e4913ac732775444a26db4bc6d8344ad626aab1f7801ff9b51a8cd76a2dd61d8dc4";
-    private final String TEST_ORG_API_ID = "ORGANIZATION_RW__cb78b7e4-f38e-4b6f-b92d-214b0626e497";
-    private final String TEST_ORG_API_KEY= "1b576f5836923017f23b37a28ec6ea314e46b0c6ac721b5c884d4d535c61485b4f518eea11e9a34704a58d807ac214d4";
-    private final String TEST_INSTANCE_API_ID = "INSTANCE__a4b578b7-9094-4f81-a9dd-dc3116384300";
-    private final String TEST_INSTANCE_API_KEY = "59cea9abbf10c24c500072274816cbe53da2c5344a414490047d8967276aa56cf02ee750c3b4ae7ac2075497e378f1cf";
-    private final String TEST_APPROVAL_API_ID = "APPROVAL__dad681e9-c4f8-4631-b299-c852e1975392";
-    private final String TEST_APPROVAL_API_KEY = "cc3885c2cfd92dc4a5f44b6b4ec828ffd4f4d487d1d80e2052c1d46c6649d3e96c23c0287f07b8c598549e9ec45f68ef";
+    private final String TEST_PROJECT_UUID = "eece2d2c-18ea-450a-aa1b-fd165ea19cea";
+    private final String TEST_PROJECT_API_ID = "PROJECT__eece2d2c-18ea-450a-aa1b-fd165ea19cea";
+    private final String TEST_PROJECT_API_KEY = "40cbd45321c6d19bf39a9ff4e7b865d290109c33d6c69d723bf23ec9d298cf8a22f3873138b66b686433c7d6f5a2f0ad";
+    private final String TEST_ORG_API_ID = "ORGANIZATION_RW__d57d3dc5-f559-49d7-b1f8-b093bf1eb8de";
+    private final String TEST_ORG_API_KEY= "1dbccfa478a0e4f146e2a214b6be1463121ebf8db4cd15cbe907a89547ce2805c595e6400e891d975e8b2398c6d2c643";
+    private final String TEST_INSTANCE_API_ID = "INSTANCE__4b4a8f4e-5143-494d-b65f-cd3815876d9f";
+    private final String TEST_INSTANCE_API_KEY = "7c02de5c14e0f968be52070ce640bc9b7aa22f36f5178992f9b8cbae5c34d366b46d105e1237482351700d426ad2d0d3";
+    private final String TEST_APPROVAL_API_ID = "APPROVAL__c08c8069-d003-4f35-84a2-bf191a3d02e0";
+    private final String TEST_APPROVAL_API_KEY = "14a1b10322883fea910910b7da4c4024a50c6bccbb159c4aa33a92576fc9d47f61d2bedb34cc469af9db5f88ec665307";
     
     /**
      * Test for getVersion using org wide api key and id
