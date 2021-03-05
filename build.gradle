@@ -29,11 +29,11 @@ group = 'io.reliza'
 version = '0.1.17-SNAPSHOT'
 
 task changeVersion {
-	doLast {
-		if(project.hasProperty('newVersion')) {
-		    String s=buildFile.getText().replaceFirst("version = '$version'","version = '"+newVersion+"'")
-		    buildFile.setText(s)
-		}
+    doLast {
+        if(project.hasProperty('newVersion')) {
+            String s=buildFile.getText().replaceFirst("version = '$version'","version = '"+newVersion+"'")
+            buildFile.setText(s)
+        }
     }
 }
 

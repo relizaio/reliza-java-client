@@ -98,7 +98,7 @@ public class Library {
     /**
      * Method that denotes we are sending Release Metadata of a Project to Reliza Hub.
      * Note that Reliza Hub will only allow you to send release data once per project version. <p>
-     * Multiple artifacts per release are supported. In which case artifact specific flags (artid, arbuildid, artcimeta, arttype, artdigests, tagkey and tagval must be repeated for each artifact). <p>
+     * Multiple artifacts per release are supported. In which case artifact specific flags (artid, artbuildid, artbuilduri, artcimeta, arttype, artdigests, tagkey and tagval must be repeated for each artifact). <p>
      * For sample of how to use workflow in CI, refer to the GitHub Actions build yaml of this project here
      * <a href="https://github.com/relizaio/reliza-cli/blob/master/.github/workflows/dockerimage.yml" target="_top">https://github.com/relizaio/reliza-cli/blob/master/.github/workflows/dockerimage.yml</a> <p>
      * Method itself does not require parameters but requires that the Flags class passed during library initialization contains these parameters. <p>
@@ -116,6 +116,7 @@ public class Library {
      * - status (optional) - flag to denote release status. Supply "rejected" for failed releases, otherwise "completed" is used. <br>
      * - artId (optional) - flag to denote artifact identifier. This is required to add artifact metadata into release. <br>
      * - artBuildId (optional) - flag to denote artifact build id. This flag is optional and may be used to indicate build system id of the release (i.e., this could be circleci build number). <br>
+     * - artBuildUri (optional) - flag to denote artifact build uri. This flag is optional and is used to denote the uri for where the build takes place. <br>
      * - artCiMeta (optional) - flag to denote artifact CI metadata. This flag is optional and like artbuildid may be used to indicate build system metadata in free form. <br>
      * - artType (optional) - flag to denote artifact type. This flag is used to denote artifact type. Types are based on CycloneDX spec. Supported values: Docker, File, Image, Font, Library, Application, Framework, OS, Device, Firmware. <br>
      * - dateStart (optional, if used there must be one datestart flag entry per artifact) - flag to denote artifact build start date and time, must conform to ISO strict date, i.e. "2021-01-12T19:43:32Z". <br>
@@ -159,6 +160,7 @@ public class Library {
             
             Map<String, List<String>> artFlags = new HashMap<String, List<String>>();
             artFlags.put("buildId", flags.getArtBuildId());
+            artFlags.put("buildUri", flags.getArtBuildUri());
             artFlags.put("cicdMeta", flags.getArtCiMeta());
             artFlags.put("type", flags.getArtType());
             artFlags.put("artifactVersion", flags.getArtVersion());

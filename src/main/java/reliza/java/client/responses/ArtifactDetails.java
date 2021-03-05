@@ -19,6 +19,7 @@ public class ArtifactDetails {
     private String identifier;
     private String org;
     private String buildId;
+    private String buildUri;
     private String cicdMeta;
     private List<String> digests;
     private String isInternal;

@@ -35,6 +35,7 @@ public class Flags{
     private String dateActual;
     @Singular("artId") private List<String> artId;
     @Singular("artBuildId") private List<String> artBuildId;
+    @Singular("artBuildUri") private List<String> artBuildUri;
     @Singular("artCiMeta") private List<String> artCiMeta;
     @Singular("artType") private List<String> artType;
     @Singular("artVersion") private List<String> artVersion;

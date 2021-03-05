@@ -77,13 +77,14 @@ Sample command to send release details:
 		.vcsType("git")
 		.commitHash("7bfc5ce7b0da277d139f7993f90761223fa54442")
 		.vcsTag("20.02.3")
-		.artId(Arrays.asList("relizaio/reliza-cli"))
-		.artBuildId(Arrays.asList("1"))
-		.artCiMeta(Arrays.asList("Github Actions"))
-		.artType(Arrays.asList("Docker"))
-		.artDigests(Arrays.asList("sha256:4e8b31b19ef16731a6f82410f9fb929da692aa97b71faeb1596c55fbf663dcdd"))
-		.tagKeyArr(Arrays.asList("key1"))
-		.tagValArr(Arrays.asList("val1"))
+		.artId("relizaio/reliza-cli")
+		.artBuildId("1")
+		.artBuildUri("https://github.com/relizaio/reliza-java-client/actions/runs/619086068")
+		.artCiMeta("Github Actions")
+		.artType("Docker")
+		.artDigests("sha256:4e8b31b19ef16731a6f82410f9fb929da692aa97b71faeb1596c55fbf663dcdd")
+		.tagKeyArr("key1")
+		.tagValArr("val1")
 		.build();
 	Library library = new Library(Flags);
 	ProjectMetadata projectMetadata = addRelease(library);
