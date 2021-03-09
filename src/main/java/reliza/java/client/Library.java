@@ -58,11 +58,11 @@ public class Library {
     
     /**
      * Method that denotes we are obtaining the next available release version for the branch.
-     * Note that if the call succeeds, version assignment will be recorded and not given again by Reliza Hub, even if not consumed. It also creates a release in pending status. <p>
+     * Note that if the call succeeds, the version assignment will be recorded and will not be given again by Reliza Hub, even if it is not consumed. It will create the release in pending status. <p>
      * Method itself does not require parameters but requires that the Flags class passed during library initialization contains these parameters. <p>
      * - apiKeyId (required) - flag for project api id or organization-wide read-write api id. <br> 
      * - apiKey (required) - flag for project api key or organization-wide read-write api key. <br>
-     * - branch (required) - flag to denote branch. If branch is not recorded yet, Reliza Hub will attempt to create it. <br>
+     * - branch (required) - flag to denote branch. If the branch is not recorded yet, Reliza Hub will attempt to create it. <br>
      * - projectId (optional) - flag to denote project uuid. Required if organization-wide read-write key is used, ignored if project specific api key is used. <br>
      * - versionSchema (optional for existing branches, required for new branches) - flag to denote branch versionSchema. If supplied for an existing branch and versionSchema is different from current, it will override current versionSchema. <br>
      * - vcsUri (optional) - flag to denote vcs uri. Currently this flag is needed if we want to set a commit for the release. However, soon it will be needed only if the vcs uri is not yet set for the project. <br>
@@ -152,9 +152,13 @@ public class Library {
         
         if (CollectionUtils.isNotEmpty(flags.getArtId())) {
             List<Map<String, Object>> artifacts = new ArrayList<Map<String, Object>>();
-            for (int i = 0; i < flags.getArtId().size(); i++) {
+            for (String artId : flags.getArtId()) {
+                if (artId == null) {
+                log.error("artid flag cannot contain null values");
+                return null;
+                }
                 Map<String, Object> artifact = new HashMap<>();
-                artifact.put("identifier", flags.getArtId().get(i));
+                artifact.put("identifier", artId);
                 artifacts.add(artifact);
             }
             

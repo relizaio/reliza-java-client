@@ -3,7 +3,7 @@ This tool is a Java client for [Reliza Hub at relizahub.com](https://app.relizah
 
 Video tutorial about key functionality of Reliza Hub is available on [YouTube](https://www.youtube.com/watch?v=yDlf5fMBGuI).
 
-Community forum and support available at [r/Reliza](https://reddit.com/r/Reliza).
+Community forum and support is available at [r/Reliza](https://reddit.com/r/Reliza).
 
 ### Publishing to Maven Local
 To build and publish to local Maven Repository, use:
@@ -64,7 +64,7 @@ Sample command to obtain only version info and skip creating the release:
 
 ## 2. Use Case: Send Release Metadata to Reliza Hub
 
-This use case is commonly used in the CI workflow to stream Release metadata to Reliza Hub. As in previous case, API key must be generated for the project on Reliza Hub prior to sending release details.
+This use case is commonly used in the CI workflow to stream Release metadata to Reliza Hub. As in previous case, API key must be generated for the project on Reliza Hub prior to sending release details. When pushing multiple artifacts, unused parameters should be left as null.
 
 Sample command to send release details:
 
@@ -92,7 +92,7 @@ Sample command to send release details:
 
 ## 3. Use Case: Check If Artifact Hash Already Present In Some Release
 
-This is particularly useful for monorepos to see if there was a change in sub-project or not. We are using this technique in our sample [playground project](https://github.com/relizaio/reliza-hub-playground). We supply artifact hash to Reliza Hub - and if it's present already, we get release details; if not - we get empty json response {}. Search space is scoped to single project which is defined by API Id and API Key.
+This is particularly useful for monorepos to see if there was a change in sub-project or not. We are using this technique in our sample [playground project](https://github.com/relizaio/reliza-hub-playground). We supply an artifact hash to Reliza Hub - and if it's present already, we get release details; if not - we get an empty json response {}. Search space is scoped to a single project which is defined by API Id and API Key.
 
 Sample command:
 
