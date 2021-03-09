@@ -21,15 +21,15 @@ import reliza.java.client.responses.ReleaseMetadata;
  * Class for testing Library.java methods.
  */
 public class LibraryTest {
-    private final String TEST_PROJECT_UUID = "eece2d2c-18ea-450a-aa1b-fd165ea19cea";
-    private final String TEST_PROJECT_API_ID = "PROJECT__eece2d2c-18ea-450a-aa1b-fd165ea19cea";
-    private final String TEST_PROJECT_API_KEY = "40cbd45321c6d19bf39a9ff4e7b865d290109c33d6c69d723bf23ec9d298cf8a22f3873138b66b686433c7d6f5a2f0ad";
-    private final String TEST_ORG_API_ID = "ORGANIZATION_RW__d57d3dc5-f559-49d7-b1f8-b093bf1eb8de";
-    private final String TEST_ORG_API_KEY= "1dbccfa478a0e4f146e2a214b6be1463121ebf8db4cd15cbe907a89547ce2805c595e6400e891d975e8b2398c6d2c643";
-    private final String TEST_INSTANCE_API_ID = "INSTANCE__4b4a8f4e-5143-494d-b65f-cd3815876d9f";
-    private final String TEST_INSTANCE_API_KEY = "7c02de5c14e0f968be52070ce640bc9b7aa22f36f5178992f9b8cbae5c34d366b46d105e1237482351700d426ad2d0d3";
-    private final String TEST_APPROVAL_API_ID = "APPROVAL__c08c8069-d003-4f35-84a2-bf191a3d02e0";
-    private final String TEST_APPROVAL_API_KEY = "14a1b10322883fea910910b7da4c4024a50c6bccbb159c4aa33a92576fc9d47f61d2bedb34cc469af9db5f88ec665307";
+    private final String TEST_PROJECT_UUID = "314c0886-0f41-4f92-a4ef-59c2cbb0e3b0";
+    private final String TEST_PROJECT_API_ID = "PROJECT__314c0886-0f41-4f92-a4ef-59c2cbb0e3b0";
+    private final String TEST_PROJECT_API_KEY = "58f7bee5fb50919b055708b0936179ca39083f8e9ec3626d68ccee78e75613f8c0e804dbe41376afe005355eeffc22d4";
+    private final String TEST_ORG_API_ID = "ORGANIZATION_RW__c3c606a8-4fa2-4115-b731-a8ae513bc302";
+    private final String TEST_ORG_API_KEY= "6380ad96fa8157caa908a6ddf067274d6abe3558ab08ee52850fad5f1342fe497d695f393fe668ea69ac65ab8cc21b30";
+    private final String TEST_INSTANCE_API_ID = "INSTANCE__ba118a3c-c83d-453a-9515-b90b2868d0f3";
+    private final String TEST_INSTANCE_API_KEY = "cf9a27900e54c5cf207cd7c3a767e4c31af3676ecad3aa58ed1481340448966bc3f2ecd88c5f094fb2544a5972d385f8";
+    private final String TEST_APPROVAL_API_ID = "APPROVAL__a828881c-a7d9-4fc4-9ebb-b90cde845b73";
+    private final String TEST_APPROVAL_API_KEY = "4eada132ad2eed3c40fee1998e97162b4896f00a9dde367ac098f08009a2639f266f44db079b6970e459c3af4b031147";
     
     /**
      * Test for getVersion using org wide api key and id
@@ -84,7 +84,7 @@ public class LibraryTest {
     @Test public void testCheckHash() {
         Flags flags = Flags.builder().apiKeyId(TEST_PROJECT_API_ID)
             .apiKey(TEST_PROJECT_API_KEY)
-            .hash("sha256:2")
+            .hash("sha256:52")
             .baseUrl("https://test.relizahub.com")
             .build();
         Library library = new Library(flags);
