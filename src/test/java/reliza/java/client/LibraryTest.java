@@ -36,11 +36,11 @@ public class LibraryTest {
      */
     @Test public void testGetVersion() {
         Flags flags = Flags.builder().apiKeyId(TEST_ORG_API_ID)
-              .apiKey(TEST_ORG_API_KEY)
-              .branch("master")
-              .projectId(UUID.fromString(TEST_PROJECT_UUID))
-              .baseUrl("https://test.relizahub.com")
-              .build();
+            .apiKey(TEST_ORG_API_KEY)
+            .branch("master")
+            .projectId(UUID.fromString(TEST_PROJECT_UUID))
+            .baseUrl("https://test.relizahub.com")
+            .build();
         Library library = new Library(flags);
         ProjectVersion projectVersion = library.getVersion();
         Assert.assertNotNull(projectVersion);
@@ -126,13 +126,13 @@ public class LibraryTest {
      * Test for getMyRelease method.
      */
     @Test public void testGetMyRelease() {
-      Flags flags = Flags.builder().apiKeyId(TEST_INSTANCE_API_ID)
-          .apiKey(TEST_INSTANCE_API_KEY)
-          .baseUrl("https://test.relizahub.com")
-          .build();
-      Library library = new Library(flags);
-      List<ReleaseMetadata> releaseMetadata = library.getMyRelease();
-      Assert.assertNotNull(releaseMetadata);
+        Flags flags = Flags.builder().apiKeyId(TEST_INSTANCE_API_ID)
+            .apiKey(TEST_INSTANCE_API_KEY)
+            .baseUrl("https://test.relizahub.com")
+            .build();
+        Library library = new Library(flags);
+        List<ReleaseMetadata> releaseMetadata = library.getMyRelease();
+        Assert.assertNotNull(releaseMetadata);
     }
     
     /**

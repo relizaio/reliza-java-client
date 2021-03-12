@@ -287,7 +287,7 @@ public class Library {
      * @return returns class ReleaseMetadata if successful API call and null otherwise.
      */
     public List<ReleaseMetadata> getMyRelease() {
-        Call<List<ReleaseMetadata>> call = rhs.getMyRelease(flags.getNamespace());
+        Call<List<ReleaseMetadata>> call = rhs.getMyRelease(flags.getInstance(), flags.getNamespace());
         return execute(call);
     }
     

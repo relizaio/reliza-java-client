@@ -1,5 +1,6 @@
 package reliza.java.client;
 
+import java.net.URI;
 import java.util.List;
 import java.util.Map;
 
@@ -61,11 +62,12 @@ public interface RHService {
     
     /**
      * GET request corresponding to getMyRelease method.
-     * @param namespace - URL parameter.
+     * @param instance - URI of instance.
+     * @param namespace - namespace of instance.
      * @return requested InstanceMetadata call
      */
     @GET("/api/programmatic/v1/instance/getMyFollowReleases")
-    Call<List<ReleaseMetadata>> getMyRelease(@Query("namespace") String namespace);
+    Call<List<ReleaseMetadata>> getMyRelease(@Query("instance") String instance, @Query("namespace") String namespace);
     
     /**
      * POST request corresponding to getLatestRelease method.
