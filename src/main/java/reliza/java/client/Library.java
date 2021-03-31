@@ -153,9 +153,9 @@ public class Library {
         if (CollectionUtils.isNotEmpty(flags.getArtId())) {
             List<Map<String, Object>> artifacts = new ArrayList<Map<String, Object>>();
             for (String artId : flags.getArtId()) {
-                if (artId == null) {
-                log.error("artid flag cannot contain null values");
-                return null;
+                if (StringUtils.isEmpty(artId)) {
+                    log.error("artid flag cannot be empty");
+                    return null;
                 }
                 Map<String, Object> artifact = new HashMap<>();
                 artifact.put("identifier", artId);
@@ -180,6 +180,9 @@ public class Library {
                     return null;
                 } else if (CollectionUtils.isNotEmpty(artFlags.get(key))) {
                     for (int j = 0; j < flags.getArtId().size(); j++) {
+                        if (StringUtils.isEmpty(artFlags.get(key).get(j))) {
+                            continue;
+                        }
                         artifacts.get(j).put(key, artFlags.get(key).get(j));
                     }
                 }
@@ -190,7 +193,9 @@ public class Library {
                 return null;
             } else if (CollectionUtils.isNotEmpty(flags.getArtDigests())) {
                 for (int i = 0; i < flags.getArtId().size(); i++) {
-                    if (flags.getArtDigests().get(i) == null) { continue; }
+                    if (StringUtils.isEmpty(flags.getArtDigests().get(i))) {
+                        continue;
+                    }
                     artifacts.get(i).put("digests", Arrays.asList(flags.getArtDigests().get(i).split(",")));
                 }
             }
@@ -206,7 +211,9 @@ public class Library {
                 return null;
             } else if (CollectionUtils.isNotEmpty(flags.getTagKeys())) {
                 for (int i = 0; i < flags.getTagKeys().size(); i++) {
-                    if (flags.getTagKeys().get(i) == null || flags.getTagVals().get(i) == null) { continue; }
+                    if (StringUtils.isEmpty(flags.getTagKeys().get(i)) || StringUtils.isEmpty(flags.getTagVals().get(i))) {
+                        continue;
+                    }
                     List<String> keys = Arrays.asList(flags.getTagKeys().get(i).split(","));
                     List<String> vals = Arrays.asList(flags.getTagVals().get(i).split(","));
                     if (CollectionUtils.isNotEmpty(keys) && CollectionUtils.isNotEmpty(vals) && keys.size() != vals.size()) {
