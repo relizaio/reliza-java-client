@@ -63,6 +63,7 @@ public class LibraryTest {
             .dateActual("2021-01-11T19:43:32.286086002Z")
             .dateEnd(Arrays.asList("2021-01-12T19:43:32.286086002Z", "2021-01-12T19:43:32.286086002Z"))
             .dateStart(Arrays.asList("2021-01-11T19:43:32.286086002Z", "2021-01-11T19:43:32.286086002Z"))
+            .artDigests(Arrays.asList("sha256:123", "sha256:125"))
             .endPoint("https://github.com/relizaio/reliza-java-client")
             .status("completed")
             .tagKeys(Arrays.asList("prod", "prod"))

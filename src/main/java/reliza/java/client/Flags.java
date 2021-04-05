@@ -27,6 +27,9 @@ public class Flags{
     private String status;
     private String endPoint;
     private UUID projectId;
+    private String action;
+    private String metadata;
+    private String modifier;
     private String commitHash;
     private String vcsType;
     private String vcsUri;

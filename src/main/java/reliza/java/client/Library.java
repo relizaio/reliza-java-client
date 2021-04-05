@@ -70,7 +70,10 @@ public class Library {
      * - commitHash (optional) - flag to denote vcs commit id or hash. This is needed to provide source code entry metadata into the release. <br>
      * - dateActual (optional) - flag to denote date time with timezone when commit was made, iso strict formatting with timezone is required, i.e. for git use git log --date=iso-strict. <br>
      * - vcsTag (optional) - flag to denote vcs tag. This is needed to include vcs tag into commit, if present. <br>
-     * - manual (optional) - flag to indicate a manual release. Sets status as "draft", otherwise "pending" status is used.
+     * - manual (optional) - flag to indicate a manual release. Sets status as "draft", otherwise "pending" status is used. <br>
+     * - metadata (optional) - flag to set version metadata. This may be semver metadata or custom version schema metadata. <br>
+     * - modifier (optional) - flag to set version modifier. This may be semver modifier or custom version schema. <br>
+     * - action (optional)
      * - onlyVersion (optional) - boolean flag to skip creation of the release. Default is false.
      * @return returns class ProjectVersion if successful API call and null otherwise.
      */
@@ -80,6 +83,9 @@ public class Library {
         body.put("versionSchema", flags.getVersionSchema());
         body.put("project", flags.getProjectId());
         body.put("onlyVersion", flags.getOnlyVersion());
+        body.put("modifier", flags.getModifier());
+        body.put("metadata", flags.getMetadata());
+        body.put("action", flags.getAction());
         
         if (StringUtils.isNotEmpty(flags.getCommitHash())) {
             Map<String, String> commitMap = new HashMap<>();
@@ -121,10 +127,10 @@ public class Library {
      * - artType (optional) - flag to denote artifact type. This flag is used to denote artifact type. Types are based on CycloneDX spec. Supported values: Docker, File, Image, Font, Library, Application, Framework, OS, Device, Firmware. <br>
      * - dateStart (optional, if used there must be one datestart flag entry per artifact) - flag to denote artifact build start date and time, must conform to ISO strict date, i.e. "2021-01-12T19:43:32Z". <br>
      * - dateEnd (optional, if used there must be one datestart flag entry per artifact) - flag to denote artifact build end date and time, must conform to ISO strict date, i.e. "2021-01-12T19:43:32Z". <br>
-     * - publisher (optional, if used there must be one publisher flag entry per artifact) - flag to denote artifact publisher. <br>
-     * - version (optional, if used there must be one version flag entry per artifact) - flag to denote artifact version if different from release version. <br>
-     * - package (optional, if used there must be one package flag entry per artifact) - flag to denote artifact package type according to CycloneDX spec: MAVEN, NPM, NUGET, GEM, PYPI, DOCKER. <br>
-     * - group (optional, if used there must be one group flag entry per artifact) - flag to denote artifact group. <br>
+     * - artPublisher (optional, if used there must be one publisher flag entry per artifact) - flag to denote artifact publisher. <br>
+     * - artVersion (optional, if used there must be one version flag entry per artifact) - flag to denote artifact version if different from release version. <br>
+     * - artPackage (optional, if used there must be one package flag entry per artifact) - flag to denote artifact package type according to CycloneDX spec: MAVEN, NPM, NUGET, GEM, PYPI, DOCKER. <br>
+     * - artGroup (optional, if used there must be one group flag entry per artifact) - flag to denote artifact group. <br>
      * - artDigests (optional) - flag to denote artifact digests. This flag is used to indicate artifact digests. By convention, digests must be prefixed with type followed by colon and then actual digest hash, i.e. <br>
      *                  sha256:4e8b31b19ef16731a6f82410f9fb929da692aa97b71faeb1596c55fbf663dcdd - here type is sha256 and digest is 4e8b31b19ef16731a6f82410f9fb929da692aa97b71faeb1596c55fbf663dcdd. Multiple digests are supported and must be comma separated. i.e. <br>
      *                  sha256:4e8b31b19ef16731a6f82410f9fb929da692aa97b71faeb1596c55fbf663dcdd,sha1:fe4165996a41501715ea0662b6a906b55e34a2a1 <br>
@@ -334,8 +340,10 @@ public class Library {
      * - apiKeyId (required) - flag for api id. <br>
      * - apiKey (required) - flag for api key. <br>
      * - releaseId (either this flag or project id and release version is required) - flag to specify release uuid, which can be obtained from the release view or programmatically. <br>
-     * - projectId (either this flag and release version or releaseid must be provided) - flag to specify project uuid, which can be obtained from the project settings on Reliza Hub UI. <br>
      * - releaseVersion (either this flag and project or releaseid must be provided) - flag to specify release string version with the project flag above. <br>
+     * - projectId (either this flag and release version or releaseid must be provided) - flag to specify project uuid, which can be obtained from the project settings on Reliza Hub UI. <br>
+     * - instance (either instance and project or releaseid or releaseversion and project must be set) - UUID or URI of instance for which release should be approved. <br>
+     * - namespace (optional, only considered if instance is specified") - Namespace of the instance for which release should be approved. <br>
      * - approvalType (required) - approval type as per approval matrix on the Organization Settings page in Reliza Hub. <br>
      * - disapprove (optional) - flag to indicate disapproval event instead of approval.
      * @return returns class ReleaseMetadata if successful API call and null otherwise.
@@ -348,6 +356,8 @@ public class Library {
         body.put("uuid", flags.getReleaseId());
         body.put("version", flags.getVersion());
         body.put("project", flags.getProjectId());
+        body.put("instance", flags.getInstance());
+        body.put("namespace", flags.getNamespace());
         Call<ReleaseMetadata> call = rhs.approveRelease(body);
         return execute(call);
     }
@@ -369,7 +379,7 @@ public class Library {
                 return null;
             }
         } catch (IOException e) {
-            log.error("IO exception", e);
+            log.error("IO exception (null return value)", e);
             return null;
         }
     }
