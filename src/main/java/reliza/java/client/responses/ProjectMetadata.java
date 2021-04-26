@@ -21,6 +21,7 @@ public class ProjectMetadata {
     private String version;
     private String status;
     private String org;
+    private List<String> commits;
     private List<Object> parentReleases;
     private List<Object> optionalReleases;
     private String sourceCodeEntry;

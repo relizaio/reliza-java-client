@@ -30,7 +30,9 @@ public class Flags{
     private String action;
     private String metadata;
     private String modifier;
+    private String commitMessage;
     private String commitHash;
+    private String commitList;
     private String vcsType;
     private String vcsUri;
     private String vcsTag;

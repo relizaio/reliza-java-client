@@ -5,6 +5,7 @@ import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -17,6 +18,7 @@ import okhttp3.OkHttpClient;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
 import retrofit2.Call;
 import retrofit2.Response;
 import retrofit2.Retrofit;
@@ -149,11 +151,39 @@ public class Library {
         if (StringUtils.isNotEmpty(flags.getCommitHash())) {
             Map<String, String> commitMap = new HashMap<>();
             commitMap.put("commit", flags.getCommitHash());
+            commitMap.put("commitMessage", flags.getCommitMessage());
             commitMap.put("uri", flags.getVcsUri());
             commitMap.put("type", flags.getVcsType());
             commitMap.put("vcsTag", flags.getVcsTag());
             commitMap.put("dateActual", flags.getDateActual());
             body.put("sourceCodeEntry", commitMap);
+        }
+        
+        if (StringUtils.isNotEmpty(flags.getCommitList())) {
+            String commits = new String(Base64.getDecoder().decode(flags.getCommitList()));
+            List<String> commitList = Arrays.asList(StringUtils.split(commits, System.lineSeparator()));
+            List<Map<String, Object>> commitsInBody = new ArrayList<Map<String, Object>>();
+            
+            for (int i = 0; i < commitList.size(); i++) {
+                Map<String, Object> singleCommit = new HashMap<>();
+                List<String> commitParts = Arrays.asList(StringUtils.split(commitList.get(i), "|||"));
+                singleCommit.put("commit", commitParts.get(0));
+                singleCommit.put("dateActual", commitParts.get(1));
+                singleCommit.put("commitMessage", commitParts.get(2));
+                commitsInBody.add(singleCommit);
+                
+                if (i == 0 && !StringUtils.isNotEmpty(flags.getCommitHash())) {
+                    Map<String, Object> commitMap = new HashMap<>();
+                    commitMap.put("commit", commitParts.get(0));
+                    commitMap.put("dateActual", commitParts.get(1));
+                    commitMap.put("commitMessage", commitParts.get(2));
+                    commitMap.put("vcsTag", flags.getVcsTag());
+                    commitMap.put("vcsUri", flags.getVcsUri());
+                    commitMap.put("vcsType", flags.getVcsType());
+                    body.put("sourceCodeEntry", commitMap);
+                }
+            }
+            body.put("commits", commitsInBody);
         }
         
         if (CollectionUtils.isNotEmpty(flags.getArtId())) {
@@ -202,7 +232,7 @@ public class Library {
                     if (StringUtils.isEmpty(flags.getArtDigests().get(i))) {
                         continue;
                     }
-                    artifacts.get(i).put("digests", Arrays.asList(flags.getArtDigests().get(i).split(",")));
+                    artifacts.get(i).put("digests", Arrays.asList(StringUtils.split(flags.getArtDigests().get(i), ",")));
                 }
             }
             
@@ -220,8 +250,8 @@ public class Library {
                     if (StringUtils.isEmpty(flags.getTagKeys().get(i)) || StringUtils.isEmpty(flags.getTagVals().get(i))) {
                         continue;
                     }
-                    List<String> keys = Arrays.asList(flags.getTagKeys().get(i).split(","));
-                    List<String> vals = Arrays.asList(flags.getTagVals().get(i).split(","));
+                    List<String> keys = Arrays.asList(StringUtils.split(flags.getTagKeys().get(i), ","));
+                    List<String> vals = Arrays.asList(StringUtils.split(flags.getTagVals().get(i), ","));
                     if (CollectionUtils.isNotEmpty(keys) && CollectionUtils.isNotEmpty(vals) && keys.size() != vals.size()) {
                         log.error("number of keys and values per each tagval and tagkey flag must be the same");
                         return null;
@@ -271,11 +301,11 @@ public class Library {
     public InstanceMetadata instData() {
         Map<String, Object> body = new HashMap<>();
         if (StringUtils.isNotEmpty(flags.getImagesString())) {
-            body.put("images", Arrays.asList(flags.getImagesString().split(" ")));
+            body.put("images", Arrays.asList(StringUtils.split(flags.getImagesString(), " ")));
         } else if (flags.getImageInputStream() != null) {
             try {
                 byte[] imageBytes = IOUtils.toByteArray(flags.getImageInputStream());
-                body.put("images", Arrays.asList(new String(imageBytes, StandardCharsets.UTF_8).split(" ")));
+                body.put("images", Arrays.asList(StringUtils.split(new String(imageBytes, StandardCharsets.UTF_8), " ")));
             } catch (IOException e) {
                 log.error("IO exception", e);
                 return null;
