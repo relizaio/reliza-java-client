@@ -17,6 +17,7 @@ public class SourceCodeEntryDetails {
     private UUID vcsRepositoryUuid;
     private String vcsBranch;
     private String commit;
+    private String commitMessage;
     private String vcsTag;
     private String notes;
     private String org;

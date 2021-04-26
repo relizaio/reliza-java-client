@@ -409,7 +409,7 @@ public class Library {
                 return null;
             }
         } catch (IOException e) {
-            log.error("IO exception (null return value)", e);
+            log.error("IO exception", e);
             return null;
         }
     }

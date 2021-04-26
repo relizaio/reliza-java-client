@@ -17,6 +17,8 @@ public class InstanceMetadata {
     private String createdDate;
     private String uri;
     private String org;
+    private String status;
+    private List<String> commits;
     private Map<String, String> properties;
     private List<ReleaseDetails> releases;
     private String agentData;
