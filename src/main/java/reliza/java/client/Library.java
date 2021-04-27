@@ -178,8 +178,8 @@ public class Library {
                     commitMap.put("dateActual", commitParts.get(1));
                     commitMap.put("commitMessage", commitParts.get(2));
                     commitMap.put("vcsTag", flags.getVcsTag());
-                    commitMap.put("vcsUri", flags.getVcsUri());
-                    commitMap.put("vcsType", flags.getVcsType());
+                    commitMap.put("uri", flags.getVcsUri());
+                    commitMap.put("type", flags.getVcsType());
                     body.put("sourceCodeEntry", commitMap);
                 }
             }
