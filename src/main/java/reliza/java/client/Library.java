@@ -164,24 +164,13 @@ public class Library {
             List<String> commitList = Arrays.asList(StringUtils.split(commits, System.lineSeparator()));
             List<Map<String, Object>> commitsInBody = new ArrayList<Map<String, Object>>();
             
-            for (int i = 0; i < commitList.size(); i++) {
+            for (String commit : commitList) {
                 Map<String, Object> singleCommit = new HashMap<>();
-                List<String> commitParts = Arrays.asList(StringUtils.split(commitList.get(i), "|||"));
+                List<String> commitParts = Arrays.asList(StringUtils.split(commit, "|||"));
                 singleCommit.put("commit", commitParts.get(0));
                 singleCommit.put("dateActual", commitParts.get(1));
                 singleCommit.put("commitMessage", commitParts.get(2));
                 commitsInBody.add(singleCommit);
-                
-                if (i == 0 && !StringUtils.isNotEmpty(flags.getCommitHash())) {
-                    Map<String, Object> commitMap = new HashMap<>();
-                    commitMap.put("commit", commitParts.get(0));
-                    commitMap.put("dateActual", commitParts.get(1));
-                    commitMap.put("commitMessage", commitParts.get(2));
-                    commitMap.put("vcsTag", flags.getVcsTag());
-                    commitMap.put("uri", flags.getVcsUri());
-                    commitMap.put("type", flags.getVcsType());
-                    body.put("sourceCodeEntry", commitMap);
-                }
             }
             body.put("commits", commitsInBody);
         }
