@@ -1,13 +1,12 @@
 package reliza.java.client.responses;
 
-import lombok.Getter;
-import lombok.ToString;
+import lombok.Data;
 
 /**
- * Response class of method getVersion from Library.java
+ * Version of release
  */
-@Getter @ToString
+@Data
 public class ProjectVersion {
-    private String dockerTagSafeVersion;
-    private String version;
+	private String dockerTagSafeVersion;
+	private String version;
 }

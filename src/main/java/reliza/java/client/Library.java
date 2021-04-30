@@ -18,6 +18,7 @@ import okhttp3.OkHttpClient;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 import retrofit2.Call;
 import retrofit2.Response;
@@ -25,10 +26,9 @@ import retrofit2.Retrofit;
 import retrofit2.converter.jackson.JacksonConverterFactory;
 
 import reliza.java.client.interceptors.BasicAuthInterceptor;
-import reliza.java.client.responses.InstanceMetadata;
-import reliza.java.client.responses.ProjectMetadata;
+import reliza.java.client.responses.FullRelease;
 import reliza.java.client.responses.ProjectVersion;
-import reliza.java.client.responses.ReleaseMetadata;
+import reliza.java.client.responses.ReleaseData;
 
 /**
  * Defines a library which holds all the parameters from Flags and uses it to make API calls
@@ -46,6 +46,7 @@ public class Library {
     public Library(Flags flags) {
         this.flags = flags;
         ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.registerModule(new JavaTimeModule());
         objectMapper.setSerializationInclusion(JsonInclude.Include.NON_EMPTY);
         OkHttpClient client = new OkHttpClient.Builder()
             .addInterceptor(new BasicAuthInterceptor(flags.getApiKeyId(), flags.getApiKey()))
@@ -140,7 +141,7 @@ public class Library {
      * - tagVals (optional, but every tag value must have corresponding tag key) - flag to denote values of artifact tags. Multiple tag values per artifact are supported and must be comma separated. I.e.:tagValArr(val1,val2)
      * @return returns class ProjectMetadata if successful API call and null otherwise.
      */
-    public ProjectMetadata addRelease() {
+    public ReleaseData addRelease() {
         Map<String, Object> body = new HashMap<>();
         body.put("branch", flags.getBranch());
         body.put("version", flags.getVersion());
@@ -265,7 +266,7 @@ public class Library {
             }
             body.put("artifacts", artifacts);
         }
-        Call<ProjectMetadata> call = rhs.addRelease(body);
+        Call<ReleaseData> call = rhs.addRelease(body);
         return execute(call);
     }
     
@@ -277,11 +278,11 @@ public class Library {
      * - hash (required) - flag to denote actual hash. By convention, hash must include hashing algorithm as its first part, i.e. sha256: or sha512:
      * @return returns class ProjectMetadata if successful API call and null otherwise.
      */
-    public ProjectMetadata checkHash() {
+    public ReleaseData checkHash() {
         Map<String, Object> body = new HashMap<>();
         body.put("hash", flags.getHash());
-        Call<Map<String,ProjectMetadata>> call = rhs.checkHash(body);
-        Map<String,ProjectMetadata> response = execute(call);
+        Call<Map<String, ReleaseData>> call = rhs.checkHash(body);
+        Map<String, ReleaseData> response = execute(call);
         if (response == null) {
             return null;
         }
@@ -298,7 +299,7 @@ public class Library {
      * - senderId (optional) - flag to denote unique sender within a single namespace. This is useful if say there are different nodes where each streams only part of application deployment data. In this case such nodes need to use same namespace but different senders so that their data does not stomp on each other. <br>
      * @return returns class InstanceMetadata if successful API call and null otherwise.
      */
-    public InstanceMetadata instData() {
+    public Map<String, String> instData() {
         Map<String, Object> body = new HashMap<>();
         if (StringUtils.isNotEmpty(flags.getImagesString())) {
             body.put("images", Arrays.asList(StringUtils.split(flags.getImagesString(), " ")));
@@ -317,7 +318,7 @@ public class Library {
         body.put("timeSent", Instant.now().toString());
         body.put("namespace", flags.getNamespace());
         body.put("senderId", flags.getSenderId());
-        Call<InstanceMetadata> call = rhs.instData(body);
+        Call<Map<String, String>> call = rhs.instData(body);
         return execute(call);
     }
     
@@ -329,8 +330,8 @@ public class Library {
      * - namespace (optional, if not sent "default" namespace is used) - flag to denote namespace for which we are requesting release data. Namespaces are useful to separate different products deployed on the same instance.
      * @return returns class ReleaseMetadata if successful API call and null otherwise.
      */
-    public List<ReleaseMetadata> getMyRelease() {
-        Call<List<ReleaseMetadata>> call = rhs.getMyRelease(flags.getInstance(), flags.getNamespace());
+    public List<FullRelease> getMyRelease() {
+        Call<List<FullRelease>> call = rhs.getMyRelease(flags.getInstance(), flags.getNamespace());
         return execute(call);
     }
     
@@ -349,7 +350,7 @@ public class Library {
      * - namespace (optional) - flag to denote specific namespace within instance, if instance is supplied.
      * @return returns class ReleaseMetadata if successful API call and null otherwise.
      */
-    public ReleaseMetadata getLatestRelease() {
+    public FullRelease getLatestRelease() {
         Map<String, Object> body = new HashMap<>();
         body.put("project", flags.getProjectId());
         body.put("environment", flags.getEnvironment());
@@ -360,7 +361,7 @@ public class Library {
         body.put("branch", flags.getBranch());
         body.put("instance", flags.getInstance());
         body.put("namespace", flags.getNamespace());
-        Call<ReleaseMetadata> call = rhs.getLatestRelease(body);
+        Call<FullRelease> call = rhs.getLatestRelease(body);
         return execute(call);
     }
     
@@ -378,7 +379,7 @@ public class Library {
      * - disapprove (optional) - flag to indicate disapproval event instead of approval.
      * @return returns class ReleaseMetadata if successful API call and null otherwise.
      */
-    public ReleaseMetadata approveRelease() {
+    public ReleaseData approveRelease() {
         Map<String, Object> body = new HashMap<>();
         Map<String, Boolean> approvalMap = new HashMap<>();
         approvalMap.put(flags.getApprovalType(), !flags.getDisapprove());
@@ -388,7 +389,7 @@ public class Library {
         body.put("project", flags.getProjectId());
         body.put("instance", flags.getInstance());
         body.put("namespace", flags.getNamespace());
-        Call<ReleaseMetadata> call = rhs.approveRelease(body);
+        Call<ReleaseData> call = rhs.approveRelease(body);
         return execute(call);
     }
     

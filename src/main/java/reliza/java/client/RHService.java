@@ -3,10 +3,9 @@ package reliza.java.client;
 import java.util.List;
 import java.util.Map;
 
-import reliza.java.client.responses.InstanceMetadata;
-import reliza.java.client.responses.ProjectMetadata;
+import reliza.java.client.responses.FullRelease;
 import reliza.java.client.responses.ProjectVersion;
-import reliza.java.client.responses.ReleaseMetadata;
+import reliza.java.client.responses.ReleaseData;
 
 import retrofit2.Call;
 import retrofit2.http.Body;
@@ -41,7 +40,7 @@ public interface RHService {
      * @return requested ProjectMetadata call
      */
     @POST("/api/programmatic/v1/release/create")
-    Call<ProjectMetadata> addRelease(@Body Map<String, Object> body);
+    Call<ReleaseData> addRelease(@Body Map<String, Object> body);
     
     /**
      * POST request corresponding to checkHash method.
@@ -49,7 +48,7 @@ public interface RHService {
      * @return requested ProjectMetadata call
      */
     @POST("/api/programmatic/v1/release/getByHash")
-    Call<Map<String, ProjectMetadata>> checkHash(@Body Map<String, Object> body);
+    Call<Map<String, ReleaseData>> checkHash(@Body Map<String, Object> body);
     
     /**
      * POST request corresponding to instData method.
@@ -57,7 +56,7 @@ public interface RHService {
      * @return requested projectmetadata call
      */
     @PUT("/api/programmatic/v1/instance/sendAgentData")
-    Call<InstanceMetadata> instData(@Body Map<String, Object> body);
+    Call<Map<String, String>> instData(@Body Map<String, Object> body);
     
     /**
      * GET request corresponding to getMyRelease method.
@@ -66,7 +65,7 @@ public interface RHService {
      * @return requested InstanceMetadata call
      */
     @GET("/api/programmatic/v1/instance/getMyFollowReleases")
-    Call<List<ReleaseMetadata>> getMyRelease(@Query("instance") String instance, @Query("namespace") String namespace);
+    Call<List<FullRelease>> getMyRelease(@Query("instance") String instance, @Query("namespace") String namespace);
     
     /**
      * POST request corresponding to getLatestRelease method.
@@ -74,7 +73,7 @@ public interface RHService {
      * @return requested ReleaseMetadata call
      */
     @POST("/api/programmatic/v1/release/getLatestProjectRelease")
-    Call<ReleaseMetadata> getLatestRelease(@Body Map<String, Object> body);
+    Call<FullRelease> getLatestRelease(@Body Map<String, Object> body);
     
     /**
      * PUT request corresponding to approveRelease method.
@@ -82,5 +81,5 @@ public interface RHService {
      * @return requested ReleaseMetadata call
      */
     @PUT("/api/programmatic/v1/release/approve")
-    Call<ReleaseMetadata> approveRelease(@Body Map<String, Object> body);
+    Call<ReleaseData> approveRelease(@Body Map<String, Object> body);
 }
