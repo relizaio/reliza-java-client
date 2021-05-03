@@ -20,66 +20,66 @@ import retrofit2.http.Query;
  * All request payloads are taken as Map&lt;String,Object&gt; and converted to JSON using JacksonConverterFactory.
  */
 public interface RHService {   
-    @Headers({
-        "Content-Type: application/json",
-        "User-Agent: Reliza Java Client",
-        "Accept-Encoding: gzip, deflate"
-    })
-    
-    /**
-     * POST request corresponding to getVersion method.
-     * @param body - request payload.
-     * @return requested ProjectVersion call
-     */
-    @POST("/api/programmatic/v2/project/getNewVersion")
-    Call<ProjectVersion> getVersion(@Body Map<String, Object> body);
-    
-    /**
-     * POST request corresponding to addRelease method.
-     * @param body - request payload.
-     * @return requested ProjectMetadata call
-     */
-    @POST("/api/programmatic/v1/release/create")
-    Call<ReleaseData> addRelease(@Body Map<String, Object> body);
-    
-    /**
-     * POST request corresponding to checkHash method.
-     * @param body - request payload.
-     * @return requested ProjectMetadata call
-     */
-    @POST("/api/programmatic/v1/release/getByHash")
-    Call<Map<String, ReleaseData>> checkHash(@Body Map<String, Object> body);
-    
-    /**
-     * POST request corresponding to instData method.
-     * @param body - request payload.
-     * @return requested projectmetadata call
-     */
-    @PUT("/api/programmatic/v1/instance/sendAgentData")
-    Call<Map<String, String>> instData(@Body Map<String, Object> body);
-    
-    /**
-     * GET request corresponding to getMyRelease method.
-     * @param instance - URI of instance.
-     * @param namespace - namespace of instance.
-     * @return requested InstanceMetadata call
-     */
-    @GET("/api/programmatic/v1/instance/getMyFollowReleases")
-    Call<List<FullRelease>> getMyRelease(@Query("instance") String instance, @Query("namespace") String namespace);
-    
-    /**
-     * POST request corresponding to getLatestRelease method.
-     * @param body - request payload.
-     * @return requested ReleaseMetadata call
-     */
-    @POST("/api/programmatic/v1/release/getLatestProjectRelease")
-    Call<FullRelease> getLatestRelease(@Body Map<String, Object> body);
-    
-    /**
-     * PUT request corresponding to approveRelease method.
-     * @param body - request payload.
-     * @return requested ReleaseMetadata call
-     */
-    @PUT("/api/programmatic/v1/release/approve")
-    Call<ReleaseData> approveRelease(@Body Map<String, Object> body);
+	@Headers({
+		"Content-Type: application/json",
+		"User-Agent: Reliza Java Client",
+		"Accept-Encoding: gzip, deflate"
+	})
+	
+	/**
+	 * POST request corresponding to getVersion method.
+	 * @param body - request payload.
+	 * @return requested ProjectVersion call
+	 */
+	@POST("/api/programmatic/v2/project/getNewVersion")
+	Call<ProjectVersion> getVersion(@Body Map<String, Object> body);
+	
+	/**
+	 * POST request corresponding to addRelease method.
+	 * @param body - request payload.
+	 * @return requested ProjectMetadata call
+	 */
+	@POST("/api/programmatic/v1/release/create")
+	Call<ReleaseData> addRelease(@Body Map<String, Object> body);
+	
+	/**
+	 * POST request corresponding to checkHash method.
+	 * @param body - request payload.
+	 * @return requested ProjectMetadata call
+	 */
+	@POST("/api/programmatic/v1/release/getByHash")
+	Call<Map<String, ReleaseData>> checkHash(@Body Map<String, Object> body);
+	
+	/**
+	 * POST request corresponding to instData method.
+	 * @param body - request payload.
+	 * @return requested projectmetadata call
+	 */
+	@PUT("/api/programmatic/v1/instance/sendAgentData")
+	Call<Map<String, String>> instData(@Body Map<String, Object> body);
+	
+	/**
+	 * GET request corresponding to getMyRelease method.
+	 * @param instance - URI of instance.
+	 * @param namespace - namespace of instance.
+	 * @return requested InstanceMetadata call
+	 */
+	@GET("/api/programmatic/v1/instance/getMyFollowReleases")
+	Call<List<FullRelease>> getMyRelease(@Query("instance") String instance, @Query("namespace") String namespace);
+	
+	/**
+	 * POST request corresponding to getLatestRelease method.
+	 * @param body - request payload.
+	 * @return requested ReleaseMetadata call
+	 */
+	@POST("/api/programmatic/v1/release/getLatestProjectRelease")
+	Call<FullRelease> getLatestRelease(@Body Map<String, Object> body);
+	
+	/**
+	 * PUT request corresponding to approveRelease method.
+	 * @param body - request payload.
+	 * @return requested ReleaseMetadata call
+	 */
+	@PUT("/api/programmatic/v1/release/approve")
+	Call<ReleaseData> approveRelease(@Body Map<String, Object> body);
 }
