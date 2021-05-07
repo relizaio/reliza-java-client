@@ -23,7 +23,7 @@ import reliza.java.client.responses.ReleaseData;
 public class LibraryTest {
 	private final String TEST_PROJECT_UUID = "314c0886-0f41-4f92-a4ef-59c2cbb0e3b0";
 	private final String TEST_PROJECT_API_ID = "PROJECT__314c0886-0f41-4f92-a4ef-59c2cbb0e3b0";
-	private final String TEST_PROJECT_API_KEY = "7dc2dcd7a581f5a8346d9499adef781334785a149de18d92c65b938723aed32c8861473b720f3eab0170c3b188e8d19b";
+	private final String TEST_PROJECT_API_KEY = "f74b7b71afcca541c4696a7fbf484e6dc47ebbcc0b5c38859a004d11bb7cc6e11c1405ae4d9161c153f7287d4ca545e7";
 	private final String TEST_ORG_API_ID = "ORGANIZATION_RW__c3c606a8-4fa2-4115-b731-a8ae513bc302";
 	private final String TEST_ORG_API_KEY= "6380ad96fa8157caa908a6ddf067274d6abe3558ab08ee52850fad5f1342fe497d695f393fe668ea69ac65ab8cc21b30";
 	private final String TEST_INSTANCE_API_ID = "INSTANCE__ba118a3c-c83d-453a-9515-b90b2868d0f3";
