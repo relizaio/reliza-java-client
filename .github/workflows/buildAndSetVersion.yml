@@ -50,8 +50,7 @@ jobs:
       if: always()
       run: |
         echo -n "-i $RELIZA_API_ID -k $RELIZA_API_KEY -b $GITHUB_REF --vcstype git \
-        --date $(git log -1 --date=iso-strict --pretty="%ad") --commit $(git rev-parse HEAD) \
-        --commitmessage \"$(git log -1 --pretty='%s')\" --vcsuri github.com/$GITHUB_REPOSITORY -v $RLZ_FULL_VER" >> reliza_command
+        --date $(git log -1 --date=iso-strict --pretty="%ad") --commit $(git rev-parse HEAD) --commitmessage \"$(git log -1 --pretty='%s')\" --vcsuri github.com/$GITHUB_REPOSITORY -v $RLZ_FULL_VER" >> reliza_command
         # debug
         cat reliza_command
         # send data
