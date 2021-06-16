@@ -9,6 +9,7 @@ import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.io.IOUtils;
@@ -27,6 +28,7 @@ import retrofit2.converter.jackson.JacksonConverterFactory;
 
 import reliza.java.client.interceptors.BasicAuthInterceptor;
 import reliza.java.client.responses.FullRelease;
+import reliza.java.client.responses.GraphQLResponse;
 import reliza.java.client.responses.ProjectVersion;
 import reliza.java.client.responses.ReleaseData;
 
@@ -37,6 +39,9 @@ import reliza.java.client.responses.ReleaseData;
 public class Library {
 	Flags flags;
 	RHService rhs;
+	ObjectMapper OM = new ObjectMapper();
+	String RELEASE_GQL_DATA;
+	String FULL_RELEASE_GQL_DATA;
 	
 	/**
 	 * Initializing Flags and RHService to call API. Default endpoint is set to https://app.relizahub.com, however can be modified
@@ -45,18 +50,123 @@ public class Library {
 	 */   
 	public Library(Flags flags) {
 		this.flags = flags;
-		ObjectMapper objectMapper = new ObjectMapper();
-		objectMapper.registerModule(new JavaTimeModule());
-		objectMapper.setSerializationInclusion(JsonInclude.Include.NON_EMPTY);
+		this.OM.registerModule(new JavaTimeModule());
+		this.OM.setSerializationInclusion(JsonInclude.Include.NON_EMPTY);
 		OkHttpClient client = new OkHttpClient.Builder()
 				.addInterceptor(new BasicAuthInterceptor(flags.getApiKeyId(), flags.getApiKey()))
 				.build();
 		Retrofit retrofit = new Retrofit.Builder()
 				.baseUrl(flags.getBaseUrl())
-				.addConverterFactory(JacksonConverterFactory.create(objectMapper))
+				.addConverterFactory(JacksonConverterFactory.create(OM))
 				.client(client)
 				.build();
 		this.rhs = retrofit.create(RHService.class);
+		
+		this.RELEASE_GQL_DATA = ""
+			+ "uuid \n"
+			+ "createdType \n"
+			+ "lastUpdatedBy \n"
+			+ "createdDate \n"
+			+ "version \n"
+			+ "status \n"
+			+ "org \n"
+			+ "project \n"
+			+ "branch \n"
+			+ "parentReleases { \n"
+				+ "timeSent \n"
+				+ "release \n"
+				+ "artifact \n"
+				+ "type \n"
+				+ "namespace \n"
+				+ "properties \n"
+				+ "state \n"
+				+ "replicas { \n"
+					+ "id \n"
+					+ "state \n"
+				+ "} \n"
+				+ "isInError \n"
+			+ "} \n"
+			+ "optionalReleases { \n"
+				+ "timeSent \n"
+				+ "release \n"
+				+ "artifact \n"
+				+ "type \n"
+				+ "namespace \n"
+				+ "properties \n"
+				+ "state \n"
+				+ "replicas { \n"
+					+ "id \n"
+					+ "state \n"
+				+ "} \n"
+				+ "isInError \n"
+			+ "} \n"
+			+ "sourceCodeEntry \n"
+			+ "commits \n"
+			+ "commitTime \n"
+			+ "artifacts \n"
+			+ "type \n"
+			+ "notes \n"
+			+ "approvals \n"
+			+ "timing { \n"
+				+ "lifecycle \n"
+				+ "dateFrom \n"
+				+ "dateTo \n"
+				+ "instanceUuid \n"
+				+ "environment \n"
+				+ "event \n"
+				+ "duration \n"
+			+ "} \n"
+			+ "decoratedVersionString \n"
+			+ "endpoint";
+		
+		this.FULL_RELEASE_GQL_DATA = RELEASE_GQL_DATA + "\n"
+			+ "sourceCodeEntryDetails { \n"
+				+ "uuid \n"
+				+ "branchUuid\n"
+				+ "vcsUuid\n"
+				+ "vcsBranch\n"
+				+ "commit\n"
+				+ "commits\n"
+				+ "commitMessage\n"
+				+ "vcsTag\n"
+				+ "notes\n"
+				+ "org\n"
+				+ "dateActual \n"
+			+ "} \n"
+			+ "vcsRepository { \n"
+				+ "uuid \n"
+				+ "name \n"
+				+ "org \n"
+				+ "uri \n"
+				+ "type \n"
+			+ "} \n"
+			+ "artifactDetails { \n"
+				+ "uuid \n"
+				+ "identifier \n"
+				+ "org \n"
+				+ "branch \n"
+				+ "buildId \n"
+				+ "buildUri \n"
+				+ "cicdMeta \n"
+				+ "digests \n"
+				+ "isInternal \n"
+				+ "artifactType { \n"
+					+ "name \n"
+					+ "aliases \n"
+				+ "} \n"
+				+ "notes \n"
+				+ "tags \n"
+				+ "dateFrom \n"
+				+ "dateTo \n"
+				+ "buildDuration \n"
+				+ "packageType \n"
+				+ "version \n"
+				+ "publisher \n"
+				+ "group \n"
+				+ "dependencies \n"
+			+ "} \n"
+			+ "projectName \n"
+			+ "namespace";
 	}
 	
 	/**
@@ -81,14 +191,14 @@ public class Library {
 	 * @return returns class ProjectVersion if successful API call and null otherwise.
 	 */
 	public ProjectVersion getVersion() {
-		Map<String, Object> body = new HashMap<>();  
-		body.put("branch", flags.getBranch());
-		body.put("versionSchema", flags.getVersionSchema());
-		body.put("project", flags.getProjectId());
-		body.put("onlyVersion", flags.getOnlyVersion());
-		body.put("modifier", flags.getModifier());
-		body.put("metadata", flags.getMetadata());
-		body.put("action", flags.getAction());
+		Map<String, Object> variables = new HashMap<>();
+		variables.put("branch", flags.getBranch());
+		variables.put("versionSchema", flags.getVersionSchema());
+		variables.put("project", flags.getProjectId());
+		variables.put("onlyVersion", flags.getOnlyVersion());
+		variables.put("modifier", flags.getModifier());
+		variables.put("metadata", flags.getMetadata());
+		variables.put("action", flags.getAction());
 		
 		if (StringUtils.isNotEmpty(flags.getCommitHash())) {
 			Map<String, String> commitMap = new HashMap<>();
@@ -97,11 +207,24 @@ public class Library {
 			commitMap.put("type", flags.getVcsType());
 			commitMap.put("vcsTag", flags.getVcsTag());
 			commitMap.put("dateActual", flags.getDateActual());
-			body.put("sourceCodeEntry", commitMap);
+			variables.put("sourceCodeEntry", commitMap);
 		}
-		if (flags.getManual()) {body.put("status", "draft");}
-		Call<ProjectVersion> call = rhs.getVersion(body);
-		return execute(call);
+		if (flags.getManual()) {
+			variables.put("status", "DRAFT");
+		}
+		
+		String query = 	""
+		+ "mutation ($GetNewVersionInput: GetNewVersionInput) { \n"
+			+ "getNewVersion(project:$GetNewVersionInput) \n"
+		+ "}";
+		
+		Map<String, Object> body = new HashMap<>();
+		body.put("query", query);
+		body.put("variables", Map.of("GetNewVersionInput", variables));
+		Call<GraphQLResponse> call = rhs.getVersion(body);
+		Map<String, Object> response = execute(call);
+		return response == null ? null :
+			OM.convertValue(response.get("getNewVersion"), ProjectVersion.class);
 	}
 	
 	/**
@@ -141,13 +264,13 @@ public class Library {
 	 * - tagVals (optional, but every tag value must have corresponding tag key) - flag to denote values of artifact tags. Multiple tag values per artifact are supported and must be comma separated. I.e.:tagValArr(val1,val2)
 	 * @return returns class ProjectMetadata if successful API call and null otherwise.
 	 */
-	public ReleaseData addRelease() {
-		Map<String, Object> body = new HashMap<>();
-		body.put("branch", flags.getBranch());
-		body.put("version", flags.getVersion());
-		body.put("status", flags.getStatus());
-		body.put("endpoint", flags.getEndPoint());
-		body.put("project", flags.getProjectId());
+	public FullRelease addRelease() {
+		Map<String, Object> variables = new HashMap<>();
+		variables.put("branch", flags.getBranch());
+		variables.put("version", flags.getVersion());
+		variables.put("status", flags.getStatus().toUpperCase());
+		variables.put("endpoint", flags.getEndPoint());
+		variables.put("project", flags.getProjectId());
 		
 		if (StringUtils.isNotEmpty(flags.getCommitHash())) {
 			Map<String, String> commitMap = new HashMap<>();
@@ -157,7 +280,7 @@ public class Library {
 			commitMap.put("type", flags.getVcsType());
 			commitMap.put("vcsTag", flags.getVcsTag());
 			commitMap.put("dateActual", flags.getDateActual());
-			body.put("sourceCodeEntry", commitMap);
+			variables.put("sourceCodeEntry", commitMap);
 		}
 		
 		if (StringUtils.isNotEmpty(flags.getCommitList())) {
@@ -181,10 +304,10 @@ public class Library {
 					commitMap.put("vcsTag", flags.getVcsTag());
 					commitMap.put("uri", flags.getVcsUri());
 					commitMap.put("type", flags.getVcsType());
-					body.put("sourceCodeEntry", commitMap);
+					variables.put("sourceCodeEntry", commitMap);
 				}
 			}
-			body.put("commits", commitsInBody);
+			variables.put("commits", commitsInBody);
 		}
 		
 		if (CollectionUtils.isNotEmpty(flags.getArtId())) {
@@ -205,7 +328,7 @@ public class Library {
 			artFlags.put("cicdMeta", flags.getArtCiMeta());
 			artFlags.put("type", flags.getArtType());
 			artFlags.put("artifactVersion", flags.getArtVersion());
-			artFlags.put("publisher", flags.getArtPublisher());
+			artFlags.put("publisher", flags.getArtPublisher().stream().map(s -> s.toUpperCase()).collect(Collectors.toList()));
 			artFlags.put("packageType", flags.getArtPackage());
 			artFlags.put("group", flags.getArtGroup());
 			artFlags.put("dateFrom", flags.getDateStart());
@@ -264,10 +387,23 @@ public class Library {
 					artifacts.get(i).put("tags", tagKeyToVal);
 				}
 			}
-			body.put("artifacts", artifacts);
+			variables.put("artifacts", artifacts);
 		}
-		Call<ReleaseData> call = rhs.addRelease(body);
-		return execute(call);
+		
+		String query = 	""
+		+ "mutation ($ReleaseInputProg: ReleaseInputProg) { \n"
+			+ "addReleaseProg(release:$ReleaseInputProg) { \n"
+				+ FULL_RELEASE_GQL_DATA + "\n"
+			+ "} \n"
+		+ "}";
+		
+		Map<String, Object> body = new HashMap<>();
+		body.put("query", query);
+		body.put("variables", Map.of("ReleaseInputProg", variables));
+		Call<GraphQLResponse> call = rhs.addRelease(body);
+		Map<String, Object> response = execute(call);
+		return response == null ? null :
+			OM.convertValue(response.get("addReleaseProg"), FullRelease.class);
 	}
 	
 	/**
@@ -279,14 +415,20 @@ public class Library {
 	 * @return returns class ProjectMetadata if successful API call and null otherwise.
 	 */
 	public ReleaseData checkHash() {
+		String query = 	""
+		+ "query ($hash: String!) { \n"
+			+ "getReleaseByHash(hash:$hash) { \n"
+				+ RELEASE_GQL_DATA + "\n"
+			+ "} \n"
+		+ "}";
+		
 		Map<String, Object> body = new HashMap<>();
-		body.put("hash", flags.getHash());
-		Call<Map<String, ReleaseData>> call = rhs.checkHash(body);
-		Map<String, ReleaseData> response = execute(call);
-		if (response == null) {
-			return null;
-		}
-		return response.get("release");
+		body.put("query", query);
+		body.put("variables", Map.of("hash", flags.getHash()));
+		Call<GraphQLResponse> call = rhs.checkHash(body);
+		Map<String, Object> response = execute(call);
+		return response == null ? null :
+			OM.convertValue(response.get("getReleaseByHash"), ReleaseData.class);
 	}
 	
 	/**
@@ -300,13 +442,13 @@ public class Library {
 	 * @return returns class InstanceMetadata if successful API call and null otherwise.
 	 */
 	public Map<String, String> instData() {
-		Map<String, Object> body = new HashMap<>();
+		Map<String, Object> variables = new HashMap<>();
 		if (StringUtils.isNotEmpty(flags.getImagesString())) {
-			body.put("images", Arrays.asList(StringUtils.split(flags.getImagesString(), " ")));
+			variables.put("images", Arrays.asList(StringUtils.split(flags.getImagesString(), " ")));
 		} else if (flags.getImageInputStream() != null) {
 			try {
 				byte[] imageBytes = IOUtils.toByteArray(flags.getImageInputStream());
-				body.put("images", Arrays.asList(StringUtils.split(new String(imageBytes, StandardCharsets.UTF_8), " ")));
+				variables.put("images", Arrays.asList(StringUtils.split(new String(imageBytes, StandardCharsets.UTF_8), " ")));
 			} catch (IOException e) {
 				log.error("IO exception", e);
 				return null;
@@ -315,11 +457,22 @@ public class Library {
 				return null;
 			}
 		}
-		body.put("timeSent", Instant.now().toString());
-		body.put("namespace", flags.getNamespace());
-		body.put("senderId", flags.getSenderId());
-		Call<Map<String, String>> call = rhs.instData(body);
-		return execute(call);
+		variables.put("timeSent", Instant.now().toString());
+		variables.put("namespace", flags.getNamespace());
+		variables.put("senderId", flags.getSenderId());
+		
+		String query = 	""
+		+ "mutation ($InstanceDataInput: InstanceDataInput) { \n"
+			+ "instData(instance:$InstanceDataInput) \n"
+		+ "}";
+		
+		Map<String, Object> body = new HashMap<>();
+		body.put("query", query);
+		body.put("variables", Map.of("InstanceDataInput", variables));
+		Call<GraphQLResponse> call = rhs.checkHash(body);
+		Map<String, Object> response = execute(call);
+		return response == null ? null :
+			(Map<String, String>) response.get("instData");
 	}
 	
 	/**
@@ -331,8 +484,23 @@ public class Library {
 	 * @return returns class ReleaseMetadata if successful API call and null otherwise.
 	 */
 	public List<FullRelease> getMyRelease() {
-		Call<List<FullRelease>> call = rhs.getMyRelease(flags.getInstance(), flags.getNamespace());
-		return execute(call);
+		String query = 	""
+		+ "query ($instance: String, $namespace: String) { \n"
+			+ "getMyRelease(instance:$instance, namespace:$namespace) { \n"
+				+ FULL_RELEASE_GQL_DATA + "\n"
+			+ "} \n"
+		+ "}";
+		
+		Map<String, Object> variables = new HashMap<>();
+		Map<String, Object> body = new HashMap<>();
+		variables.put("instance", flags.getInstance());
+		variables.put("namespace", flags.getNamespace());
+		body.put("query", query);
+		body.put("variables", variables);
+		Call<GraphQLResponse> call = rhs.addRelease(body);
+		Map<String, Object> response = execute(call);
+		return response == null ? null :
+			Arrays.asList(OM.convertValue(response.get("getMyRelease"), FullRelease[].class));
 	}
 	
 	/**
@@ -351,18 +519,31 @@ public class Library {
 	 * @return returns class ReleaseMetadata if successful API call and null otherwise.
 	 */
 	public FullRelease getLatestRelease() {
-		Map<String, Object> body = new HashMap<>();
-		body.put("project", flags.getProjectId());
-		body.put("environment", flags.getEnvironment());
-		body.put("product", flags.getEnvironment());
+		Map<String, Object> variables = new HashMap<>();
+		variables.put("project", flags.getProjectId());
+		variables.put("environment", flags.getEnvironment());
+		variables.put("product", flags.getProduct());
 		if (CollectionUtils.isNotEmpty(flags.getTagKeys()) && CollectionUtils.isNotEmpty(flags.getTagVals())) {
-			body.put("tags", flags.getTagKeys().get(0) + " " + flags.getTagVals().get(0));
+			variables.put("tags", flags.getTagKeys().get(0) + " " + flags.getTagVals().get(0));
 		}
-		body.put("branch", flags.getBranch());
-		body.put("instance", flags.getInstance());
-		body.put("namespace", flags.getNamespace());
-		Call<FullRelease> call = rhs.getLatestRelease(body);
-		return execute(call);
+		variables.put("branch", flags.getBranch());
+		variables.put("instance", flags.getInstance());
+		variables.put("namespace", flags.getNamespace());
+		
+		String query = 	""
+		+ "query ($GetLatestReleaseInput: GetLatestReleaseInput) { \n"
+			+ "getLatestRelease(release:$GetLatestReleaseInput) { \n"
+				+ FULL_RELEASE_GQL_DATA + "\n"
+			+ "} \n"
+		+ "}";
+		
+		Map<String, Object> body = new HashMap<>();
+		body.put("query", query);
+		body.put("variables", Map.of("GetLatestReleaseInput", variables));
+		Call<GraphQLResponse> call = rhs.addRelease(body);
+		Map<String, Object> response = execute(call);
+		return response == null ? null :
+			OM.convertValue(response.get("getLatestRelease"), FullRelease.class);
 	}
 	
 	/**
@@ -380,33 +561,45 @@ public class Library {
 	 * @return returns class ReleaseMetadata if successful API call and null otherwise.
 	 */
 	public ReleaseData approveRelease() {
-		Map<String, Object> body = new HashMap<>();
+		Map<String, Object> variables = new HashMap<>();
 		Map<String, Boolean> approvalMap = new HashMap<>();
 		approvalMap.put(flags.getApprovalType(), !flags.getDisapprove());
-		body.put("approvals", approvalMap);
-		body.put("uuid", flags.getReleaseId());
-		body.put("version", flags.getVersion());
-		body.put("project", flags.getProjectId());
-		body.put("instance", flags.getInstance());
-		body.put("namespace", flags.getNamespace());
-		Call<ReleaseData> call = rhs.approveRelease(body);
-		return execute(call);
+		variables.put("approvals", approvalMap);
+		variables.put("uuid", flags.getReleaseId());
+		variables.put("version", flags.getVersion());
+		variables.put("project", flags.getProjectId());
+		variables.put("instance", flags.getInstance());
+		variables.put("namespace", flags.getNamespace());
+		
+		String query = 	""
+		+ "mutation ($ApproveReleaseInput: ApproveReleaseInput) { \n"
+			+ "approveReleaseProg(release:$ApproveReleaseInput) { \n"
+				+ RELEASE_GQL_DATA + "\n"
+			+ "} \n"
+		+ "}";
+		
+		Map<String, Object> body = new HashMap<>();
+		body.put("query", query);
+		body.put("variables", Map.of("ApproveReleaseInput", variables));
+		Call<GraphQLResponse> call = rhs.addRelease(body);
+		Map<String, Object> response = execute(call);
+		return response == null ? null :
+			OM.convertValue(response.get("approveReleaseProg"), ReleaseData.class);
 	}
 	
 	/**
 	 * Method for executing call and logging results
-	 * @param <T> - The response class of our call.
 	 * @param call - The call which we send to the API.
-	 * @return If call is successful return API response and return null otherwise.
+	 * @return If call has no errors return API response and return null otherwise.
 	 */
-	private static <T> T execute(Call<T> call) {
+	private static Map<String, Object> execute(Call<GraphQLResponse> call) {
 		try {
-			Response<T> resp = call.execute();
-			if (resp.isSuccessful()) {
-				log.debug(resp.body().toString());
-				return resp.body();
+			Response<GraphQLResponse> resp = call.execute();
+			if (resp.body().getErrors() == null) {
+				log.debug(resp.body().getData().toString());
+				return resp.body().getData();
 			} else {
-				log.error(resp.errorBody().string());
+				log.error(resp.body().getErrors().toString());
 				return null;
 			}
 		} catch (IOException e) {

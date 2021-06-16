@@ -22,17 +22,23 @@ public class ArtifactData extends RelizaDataParent {
 	private String cicdMeta;
 	private List<String> digests;
 	private ArtifactBelonging isInternal;
-	private String type;
+	private ArtifactType artifactType;
 	private String notes;
 	private Map<String, String> tags;
 	private ZonedDateTime dateFrom;
 	private ZonedDateTime dateTo;
-	private Long duration;
+	private Long buildDuration;
 	private PackageType packageType;
 	private String version;
 	private String publisher;
 	private String group;
 	private List<UUID> dependencies;
+	
+	@Data
+	public class ArtifactType {
+		private String name;
+		private List<String> aliases;
+	}
 	
 	public enum ArtifactBelonging {
 		INTERNAL,

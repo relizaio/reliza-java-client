@@ -21,6 +21,7 @@ public class DeployedRelease {
 	private Map<UUID, String> properties;
 	private ServiceState state;
 	private List<DeployedReplica> replicas;
+	private Boolean isInError;
 	
 	@Data
 	public class DeployedReplica {

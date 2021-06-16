@@ -21,6 +21,7 @@ import reliza.java.client.responses.ReleaseData;
  * Class for testing Library.java methods.
  */
 public class LibraryTest {
+	private final String BASE_URL = "https://test.relizahub.com";
 	private final String TEST_PROJECT_UUID = "314c0886-0f41-4f92-a4ef-59c2cbb0e3b0";
 	private final String TEST_PROJECT_API_ID = "PROJECT__314c0886-0f41-4f92-a4ef-59c2cbb0e3b0";
 	private final String TEST_PROJECT_API_KEY = "f74b7b71afcca541c4696a7fbf484e6dc47ebbcc0b5c38859a004d11bb7cc6e11c1405ae4d9161c153f7287d4ca545e7";
@@ -39,7 +40,7 @@ public class LibraryTest {
 			.apiKey(TEST_ORG_API_KEY)
 			.branch("master")
 			.projectId(UUID.fromString(TEST_PROJECT_UUID))
-			.baseUrl("https://test.relizahub.com")
+			.baseUrl(BASE_URL)
 			.build();
 		Library library = new Library(flags);
 		ProjectVersion projectVersion = library.getVersion();
@@ -65,11 +66,11 @@ public class LibraryTest {
 			.dateStart(Arrays.asList("2021-01-11T19:43:32.286086002Z", "2021-01-11T19:43:32.286086002Z"))
 			.artDigests(Arrays.asList("sha256:123", "sha256:125"))
 			.endPoint("https://github.com/relizaio/reliza-java-client")
-			.status("completed")
+			.status("complete")
 			.tagKeys(Arrays.asList("prod", "prod"))
 			.tagVals(Arrays.asList("true", "true"))
 			.vcsType("git")
-			.baseUrl("https://test.relizahub.com")
+			.baseUrl(BASE_URL)
 			.build();
 		Library library = new Library(flags);
 		ProjectVersion projectVersion = library.getVersion();
@@ -86,7 +87,7 @@ public class LibraryTest {
 		Flags flags = Flags.builder().apiKeyId(TEST_PROJECT_API_ID)
 			.apiKey(TEST_PROJECT_API_KEY)
 			.hash("sha256:52")
-			.baseUrl("https://test.relizahub.com")
+			.baseUrl(BASE_URL)
 			.build();
 		Library library = new Library(flags);
 		ReleaseData releaseData = library.checkHash();
@@ -97,30 +98,30 @@ public class LibraryTest {
 	 * Test for instData method with an image sha256.
 	 */
 	@Test public void testInstDataImagesString() {
-	  Flags flags = Flags.builder().apiKeyId(TEST_INSTANCE_API_ID)
-		  .apiKey(TEST_INSTANCE_API_KEY)
-		  .imagesString("sha256:poke")
-		  .baseUrl("https://test.relizahub.com")
-		  .build();
-	  Library library = new Library(flags);
-	  Map<String, String> status = library.instData();
-	  Assert.assertNotNull(status);
+		Flags flags = Flags.builder().apiKeyId(TEST_INSTANCE_API_ID)
+			.apiKey(TEST_INSTANCE_API_KEY)
+			.imagesString("sha256:tests")
+			.baseUrl(BASE_URL)
+			.build();
+		Library library = new Library(flags);
+		Map<String, String> status = library.instData();
+		Assert.assertNotNull(status);
 	}
 	
 	/**
 	 * Test for instData method using file path.
 	 */
 	@Test public void testInstDataImageStream() {
-	  Flags flags = Flags.builder().apiKeyId(TEST_INSTANCE_API_ID)
-		  .apiKey(TEST_INSTANCE_API_KEY)
-		  .imageInputStream(IOUtils.toInputStream("this is my input stream", StandardCharsets.UTF_8))
-		  .namespace("spacename")
-		  .senderId("Idsender")
-		  .baseUrl("https://test.relizahub.com")
-		  .build();
-	  Library library = new Library(flags);
-	  Map<String, String> status = library.instData();
-	  Assert.assertNotNull(status);
+		Flags flags = Flags.builder().apiKeyId(TEST_INSTANCE_API_ID)
+			.apiKey(TEST_INSTANCE_API_KEY)
+			.imageInputStream(IOUtils.toInputStream("this is my input stream", StandardCharsets.UTF_8))
+			.namespace("spacename")
+			.senderId("Idsender")
+			.baseUrl(BASE_URL)
+			.build();
+		Library library = new Library(flags);
+		Map<String, String> status = library.instData();
+		Assert.assertNotNull(status);
 	}
 	
 	/**
@@ -129,7 +130,7 @@ public class LibraryTest {
 	@Test public void testGetMyRelease() {
 		Flags flags = Flags.builder().apiKeyId(TEST_INSTANCE_API_ID)
 			.apiKey(TEST_INSTANCE_API_KEY)
-			.baseUrl("https://test.relizahub.com")
+			.baseUrl(BASE_URL)
 			.build();
 		Library library = new Library(flags);
 		List<FullRelease> fullReleases = library.getMyRelease();
@@ -144,7 +145,7 @@ public class LibraryTest {
 			.apiKey(TEST_PROJECT_API_KEY)
 			.projectId(UUID.fromString(TEST_PROJECT_UUID))
 			.branch("master")
-			.baseUrl("https://test.relizahub.com")
+			.baseUrl(BASE_URL)
 			.build();
 		Library library = new Library(flags);
 		FullRelease fullRelease = library.getLatestRelease();
@@ -160,7 +161,7 @@ public class LibraryTest {
 			.version("0.0.1")
 			.projectId(UUID.fromString(TEST_PROJECT_UUID))
 			.approvalType("PM")
-			.baseUrl("https://test.relizahub.com")
+			.baseUrl(BASE_URL)
 			.build();
 		Library approveReleaseLibrary = new Library(approveReleaseFlags);
 		ReleaseData releaseData = approveReleaseLibrary.approveRelease();

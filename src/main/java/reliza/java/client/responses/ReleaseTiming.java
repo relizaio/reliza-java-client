@@ -10,13 +10,12 @@ import lombok.Data;
  */
 @Data
 public class ReleaseTiming {
-	private UUID releaseUuid;
+	private String event;
 	private ReleaseLifeCycle lifecycle;
 	private ZonedDateTime dateFrom;
 	private ZonedDateTime dateTo;
 	private EnvironmentType environment;
-	private UUID instance;
-	private String event;
+	private UUID instanceUuid;
 	private Long duration;
 	
 	public enum ReleaseLifeCycle {
