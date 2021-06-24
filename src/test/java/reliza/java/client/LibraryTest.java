@@ -22,15 +22,15 @@ import reliza.java.client.responses.ReleaseData;
  */
 public class LibraryTest {
 	private final String BASE_URL = "https://test.relizahub.com";
-	private final String TEST_PROJECT_UUID = "314c0886-0f41-4f92-a4ef-59c2cbb0e3b0";
-	private final String TEST_PROJECT_API_ID = "PROJECT__314c0886-0f41-4f92-a4ef-59c2cbb0e3b0";
-	private final String TEST_PROJECT_API_KEY = "f74b7b71afcca541c4696a7fbf484e6dc47ebbcc0b5c38859a004d11bb7cc6e11c1405ae4d9161c153f7287d4ca545e7";
-	private final String TEST_ORG_API_ID = "ORGANIZATION_RW__c3c606a8-4fa2-4115-b731-a8ae513bc302";
-	private final String TEST_ORG_API_KEY= "6380ad96fa8157caa908a6ddf067274d6abe3558ab08ee52850fad5f1342fe497d695f393fe668ea69ac65ab8cc21b30";
-	private final String TEST_INSTANCE_API_ID = "INSTANCE__ba118a3c-c83d-453a-9515-b90b2868d0f3";
-	private final String TEST_INSTANCE_API_KEY = "cf9a27900e54c5cf207cd7c3a767e4c31af3676ecad3aa58ed1481340448966bc3f2ecd88c5f094fb2544a5972d385f8";
-	private final String TEST_APPROVAL_API_ID = "APPROVAL__a828881c-a7d9-4fc4-9ebb-b90cde845b73";
-	private final String TEST_APPROVAL_API_KEY = "4eada132ad2eed3c40fee1998e97162b4896f00a9dde367ac098f08009a2639f266f44db079b6970e459c3af4b031147";
+	private final String TEST_PROJECT_UUID = "e84763be-38a3-429b-9e4d-5c75a77e02c7";
+	private final String TEST_PROJECT_API_ID = "PROJECT__e84763be-38a3-429b-9e4d-5c75a77e02c7";
+	private final String TEST_PROJECT_API_KEY = "d7fa82031731148a15e8c0fae3a169c901794aaa13b09e240af2dac9853762237e64f77910ac2e23ac672b13ba5279c4";
+	private final String TEST_ORG_API_ID = "ORGANIZATION_RW__be10a566-1713-4459-b5c4-c80a3ace1de4__ord__00ee5893-0966-45bc-b31b-1d3f3b6d3e3b";
+	private final String TEST_ORG_API_KEY= "8c8f8fb0fb679ee38fc9299b23c083c79fdd1061a0a94ab6f7c3921fc19d6aec41c053bc2b3d68ed8898dc970e89e419";
+	private final String TEST_INSTANCE_API_ID = "INSTANCE__eff315f3-0ff3-4c6a-a002-0884acc7a73d";
+	private final String TEST_INSTANCE_API_KEY = "b07e26e16d77f4ed58b934765543318bc6c210beb8292ffd1c8741e8c2b2c31a139c64e5ae0697110856774f5732030c";
+	private final String TEST_APPROVAL_API_ID = "APPROVAL__651c41a8-97c6-40f3-82e7-492609b124d6";
+	private final String TEST_APPROVAL_API_KEY = "a2a45b65aa665d8d79d539b6d481daa9fa6362d53e52143edba88fb5a4524a2af06783b7ec3c233f53804910248f1664";
 	
 	/**
 	 * Test for getVersion using org wide api key and id
@@ -134,7 +134,7 @@ public class LibraryTest {
 			.build();
 		Library library = new Library(flags);
 		List<FullRelease> fullReleases = library.getMyRelease();
-		Assert.assertNotNull(fullReleases);
+		Assert.assertFalse(fullReleases.isEmpty());
 	}
 	
 	/**

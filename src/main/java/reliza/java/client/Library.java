@@ -188,7 +188,7 @@ public class Library {
 	 * - modifier (optional) - flag to set version modifier. This may be semver modifier or custom version schema. <br>
 	 * - action (optional)
 	 * - onlyVersion (optional) - boolean flag to skip creation of the release. Default is false.
-	 * @return returns class ProjectVersion if successful API call and null otherwise.
+	 * @return returns ProjectVersion if successful API call and null otherwise.
 	 */
 	public ProjectVersion getVersion() {
 		Map<String, Object> variables = new HashMap<>();
@@ -262,9 +262,9 @@ public class Library {
 	 *                  sha256:4e8b31b19ef16731a6f82410f9fb929da692aa97b71faeb1596c55fbf663dcdd,sha1:fe4165996a41501715ea0662b6a906b55e34a2a1 <br>
 	 * - tagKeys (optional, but every tag key must have corresponding tag value) - flag to denote keys of artifact tags. Multiple tag keys per artifact are supported and must be comma separated. I.e.:tagKeyArr(key1,key2) <br>
 	 * - tagVals (optional, but every tag value must have corresponding tag key) - flag to denote values of artifact tags. Multiple tag values per artifact are supported and must be comma separated. I.e.:tagValArr(val1,val2)
-	 * @return returns class ProjectMetadata if successful API call and null otherwise.
+	 * @return returns ReleaseData if successful API call and null otherwise.
 	 */
-	public FullRelease addRelease() {
+	public ReleaseData addRelease() {
 		Map<String, Object> variables = new HashMap<>();
 		variables.put("branch", flags.getBranch());
 		variables.put("version", flags.getVersion());
@@ -393,7 +393,7 @@ public class Library {
 		String query = 	""
 		+ "mutation ($ReleaseInputProg: ReleaseInputProg) { \n"
 			+ "addReleaseProg(release:$ReleaseInputProg) { \n"
-				+ FULL_RELEASE_GQL_DATA + "\n"
+				+ RELEASE_GQL_DATA + "\n"
 			+ "} \n"
 		+ "}";
 		
@@ -403,7 +403,7 @@ public class Library {
 		Call<GraphQLResponse> call = rhs.addRelease(body);
 		Map<String, Object> response = execute(call);
 		return response == null ? null :
-			OM.convertValue(response.get("addReleaseProg"), FullRelease.class);
+			OM.convertValue(response.get("addReleaseProg"), ReleaseData.class);
 	}
 	
 	/**
@@ -412,7 +412,7 @@ public class Library {
 	 * - apiKeyId (required) - flag for project api id. <br>
 	 * - apiKey (required) - flag for project api key. <br>
 	 * - hash (required) - flag to denote actual hash. By convention, hash must include hashing algorithm as its first part, i.e. sha256: or sha512:
-	 * @return returns class ProjectMetadata if successful API call and null otherwise.
+	 * @return returns ReleaseData if successful API call and null otherwise.
 	 */
 	public ReleaseData checkHash() {
 		String query = 	""
@@ -439,7 +439,7 @@ public class Library {
 	 * - imagesString (required) - flag which lists sha256 digests of images sent from the instances. Images must be white space separated. Note that sending full docker image URIs with digests is also accepted, i.e. it's ok to send images as relizaio/reliza-cli:latest@sha256:ebe68a0427bf88d748a4cad0a419392c75c867a216b70d4cd9ef68e8031fe7af  <br>
 	 * - namespace (optional, if not sent "default" namespace is used) - flag to denote namespace where we are sending images. Namespaces are useful to separate different products deployed on the same instance. <br>
 	 * - senderId (optional) - flag to denote unique sender within a single namespace. This is useful if say there are different nodes where each streams only part of application deployment data. In this case such nodes need to use same namespace but different senders so that their data does not stomp on each other. <br>
-	 * @return returns class InstanceMetadata if successful API call and null otherwise.
+	 * @return returns status map if successful API call and null otherwise.
 	 */
 	public Map<String, String> instData() {
 		Map<String, Object> variables = new HashMap<>();
@@ -481,7 +481,7 @@ public class Library {
 	 * - apiKeyId (required) - flag for instance api id. <br>
 	 * - apiKey (required) - flag for instance api key. <br>
 	 * - namespace (optional, if not sent "default" namespace is used) - flag to denote namespace for which we are requesting release data. Namespaces are useful to separate different products deployed on the same instance.
-	 * @return returns class ReleaseMetadata if successful API call and null otherwise.
+	 * @return returns FullRelease if successful API call and null otherwise.
 	 */
 	public List<FullRelease> getMyRelease() {
 		String query = 	""
@@ -516,7 +516,7 @@ public class Library {
 	 * - tagVals (optional, if provided tagkey flag must also be supplied) - flag to denote tag value to use as a selector for artifact. <br>
 	 * - instance (optional, if supplied namespace flag is also used and env flag gets overrided by instance's environment) - flag to denote specific instance for which release should match. <br>
 	 * - namespace (optional) - flag to denote specific namespace within instance, if instance is supplied.
-	 * @return returns class ReleaseMetadata if successful API call and null otherwise.
+	 * @return returns FullRelease if successful API call and null otherwise.
 	 */
 	public FullRelease getLatestRelease() {
 		Map<String, Object> variables = new HashMap<>();
@@ -558,7 +558,7 @@ public class Library {
 	 * - namespace (optional, only considered if instance is specified") - Namespace of the instance for which release should be approved. <br>
 	 * - approvalType (required) - approval type as per approval matrix on the Organization Settings page in Reliza Hub. <br>
 	 * - disapprove (optional) - flag to indicate disapproval event instead of approval.
-	 * @return returns class ReleaseMetadata if successful API call and null otherwise.
+	 * @return returns ReleaseData if successful API call and null otherwise.
 	 */
 	public ReleaseData approveRelease() {
 		Map<String, Object> variables = new HashMap<>();
