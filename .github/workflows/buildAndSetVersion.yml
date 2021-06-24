@@ -13,7 +13,7 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v2
       with:
-        fetch-depth: 0
+        fetch-depth: 50
     - name: Get version
       run: |
         reliza_ver=$(docker run --rm relizaio/reliza-cli getversion -i $RELIZA_API_ID -k $RELIZA_API_KEY -b $GITHUB_REF)
