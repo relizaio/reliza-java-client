@@ -1,6 +1,4 @@
-on:
-  repository_dispatch:
-    types: [reliza-build-event]
+on: [push]
 
 name: Pull versions from Reliza, do a test build, update version and commit
 

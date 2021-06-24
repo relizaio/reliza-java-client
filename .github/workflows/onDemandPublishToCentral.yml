@@ -1,4 +1,6 @@
-on: [push]
+on:
+  repository_dispatch:
+    types: [reliza-build-event]
 
 name: Publish to Maven Central
 
@@ -23,8 +25,25 @@ jobs:
         uses: actions/setup-java@v1
         with:
           java-version: 11
+      - name: Get version
+        run: |
+          reliza_ver=$(docker run --rm relizaio/reliza-cli getversion -i $RELIZA_API_ID -k $RELIZA_API_KEY -b $GITHUB_REF)
+            echo "RLZ_VER_JSON=$reliza_ver" >> $GITHUB_ENV
+            echo "completed getting ver"
+            echo $reliza_ver
+      - name: Extract Actual Version From JSON
+        run: |
+          full_ver=$(echo $RLZ_VER_JSON | jq -r ".version")
+          echo "RLZ_FULL_VER=$full_ver" >> $GITHUB_ENV
+          echo $full_ver
       - name: Set build.gradle version
         run: gradle changeVersion -PnewVersion="${RLZ_FULL_VER}"
+      - name: Commit and push
+        run: |
+          git config --global user.name 'reliza-auto'
+          git config --global user.email 'info@reliza.io'
+          git commit -am "chore: update project version to ${RLZ_FULL_VER} for push to maven central"
+          git push
       - name: Run tests
         run: gradle test
       - name: If build fails
@@ -38,8 +57,22 @@ jobs:
           if [ ! -z "$last_commit" ]
           then
             echo -n "--commits $(git log $last_commit..$GITHUB_SHA --date=iso-strict --pretty='%H|||%ad|||%s' | base64 -w 0) " >> reliza_command
+            echo $GITHUB_SHA
             echo $(git log $last_commit..$GITHUB_SHA)
+            echo $(git log $last_commit..$GITHUB_SHA --date=iso-strict --pretty='%H|||%ad|||%s' | base64 -w 0)
           fi
+      - name: Send release metadata
+        if: always()
+        run: |
+          echo "-i $RELIZA_API_ID -k $RELIZA_API_KEY -b $GITHUB_REF --vcstype git \
+          --commitmessage "$(git log -1 --pretty='%s')" \
+          --date $(git log -1 --date=iso-strict --pretty="%ad") --commit $(git rev-parse HEAD) \
+          --vcsuri github.com/$GITHUB_REPOSITORY -v $RLZ_FULL_VER" >> reliza_command
+          # debug
+          cat reliza_command
+          # send data
+          echo docker run --rm relizaio/reliza-cli addrelease $(cat reliza_command) > rlz_cmd_exec
+          eval $(cat rlz_cmd_exec)
       - name: Publish to Central
         # exporting key to sign - https://stackoverflow.com/questions/57921325/gradle-signarchives-unable-to-read-secret-key/58000485#58000485
         if: success()
