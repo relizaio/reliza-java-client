@@ -268,7 +268,7 @@ public class Library {
 		Map<String, Object> variables = new HashMap<>();
 		variables.put("branch", flags.getBranch());
 		variables.put("version", flags.getVersion());
-		variables.put("status", flags.getStatus().toUpperCase());
+		variables.put("status", StringUtils.isNotEmpty(flags.getStatus()) ?  flags.getStatus().toUpperCase() : null);
 		variables.put("endpoint", flags.getEndPoint());
 		variables.put("project", flags.getProjectId());
 		
@@ -328,7 +328,8 @@ public class Library {
 			artFlags.put("cicdMeta", flags.getArtCiMeta());
 			artFlags.put("type", flags.getArtType());
 			artFlags.put("artifactVersion", flags.getArtVersion());
-			artFlags.put("publisher", flags.getArtPublisher().stream().map(s -> s.toUpperCase()).collect(Collectors.toList()));
+			artFlags.put("publisher", flags.getArtPublisher().stream().map(
+					s -> StringUtils.isNotEmpty(s) ? s.toUpperCase() : s).collect(Collectors.toList()));
 			artFlags.put("packageType", flags.getArtPackage());
 			artFlags.put("group", flags.getArtGroup());
 			artFlags.put("dateFrom", flags.getDateStart());
