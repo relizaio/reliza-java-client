@@ -23,7 +23,7 @@ public interface RHService {
 	/**
 	 * POST request corresponding to getVersion method.
 	 * @param body - request payload.
-	 * @return requested ProjectVersion call
+	 * @return graphql response from API.
 	 */
 	@POST("/graphql")
 	Call<GraphQLResponse> getVersion(@Body Map<String, Object> body);
@@ -31,7 +31,7 @@ public interface RHService {
 	/**
 	 * POST request corresponding to addRelease method.
 	 * @param body - request payload.
-	 * @return requested ProjectMetadata call
+	 * @return graphql response from API.
 	 */
 	@POST("/graphql")
 	Call<GraphQLResponse> addRelease(@Body Map<String, Object> body);
@@ -39,7 +39,7 @@ public interface RHService {
 	/**
 	 * POST request corresponding to checkHash method.
 	 * @param body - request payload.
-	 * @return requested ProjectMetadata call
+	 * @return graphql response from API.
 	 */
 	@POST("/graphql")
 	Call<GraphQLResponse> checkHash(@Body Map<String, Object> body);
@@ -47,16 +47,15 @@ public interface RHService {
 	/**
 	 * POST request corresponding to instData method.
 	 * @param body - request payload.
-	 * @return requested projectmetadata call
+	 * @return graphql response from API.
 	 */
 	@POST("/graphl")
 	Call<GraphQLResponse> instData(@Body Map<String, Object> body);
 	
 	/**
-	 * GET request corresponding to getMyRelease method.
-	 * @param instance - URI of instance.
-	 * @param namespace - namespace of instance.
-	 * @return requested InstanceMetadata call
+	 * POST request corresponding to getMyRelease method.
+	 * @param body - request payload.
+	 * @return graphql response from API.
 	 */
 	@POST("/graphql")
 	Call<GraphQLResponse> getMyRelease(@Body Map<String, Object> body);
@@ -64,7 +63,7 @@ public interface RHService {
 	/**
 	 * POST request corresponding to getLatestRelease method.
 	 * @param body - request payload.
-	 * @return requested ReleaseMetadata call
+	 * @return graphql response from API.
 	 */
 	@POST("/graphql")
 	Call<GraphQLResponse> getLatestRelease(@Body Map<String, Object> body);
@@ -72,7 +71,7 @@ public interface RHService {
 	/**
 	 * PUT request corresponding to approveRelease method.
 	 * @param body - request payload.
-	 * @return requested ReleaseMetadata call
+	 * @return graphql response from API.
 	 */
 	@POST("/graphql")
 	Call<GraphQLResponse> approveRelease(@Body Map<String, Object> body);
