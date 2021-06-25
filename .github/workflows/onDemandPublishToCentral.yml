@@ -53,13 +53,9 @@ jobs:
         run: |
           last_commit=$(docker run --rm relizaio/reliza-cli getlatestrelease -i ${{ secrets.RELIZA_API_ID }} -k ${{ secrets.RELIZA_API_KEY }} \
             --branch $GITHUB_REF | jq -r ".sourceCodeEntryDetails.commit")
-          echo $last_commit
           if [ ! -z "$last_commit" ]
           then
-            echo -n "--commits $(git log $last_commit..$GITHUB_SHA --date=iso-strict --pretty='%H|||%ad|||%s' | base64 -w 0) " >> reliza_command
-            echo $GITHUB_SHA
-            echo $(git log $last_commit..$GITHUB_SHA)
-            echo $(git log $last_commit..$GITHUB_SHA --date=iso-strict --pretty='%H|||%ad|||%s' | base64 -w 0)
+            echo -n "--commits $(git log $last_commit..$(git rev-parse HEAD) --date=iso-strict --pretty='%H|||%ad|||%s' | base64 -w 0) " >> reliza_command
           fi
       - name: Send release metadata
         if: always()

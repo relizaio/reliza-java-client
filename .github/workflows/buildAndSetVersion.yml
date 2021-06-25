@@ -44,7 +44,7 @@ jobs:
           --branch $GITHUB_REF | jq -r ".sourceCodeEntryDetails.commit")
         if [ ! -z "$last_commit" ]
         then
-          echo -n "--commits $(git log $last_commit..$GITHUB_SHA --date=iso-strict --pretty='%H|||%ad|||%s' | base64 -w 0) " >> reliza_command
+          echo -n "--commits $(git log $last_commit..$(git rev-parse HEAD) --date=iso-strict --pretty='%H|||%ad|||%s' | base64 -w 0) " >> reliza_command
         fi
     - name: Send release metadata
       if: always()
