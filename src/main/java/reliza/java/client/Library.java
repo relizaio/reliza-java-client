@@ -218,9 +218,12 @@ public class Library {
 			+ "getNewVersion(project:$GetNewVersionInput) \n"
 		+ "}";
 		
+		Map<String, Object> input = new HashMap<>();
+		input.put("GetNewVersionInput", variables);
 		Map<String, Object> body = new HashMap<>();
 		body.put("query", query);
-		body.put("variables", Map.of("GetNewVersionInput", variables));
+		body.put("variables", input);
+		
 		Call<GraphQLResponse> call = rhs.getVersion(body);
 		Map<String, Object> response = execute(call);
 		return response == null ? null :
@@ -398,9 +401,12 @@ public class Library {
 			+ "} \n"
 		+ "}";
 		
+		Map<String, Object> input = new HashMap<>();
+		input.put("ReleaseInputProg", variables);
 		Map<String, Object> body = new HashMap<>();
 		body.put("query", query);
-		body.put("variables", Map.of("ReleaseInputProg", variables));
+		body.put("variables", input);
+		
 		Call<GraphQLResponse> call = rhs.addRelease(body);
 		Map<String, Object> response = execute(call);
 		return response == null ? null :
@@ -423,9 +429,12 @@ public class Library {
 			+ "} \n"
 		+ "}";
 		
+		Map<String, Object> input = new HashMap<>();
+		input.put("hash", flags.getHash());
 		Map<String, Object> body = new HashMap<>();
 		body.put("query", query);
-		body.put("variables", Map.of("hash", flags.getHash()));
+		body.put("variables", input);
+		
 		Call<GraphQLResponse> call = rhs.checkHash(body);
 		Map<String, Object> response = execute(call);
 		return response == null ? null :
@@ -467,9 +476,12 @@ public class Library {
 			+ "instData(instance:$InstanceDataInput) \n"
 		+ "}";
 		
+		Map<String, Object> input = new HashMap<>();
+		input.put("InstanceDataInput", variables);
 		Map<String, Object> body = new HashMap<>();
 		body.put("query", query);
-		body.put("variables", Map.of("InstanceDataInput", variables));
+		body.put("variables", input);
+		
 		Call<GraphQLResponse> call = rhs.checkHash(body);
 		Map<String, Object> response = execute(call);
 		return response == null ? null :
@@ -538,9 +550,12 @@ public class Library {
 			+ "} \n"
 		+ "}";
 		
+		Map<String, Object> input = new HashMap<>();
+		input.put("GetLatestReleaseInput", variables);
 		Map<String, Object> body = new HashMap<>();
 		body.put("query", query);
-		body.put("variables", Map.of("GetLatestReleaseInput", variables));
+		body.put("variables", input);
+		
 		Call<GraphQLResponse> call = rhs.addRelease(body);
 		Map<String, Object> response = execute(call);
 		return response == null ? null :
@@ -579,9 +594,12 @@ public class Library {
 			+ "} \n"
 		+ "}";
 		
+		Map<String, Object> input = new HashMap<>();
+		input.put("ApproveReleaseInput", variables);
 		Map<String, Object> body = new HashMap<>();
 		body.put("query", query);
-		body.put("variables", Map.of("ApproveReleaseInput", variables));
+		body.put("variables", input);
+		
 		Call<GraphQLResponse> call = rhs.addRelease(body);
 		Map<String, Object> response = execute(call);
 		return response == null ? null :
