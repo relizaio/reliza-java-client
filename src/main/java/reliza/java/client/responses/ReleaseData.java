@@ -29,7 +29,7 @@ public class ReleaseData extends RelizaDataParent {
 	private List<UUID> artifacts;
 	private ReleaseType type;
 	private String notes;
-	private Map<ApprovalType, Boolean> approvals;
+	private Map<String, Boolean> approvals;
 	private List<ReleaseTiming> timing;
 	private String decoratedVersionString;
 	private URI endpoint;
@@ -50,22 +50,5 @@ public class ReleaseData extends RelizaDataParent {
 	public enum ReleaseType {
 		PLACEHOLDER,
 		REGULAR
-	}
-	
-	public enum ApprovalType {
-		DEV,
-		QA,
-		QA_MAN,
-		QA_AUTO,
-		QA_SIT,
-		QA_UAT,
-		QA_PAT,
-		PM,
-		OPS,
-		IT,
-		INFOSEC,
-		CLIENT,
-		MARKETING,
-		EXEC
 	}
 }

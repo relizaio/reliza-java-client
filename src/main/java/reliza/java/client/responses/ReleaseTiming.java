@@ -14,7 +14,7 @@ public class ReleaseTiming {
 	private ReleaseLifeCycle lifecycle;
 	private ZonedDateTime dateFrom;
 	private ZonedDateTime dateTo;
-	private EnvironmentType environment;
+	private String environment;
 	private UUID instanceUuid;
 	private Long duration;
 	
@@ -30,16 +30,5 @@ public class ReleaseTiming {
 		DISAPPROVED,
 		DEPLOYED,
 		UNDEPLOYED
-	}
-	
-	public enum EnvironmentType {
-		DEV,
-		BUILD,
-		TEST,
-		SIT,
-		UAT,
-		PAT,
-		STAGING,
-		PRODUCTION
 	}
 }
