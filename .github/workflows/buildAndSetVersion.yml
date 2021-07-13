@@ -16,6 +16,7 @@ jobs:
         fetch-depth: 50
     - name: Get version
       run: |
+        # sce cannot be set during getversion as version is required to make commit and push
         reliza_ver=$(docker run --rm relizaio/reliza-cli getversion -i $RELIZA_API_ID -k $RELIZA_API_KEY -b $GITHUB_REF)
           echo "RLZ_VER_JSON=$reliza_ver" >> $GITHUB_ENV
           echo "completed getting ver"
