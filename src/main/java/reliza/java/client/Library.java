@@ -181,6 +181,8 @@ public class Library {
 	 * - vcsUri (optional) - flag to denote vcs uri. Currently this flag is needed if we want to set a commit for the release. However, soon it will be needed only if the vcs uri is not yet set for the project. <br>
 	 * - vcsType (optional) - flag to denote vcs type. Supported values: git, svn, mercurial. As with vcsuri, this flag is needed if we want to set a commit for the release. However, soon it will be needed only if the vcs uri is not yet set for the project. <br>
 	 * - commitHash (optional) - flag to denote vcs commit id or hash. This is needed to provide source code entry metadata into the release. <br>
+	 * 	 commitMessage (optional) - flag to denote the commit message of the commit. <br>
+	 * 	 commitList (optional) - flag to denote base64 encoded list of commits. Usually formatted by calling git log $START_COMMIT..$CURRENT_COMMIT --date=iso-strict --pretty="%H|||%ad|||%s" | base64 -w 0 <br>
 	 * - dateActual (optional) - flag to denote date time with timezone when commit was made, iso strict formatting with timezone is required, i.e. for git use git log --date=iso-strict. <br>
 	 * - vcsTag (optional) - flag to denote vcs tag. This is needed to include vcs tag into commit, if present. <br>
 	 * - manual (optional) - flag to indicate a manual release. Sets status as "draft", otherwise "pending" status is used. <br>
@@ -203,12 +205,41 @@ public class Library {
 		if (StringUtils.isNotEmpty(flags.getCommitHash())) {
 			Map<String, String> commitMap = new HashMap<>();
 			commitMap.put("commit", flags.getCommitHash());
+			commitMap.put("commitMessage", flags.getCommitMessage());
 			commitMap.put("uri", flags.getVcsUri());
 			commitMap.put("type", flags.getVcsType());
 			commitMap.put("vcsTag", flags.getVcsTag());
 			commitMap.put("dateActual", flags.getDateActual());
 			variables.put("sourceCodeEntry", commitMap);
 		}
+		
+		if (StringUtils.isNotEmpty(flags.getCommitList())) {
+			String commits = new String(Base64.getDecoder().decode(flags.getCommitList()));
+			List<String> commitList = Arrays.asList(StringUtils.split(commits, System.lineSeparator()));
+			List<Map<String, Object>> commitsInBody = new ArrayList<Map<String, Object>>();
+			
+			for (int i = 0; i < commitList.size(); i++) {
+				Map<String, Object> singleCommit = new HashMap<>();
+				List<String> commitParts = Arrays.asList(StringUtils.split(commitList.get(i), "|||"));
+				singleCommit.put("commit", commitParts.get(0));
+				singleCommit.put("dateActual", commitParts.get(1));
+				singleCommit.put("commitMessage", commitParts.get(2));
+				commitsInBody.add(singleCommit);
+				
+				if (i == 0 && !StringUtils.isNotEmpty(flags.getCommitHash())) {
+					Map<String, Object> commitMap = new HashMap<>();
+					commitMap.put("commit", commitParts.get(0));
+					commitMap.put("dateActual", commitParts.get(1));
+					commitMap.put("commitMessage", commitParts.get(2));
+					commitMap.put("vcsTag", flags.getVcsTag());
+					commitMap.put("uri", flags.getVcsUri());
+					commitMap.put("type", flags.getVcsType());
+					variables.put("sourceCodeEntry", commitMap);
+				}
+			}
+			variables.put("commits", commitsInBody);
+		}
+		
 		if (flags.getManual()) {
 			variables.put("status", "DRAFT");
 		}
@@ -246,6 +277,8 @@ public class Library {
 	 * - vcsUri (optional) - flag to denote vcs uri. Currently this flag is needed if we want to set a commit for the release. However, soon it will be needed only if the vcs uri is not yet set for the project. <br>
 	 * - vcsType (optional) - flag to denote vcs type. Supported values: git, svn, mercurial. As with vcsuri, this flag is needed if we want to set a commit for the release. However, soon it will be needed only if the vcs uri is not yet set for the project. <br>
 	 * - commitHash (optional) - flag to denote vcs commit id or hash. This is needed to provide source code entry metadata into the release. <br>
+	 * 	 commitMessage (optional) - flag to denote the commit message of the commit. <br>
+	 * 	 commitList (optional) - flag to denote base64 encoded list of commits. Usually formatted by calling git log $START_COMMIT..$CURRENT_COMMIT --date=iso-strict --pretty="%H|||%ad|||%s" | base64 -w 0 <br>
 	 * - dateActual (optional) - flag to denote date time with timezone when commit was made, iso strict formatting with timezone is required, i.e. for git use git log --date=iso-strict. <br>
 	 * - vcsTag (optional) - flag to denote vcs tag. This is needed to include vcs tag into commit, if present. <br>
 	 * - status (optional) - flag to denote release status. Supply "rejected" for failed releases, otherwise "completed" is used. <br>
