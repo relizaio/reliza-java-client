@@ -202,7 +202,7 @@ public class Library {
 		variables.put("metadata", flags.getMetadata());
 		variables.put("action", flags.getAction());
 		
-		if (StringUtils.isNotEmpty(flags.getCommitHash())) {
+		if (StringUtils.isNotEmpty(flags.getCommitHash()) || StringUtils.isNotEmpty(flags.getCommitMessage())) {
 			Map<String, String> commitMap = new HashMap<>();
 			commitMap.put("commit", flags.getCommitHash());
 			commitMap.put("commitMessage", flags.getCommitMessage());
