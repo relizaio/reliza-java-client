@@ -158,7 +158,7 @@ public class LibraryTest {
 	@Test public void testApproveRelease() {
 		Flags approveReleaseFlags = Flags.builder().apiKeyId(TEST_APPROVAL_API_ID)
 			.apiKey(TEST_APPROVAL_API_KEY)
-			.version("0.0.1")
+			.version("0.0.0")
 			.projectId(UUID.fromString(TEST_PROJECT_UUID))
 			.approvalType("PM")
 			.baseUrl(BASE_URL)
