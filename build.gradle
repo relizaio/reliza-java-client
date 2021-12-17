@@ -106,6 +106,10 @@ tasks.withType(Sign) {
 	onlyIf { isReleaseVersion }
 }
 
+tasks.withType(Task).all {
+  timeout = Duration.ofMinutes(30)
+}
+
 signing {
 	// required { !version.endsWith("SNAPSHOT") && gradle.taskGraph.hasTask("publish") }
 	// def signingKeyId = findProperty("signingKeyId")
