@@ -24,13 +24,13 @@ public class LibraryTest {
 	private final String BASE_URL = "https://test.relizahub.com";
 	private final String TEST_PROJECT_UUID = "24625ac0-0256-4638-99d2-f245cc56ff8f";
 	private final String TEST_PROJECT_API_ID = "PROJECT__24625ac0-0256-4638-99d2-f245cc56ff8f";
-	private final String TEST_PROJECT_API_KEY = "37fc68026cc9eb6fc5cb62e79a13994d14b7f2d9d1f9b022c90838b77b543dd0944370121ad3d459f709cb78579e9805";
-	private final String TEST_ORG_API_ID = "ORGANIZATION_RW__6dbea5c5-6b01-4df6-94dd-4ddc8a09dee1__ord__459c0c4e-29f0-4600-9ac1-75b71b93837a";
-	private final String TEST_ORG_API_KEY= "888119f82857152c9182b5cfd078fb5e773467c9635129c55a60f78d5324341c40bcb82e2ec6d06c42a52effe9baa3b0";
+	private final String TEST_PROJECT_API_KEY = "8191d4466885f82ead853ee3286cae592f8ce7374535bf707e67a7f7aaaaf8d0e0b1fc9945aacfe16cdac1712e519772";
+	private final String TEST_ORG_API_ID = "ORGANIZATION_RW__6dbea5c5-6b01-4df6-94dd-4ddc8a09dee1__ord__b41f1b17-db44-43c8-848f-065f092b8690";
+	private final String TEST_ORG_API_KEY= "a7721111aca9e7599a4565463533ab70eb56be7d00fc83bf938cb6c992f398a7e9b6d9a3e494f28a6529d238d7def8d1";
 	private final String TEST_INSTANCE_API_ID = "INSTANCE__a7088288-f1d0-4435-8f18-5e6b07c092ed";
-	private final String TEST_INSTANCE_API_KEY = "11ead67975c74df898c0b958fcc5d0107c146faee551fc9761c24e2b7452681d77379d78632697dff5005cb1ddb401e2";
-	private final String TEST_APPROVAL_API_ID = "APPROVAL__cf4ef38e-fde4-4b5b-b042-9de0afbc8ef8";
-	private final String TEST_APPROVAL_API_KEY = "8a31ed50b41f6e0675927793f71250e12a9af8b38407ce422b290242e1987b9a28643a2d08c8a6a3ed3115ee31e36ae1";
+	private final String TEST_INSTANCE_API_KEY = "7cee068b814d9bc591f252194971cd829ccbf6a17bf5505a65068f7817f0edcfc41dc9473afc071d968a538832e0c43c";
+	private final String TEST_APPROVAL_API_ID = "APPROVAL__75a68085-c46f-49aa-b549-39de03db6a43";
+	private final String TEST_APPROVAL_API_KEY = "5d1c520fcdd6be248aee0357ea8b551873a1d761e7da19a75ea825797de0e63c8e6b98b9ac41906c3e6a09ca01bf8e4f";
 	
 	/**
 	 * Test for getVersion using org wide api key and id
