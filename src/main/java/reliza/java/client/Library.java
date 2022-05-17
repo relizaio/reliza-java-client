@@ -216,7 +216,7 @@ public class Library {
 		if (StringUtils.isNotEmpty(flags.getCommitList())) {
 			String commits = new String(Base64.getDecoder().decode(flags.getCommitList()));
 			List<String> commitList = Arrays.asList(StringUtils.split(commits, System.lineSeparator()));
-			List<Map<String, Object>> commitsInBody = new ArrayList<Map<String, Object>>();
+			List<Map<String, Object>> commitsInBody = new ArrayList<>();
 			
 			for (int i = 0; i < commitList.size(); i++) {
 				Map<String, Object> singleCommit = new HashMap<>();
@@ -224,6 +224,10 @@ public class Library {
 				singleCommit.put("commit", commitParts.get(0));
 				singleCommit.put("dateActual", commitParts.get(1));
 				singleCommit.put("commitMessage", commitParts.get(2));
+				if (commitParts.size() > 3) {
+					singleCommit.put("commitAuthor", commitParts.get(3));
+					singleCommit.put("commitEmail", commitParts.get(4));
+				}
 				commitsInBody.add(singleCommit);
 				
 				if (i == 0 && !StringUtils.isNotEmpty(flags.getCommitHash())) {
@@ -231,6 +235,10 @@ public class Library {
 					commitMap.put("commit", commitParts.get(0));
 					commitMap.put("dateActual", commitParts.get(1));
 					commitMap.put("commitMessage", commitParts.get(2));
+					if (commitParts.size() > 3) {
+						commitMap.put("commitAuthor", commitParts.get(3));
+						commitMap.put("commitEmail", commitParts.get(4));
+					}
 					commitMap.put("vcsTag", flags.getVcsTag());
 					commitMap.put("uri", flags.getVcsUri());
 					commitMap.put("type", flags.getVcsType());
@@ -322,7 +330,7 @@ public class Library {
 		if (StringUtils.isNotEmpty(flags.getCommitList())) {
 			String commits = new String(Base64.getDecoder().decode(flags.getCommitList()));
 			List<String> commitList = Arrays.asList(StringUtils.split(commits, System.lineSeparator()));
-			List<Map<String, Object>> commitsInBody = new ArrayList<Map<String, Object>>();
+			List<Map<String, Object>> commitsInBody = new ArrayList<>();
 			
 			for (int i = 0; i < commitList.size(); i++) {
 				Map<String, Object> singleCommit = new HashMap<>();
@@ -330,6 +338,10 @@ public class Library {
 				singleCommit.put("commit", commitParts.get(0));
 				singleCommit.put("dateActual", commitParts.get(1));
 				singleCommit.put("commitMessage", commitParts.get(2));
+				if (commitParts.size() > 3) {
+					singleCommit.put("commitAuthor", commitParts.get(3));
+					singleCommit.put("commitEmail", commitParts.get(4));
+				}
 				commitsInBody.add(singleCommit);
 				
 				if (i == 0 && !StringUtils.isNotEmpty(flags.getCommitHash())) {
@@ -337,6 +349,10 @@ public class Library {
 					commitMap.put("commit", commitParts.get(0));
 					commitMap.put("dateActual", commitParts.get(1));
 					commitMap.put("commitMessage", commitParts.get(2));
+					if (commitParts.size() > 3) {
+						commitMap.put("commitAuthor", commitParts.get(3));
+						commitMap.put("commitEmail", commitParts.get(4));
+					}
 					commitMap.put("vcsTag", flags.getVcsTag());
 					commitMap.put("uri", flags.getVcsUri());
 					commitMap.put("type", flags.getVcsType());
