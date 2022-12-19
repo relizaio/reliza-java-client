@@ -18,6 +18,7 @@ public class RelizaDataParent {
 		MANUAL,
 		AUTO,
 		MANUAL_AND_AUTO,
+		API,
 		TEST
 	}
 }
