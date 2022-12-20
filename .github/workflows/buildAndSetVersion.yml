@@ -22,7 +22,7 @@ jobs:
         then
           echo -n "--commits $(git log $last_commit..$GITHUB_SHA --date=iso-strict --pretty='%H|||%ad|||%s' | base64 -w 0) " > get_version_command
         fi
-        echo -n "-k ${{ secrets.RELIZA_API_KEY }} -i ${{ secrets.RELIZA_API_ID }} -b $GITHUB_REF --metadata GitHub \
+        echo -n "-k ${{ secrets.RELIZA_API_KEY }} -i ${{ secrets.RELIZA_API_ID }} -b $GITHUB_REF \
           --commit $GITHUB_SHA --commitmessage \"$(git log -1 --pretty='%s')\" --date $(git log -1 --date=iso-strict --pretty='%ad') \
           --vcstype git --vcsuri github.com/$GITHUB_REPOSITORY " >> get_version_command
         reliza_ver=$(docker run --rm relizaio/reliza-cli getversion $(cat get_version_command))
