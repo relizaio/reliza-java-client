@@ -9,6 +9,7 @@ import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.apache.commons.collections4.CollectionUtils;
@@ -535,6 +536,62 @@ public class Library {
 		Map<String, Object> response = execute(call);
 		return response == null ? null :
 			(Map<String, String>) response.get("instData");
+	}
+
+	/**
+	 * Method that denotes that we are sending data for a pull request. <p>
+	 * Method itself does not require parameters but requires that the Flags class passed during library initialization contains these parameters. <p>
+	 * - apiKeyId (required) - flag for instance api id. <br>
+	 * - apiKey (required) - flag for instance api key. <br>
+	 * - branch (required) - flag to denote name of the base branch for the pull request. <br>
+	 * - targetBranch (required) - flag to denote name of the target branch for the pull request. <br>
+	 * - state (required) - flag to denote state of the pull request. <br>
+	 * - endpoint (required) - flag to denote HTML endpoint of the pull request. <br>
+	 * - title (required) - flag to denote title of the pull request. <br>
+	 * - number (required) - flag to denote number of the pull request. <br>
+	 * - commits (required) - flag to denote comma seprated commit shas on this pull request. <br>
+	 * - createdDate (required) - flag to denote datetime when the pull request was created. <br>
+	 * - closedDate (optional) - flag to denote datetime when the pull request was closed. <br>
+	 * - mergedDate (optional) - flag to denote datetime when the pull request was merged. <br>
+	 * - projectId (optional) - flag to denote project uuid. Required if organization-wide read-write key is used, ignored if project specific api key is used. <br>
+	 * @return returns true if successful API call and null otherwise.
+	 */
+	public Optional<Boolean> prData() {
+		Map<String, Object> variables = new HashMap<>();
+		variables.put("branch", flags.getBranch());
+		variables.put("targetBranch", flags.getTargetBranch());
+		variables.put("project", flags.getProjectId());
+		variables.put("state", flags.getState());
+		variables.put("endpoint", flags.getEndPoint());
+		variables.put("title", flags.getTitle());
+		variables.put("number", flags.getNumber());
+		variables.put("createdDate", flags.getCreatedDate());
+		variables.put("closedDate", flags.getClosedDate());
+		variables.put("mergedDate", flags.getMergedDate());
+
+		if(StringUtils.isNotEmpty(flags.getCommits())){
+			List<String> commitList = Arrays.asList(StringUtils.split(flags.getCommits(),  ", "));
+			variables.put("commits", commitList);
+
+		}
+		String query = 	""
+		+ "mutation ($PullRequestInput: PullRequestInput) { \n"
+			+ "setPRData(pullRequest:$PullRequestInput) \n"
+		+ "}";
+		
+		Map<String, Object> input = new HashMap<>();
+		input.put("PullRequestInput", variables);
+		Map<String, Object> body = new HashMap<>();
+		body.put("query", query);
+		body.put("variables", input);
+		Call<GraphQLResponse> call = rhs.prData(body);
+		Map<String, Object> response = execute(call);
+		
+		Optional<Boolean> returnVal = Optional.empty();
+		if(response!= null && response.get("setPRData") != null){
+			returnVal = Optional.of((Boolean) response.get("setPRData"));
+		}
+		return returnVal;
 	}
 	
 	/**

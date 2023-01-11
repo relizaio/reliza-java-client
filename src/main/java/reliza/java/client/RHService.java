@@ -49,8 +49,16 @@ public interface RHService {
 	 * @param body - request payload.
 	 * @return graphql response from API.
 	 */
-	@POST("/graphl")
+	@POST("/graphql")
 	Call<GraphQLResponse> instData(@Body Map<String, Object> body);
+
+	/**
+	 * POST request corresponding to prData method.
+	 * @param body - request payload.
+	 * @return graphql response from API.
+	 */
+	@POST("/graphql")
+	Call<GraphQLResponse> prData(@Body Map<String, Object> body);
 	
 	/**
 	 * POST request corresponding to getMyRelease method.

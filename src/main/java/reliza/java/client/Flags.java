@@ -36,6 +36,14 @@ public class Flags{
 	private String vcsType;
 	private String vcsUri;
 	private String vcsTag;
+	private String targetBranch;
+	private String state;
+	private String title;
+	private String number;
+	private String commits;
+	private String createdDate;
+	private String closedDate;
+	private String mergedDate;
 	@Builder.Default @NonNull private Boolean manual = false;
 	private String dateActual;
 	@Singular("artId") private List<String> artId;

@@ -170,3 +170,23 @@ Sample command:
 	Library library = new Library(Flags);
 	ReleaseMetadata releaseMetadata = approveRelease(library);
 ```
+
+## 7. Use Case: Send Pull Request Data to Reliza Hub
+
+This use case is used in the CI workflow to stream Pull Request metadata to Reliza Hub.
+
+Sample command:
+
+```bash
+	Flags flags = Flags.builder().apiKeyId("api_id")
+		.apiKey("api_key")
+		.branch("base_branch")
+		.targetBranch("targetBranch")
+		.state("state")
+		.endPoint("HTML endpoint of PR")
+		.title("title")
+		.number("1")
+		.build();
+	Library library = new Library(Flags);
+	Boolean success = prData(library);
+```

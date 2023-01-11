@@ -7,6 +7,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 
 import org.apache.commons.io.IOUtils;
@@ -78,6 +79,28 @@ public class LibraryTest {
 		library.flags.setVersion(projectVersion.getVersion());
 		ReleaseData releaseData = library.addRelease();
 		Assert.assertNotNull(releaseData);
+	}
+	
+	/**
+	 * Test for setting PR data.
+	 */
+	@Test public void testSetPrData() {
+		Flags flags = Flags.builder().apiKeyId(TEST_PROJECT_API_ID)
+			.apiKey(TEST_PROJECT_API_KEY)
+			.branch("f4")
+			.targetBranch("master")
+			.projectId(UUID.fromString(TEST_PROJECT_UUID))
+			.state("OPEN")
+			.endPoint("OPEN")
+			.title("title")
+			.number("2")
+			.createdDate("2021-01-11T19:43:32.286086002Z")
+			.baseUrl(BASE_URL)
+			.build();
+		Library library = new Library(flags);
+		
+		Optional<Boolean> result = library.prData();
+		Assert.assertNotNull(result.get());
 	}
 	
 	/**
