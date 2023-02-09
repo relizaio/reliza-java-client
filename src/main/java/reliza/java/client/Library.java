@@ -572,7 +572,8 @@ public class Library {
 		if(StringUtils.isNotEmpty(flags.getCommits())){
 			List<String> commitList = Arrays.asList(StringUtils.split(flags.getCommits(),  ", "));
 			variables.put("commits", commitList);
-
+		}else if(StringUtils.isNotEmpty(flags.getCommitHash())){
+			variables.put("commit", flags.getCommitHash());
 		}
 		String query = 	""
 		+ "mutation ($PullRequestInput: PullRequestInput) { \n"
