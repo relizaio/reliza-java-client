@@ -569,10 +569,42 @@ public class Library {
 		variables.put("closedDate", flags.getClosedDate());
 		variables.put("mergedDate", flags.getMergedDate());
 
-		if(StringUtils.isNotEmpty(flags.getCommits())){
-			List<String> commitList = Arrays.asList(StringUtils.split(flags.getCommits(),  ", "));
-			variables.put("commits", commitList);
-		}else if(StringUtils.isNotEmpty(flags.getCommitHash())){
+		if (StringUtils.isNotEmpty(flags.getCommits())) {
+			String commits = new String(Base64.getDecoder().decode(flags.getCommits()));
+			List<String> commitList = Arrays.asList(StringUtils.split(commits, System.lineSeparator()));
+			List<Map<String, Object>> commitsInBody = new ArrayList<>();
+			
+			for (int i = 0; i < commitList.size(); i++) {
+				Map<String, Object> singleCommit = new HashMap<>();
+				List<String> commitParts = Arrays.asList(StringUtils.split(commitList.get(i), "|||"));
+				singleCommit.put("commit", commitParts.get(0));
+				singleCommit.put("dateActual", commitParts.get(1));
+				singleCommit.put("commitMessage", commitParts.get(2));
+				if (commitParts.size() > 3) {
+					singleCommit.put("commitAuthor", commitParts.get(3));
+					singleCommit.put("commitEmail", commitParts.get(4));
+				}
+				commitsInBody.add(singleCommit);
+				
+				if (i == 0 && !StringUtils.isNotEmpty(flags.getCommitHash())) {
+					Map<String, Object> commitMap = new HashMap<>();
+					commitMap.put("commit", commitParts.get(0));
+					commitMap.put("dateActual", commitParts.get(1));
+					commitMap.put("commitMessage", commitParts.get(2));
+					if (commitParts.size() > 3) {
+						commitMap.put("commitAuthor", commitParts.get(3));
+						commitMap.put("commitEmail", commitParts.get(4));
+					}
+					commitMap.put("vcsTag", flags.getVcsTag());
+					commitMap.put("uri", flags.getVcsUri());
+					commitMap.put("type", flags.getVcsType());
+					variables.put("sourceCodeEntry", commitMap);
+				}
+			}
+			variables.put("commits", commitsInBody);
+		}
+		
+		if(StringUtils.isNotEmpty(flags.getCommitHash())){
 			variables.put("commit", flags.getCommitHash());
 		}
 		String query = 	""
