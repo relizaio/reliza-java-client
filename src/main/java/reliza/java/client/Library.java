@@ -604,9 +604,6 @@ public class Library {
 			variables.put("commits", commitsInBody);
 		}
 		
-		if(StringUtils.isNotEmpty(flags.getCommitHash())){
-			variables.put("commit", flags.getCommitHash());
-		}
 		String query = 	""
 		+ "mutation ($PullRequestInput: PullRequestInput) { \n"
 			+ "setPRData(pullRequest:$PullRequestInput) \n"
