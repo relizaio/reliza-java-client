@@ -5,8 +5,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
+
+import com.fasterxml.jackson.annotation.JsonAlias;
+import com.fasterxml.jackson.annotation.JsonInclude;
 
 /**
  * Details of release artifact
@@ -25,6 +32,7 @@ public class ArtifactData extends RelizaDataParent {
 	private ArtifactType artifactType;
 	private String notes;
 	private Map<String, String> tags;
+	private List<TagRecord> tagRecords;
 	private ZonedDateTime dateFrom;
 	private ZonedDateTime dateTo;
 	private Long buildDuration;
@@ -33,18 +41,18 @@ public class ArtifactData extends RelizaDataParent {
 	private String publisher;
 	private String group;
 	private List<UUID> dependencies;
-	
+
 	@Data
 	public class ArtifactType {
 		private String name;
 		private List<String> aliases;
 	}
-	
+
 	public enum ArtifactBelonging {
 		INTERNAL,
 		EXTERNAL
 	}
-	
+
 	public enum PackageType {
 		MAVEN,
 		NPM,
@@ -52,5 +60,21 @@ public class ArtifactData extends RelizaDataParent {
 		GEM,
 		PYPI,
 		DOCKER
+	}
+
+	@Data
+	@JsonInclude(JsonInclude.Include.NON_NULL)
+	@Getter
+	@Setter
+	@NoArgsConstructor
+	@AllArgsConstructor
+	public static class TagRecord {
+
+		@JsonAlias("key")
+		private String key;
+
+		@JsonAlias("value")
+		private String value;
+
 	}
 }

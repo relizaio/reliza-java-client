@@ -32,6 +32,7 @@ import reliza.java.client.responses.FullRelease;
 import reliza.java.client.responses.GraphQLResponse;
 import reliza.java.client.responses.ProjectVersion;
 import reliza.java.client.responses.ReleaseData;
+import reliza.java.client.responses.ArtifactData.TagRecord;
 
 /**
  * Defines a library which holds all the parameters from Flags and uses it to make API calls
@@ -156,7 +157,10 @@ public class Library {
 					+ "aliases \n"
 				+ "} \n"
 				+ "notes \n"
-				+ "tags \n"
+				+ "tagRecords {\n"
+					+ "key \n"
+					+ "value \n"
+				+ "} \n"
 				+ "dateFrom \n"
 				+ "dateTo \n"
 				+ "buildDuration \n"
@@ -362,7 +366,7 @@ public class Library {
 			}
 			variables.put("commits", commitsInBody);
 		}
-		
+
 		if (CollectionUtils.isNotEmpty(flags.getArtId())) {
 			List<Map<String, Object>> artifacts = new ArrayList<Map<String, Object>>();
 			for (String artId : flags.getArtId()) {
@@ -434,11 +438,12 @@ public class Library {
 						log.error("number of keys and values per each tagval and tagkey flag must be the same");
 						return null;
 					}
-					Map<String, String> tagKeyToVal = new HashMap<>();
+					List<TagRecord> tags = new ArrayList<>();
 					for (int j = 0; j < keys.size(); j++) {
-						tagKeyToVal.put(keys.get(j), vals.get(j));
+						tags.add(new TagRecord(keys.get(j), vals.get(j)));
+						
 					}
-					artifacts.get(i).put("tags", tagKeyToVal);
+					artifacts.get(i).put("tags", tags);
 				}
 			}
 			variables.put("artifacts", artifacts);
