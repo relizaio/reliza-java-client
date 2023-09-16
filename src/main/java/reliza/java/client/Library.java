@@ -28,6 +28,7 @@ import retrofit2.Retrofit;
 import retrofit2.converter.jackson.JacksonConverterFactory;
 
 import reliza.java.client.interceptors.BasicAuthInterceptor;
+import reliza.java.client.interceptors.CsrfInterceptor;
 import reliza.java.client.responses.FullRelease;
 import reliza.java.client.responses.GraphQLResponse;
 import reliza.java.client.responses.ProjectVersion;
@@ -56,6 +57,7 @@ public class Library {
 		this.OM.setSerializationInclusion(JsonInclude.Include.NON_EMPTY);
 		OkHttpClient client = new OkHttpClient.Builder()
 				.addInterceptor(new BasicAuthInterceptor(flags.getApiKeyId(), flags.getApiKey()))
+				.addInterceptor(new CsrfInterceptor(flags.getBaseUrl()))
 				.build();
 		Retrofit retrofit = new Retrofit.Builder()
 				.baseUrl(flags.getBaseUrl())
