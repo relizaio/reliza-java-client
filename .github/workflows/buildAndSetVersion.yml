@@ -35,13 +35,13 @@ jobs:
         echo "RLZ_FULL_VER=$full_ver" >> $GITHUB_ENV
         echo $full_ver
     - name: Set build.gradle version
-      run: gradle changeVersion -PnewVersion="${RLZ_FULL_VER}-SNAPSHOT"
+      run: gradle changeVersion -PnewVersion="${RLZ_FULL_VER}"
     - name: Commit and push
       run: |
         rm get_version_command
         git config --global user.name 'reliza-auto'
         git config --global user.email 'info@reliza.io'
-        git commit -am "chore: update project version to ${RLZ_FULL_VER}-SNAPSHOT"
+        git commit -am "chore: update project version to ${RLZ_FULL_VER}"
         git push
     - name: Run tests
       run: gradle test
