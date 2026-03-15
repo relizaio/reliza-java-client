@@ -17,58 +17,27 @@ jobs:
       RELIZA_API_KEY: ${{ secrets.RELIZA_API_KEY }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
         with:
           fetch-depth: 50
-      # Install and setup JDK 11
-      - name: Setup JDK 11
-        uses: actions/setup-java@v1
+      - name: Setup JDK
+        uses: actions/setup-java@f2beeb24e141e01a676f977032f5a29d81c9e27e # v5.1.0
         with:
-          java-version: 11
+          java-version: 21
+          distribution: temurin
       - name: Get version
         run: |
-          reliza_ver=$(docker run --rm relizaio/reliza-cli getversion -i $RELIZA_API_ID -k $RELIZA_API_KEY -b $GITHUB_REF)
-            echo "RLZ_VER_JSON=$reliza_ver" >> $GITHUB_ENV
-            echo "completed getting ver"
-            echo $reliza_ver
-      - name: Extract Actual Version From JSON
-        run: |
-          full_ver=$(echo $RLZ_VER_JSON | jq -r ".version")
-          echo "RLZ_FULL_VER=$full_ver" >> $GITHUB_ENV
-          echo $full_ver
+          latest_rlz=$(docker run --rm relizaio/reliza-cli getlatestrelease -k ${{ secrets.RELIZA_API_KEY }} -i ${{ secrets.RELIZA_API_ID }} -b master --env PRODUCTION)
+          reliza_ver=$(echo $latest_rlz | jq -r ".version")
+          approved_commit=$(echo $latest_rlz | jq -r ".sourceCodeEntryDetails.commit")
+          echo $reliza_ver
+          echo $approved_commit
+          echo "RLZ_FULL_VER=$reliza_ver" >> $GITHUB_ENV
+          git checkout $approved_commit
       - name: Set build.gradle version
         run: gradle changeVersion -PnewVersion="${RLZ_FULL_VER}"
-      - name: Commit and push
-        run: |
-          git config --global user.name 'reliza-auto'
-          git config --global user.email 'info@reliza.io'
-          git commit -am "chore: update project version to ${RLZ_FULL_VER} for push to maven central"
-          git push
       - name: Run tests
         run: gradle test
-      - name: If build fails
-        if: failure()
-        run: echo "--status rejected " > reliza_command
-      - name: Extract Last Release Commit And Prepare List Of Commits
-        run: |
-          last_commit=$(docker run --rm relizaio/reliza-cli getlatestrelease -i ${{ secrets.RELIZA_API_ID }} -k ${{ secrets.RELIZA_API_KEY }} \
-            --branch $GITHUB_REF | jq -r ".sourceCodeEntryDetails.commit")
-          if [ ! -z "$last_commit" ]
-          then
-            echo -n "--commits $(git log $last_commit..$(git rev-parse HEAD) --date=iso-strict --pretty='%H|||%ad|||%s' | base64 -w 0) " >> reliza_command
-          fi
-      - name: Send release metadata
-        if: always()
-        run: |
-          echo "-i $RELIZA_API_ID -k $RELIZA_API_KEY -b $GITHUB_REF --vcstype git \
-          --commitmessage "$(git log -1 --pretty='%s')" \
-          --date $(git log -1 --date=iso-strict --pretty="%ad") --commit $(git rev-parse HEAD) \
-          --vcsuri github.com/$GITHUB_REPOSITORY -v $RLZ_FULL_VER" >> reliza_command
-          # debug
-          cat reliza_command
-          # send data
-          echo docker run --rm relizaio/reliza-cli addrelease $(cat reliza_command) > rlz_cmd_exec
-          eval $(cat rlz_cmd_exec)
       - name: Publish to Central
         # exporting key to sign - https://stackoverflow.com/questions/57921325/gradle-signarchives-unable-to-read-secret-key/58000485#58000485
         if: success()
@@ -77,3 +46,9 @@ jobs:
           echo "GPG_SIGNING_PASSWORD=$SIGN_PASS" >> gradle.properties
           # prepare gradle.properties for signing
           gradle publishAllPublicationsToCentralRepository -PcentralUser=$CENTRAL_USER -PcentralPassword=$CENTRAL_PASS
+      - name: Finalize deployment to Central Portal
+        # Required for new OSSRH Staging API - transfers deployment to Central Publisher Portal
+        if: success()
+        run: |
+          curl -X POST "https://ossrh-staging-api.central.sonatype.com/manual/upload/defaultRepository/io.reliza" \
+            -u "$CENTRAL_USER:$CENTRAL_PASS"
