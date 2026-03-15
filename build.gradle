@@ -9,7 +9,7 @@
 plugins {
 	// Apply the java-library plugin to add support for Java Library
 	id 'java-library'
-	id "io.freefair.lombok" version "8.12.1"
+	id "io.freefair.lombok" version "9.2.0"
 	id 'maven-publish'
 	id 'signing'
 	id 'java'
@@ -21,9 +21,9 @@ repositories {
 	mavenCentral()
 }
 
+java.sourceCompatibility = JavaVersion.VERSION_17
+java.targetCompatibility = JavaVersion.VERSION_17
 
-sourceCompatibility = 1.8
-targetCompatibility = 1.8
 
 group = 'io.reliza'
 version = '0.4.16'
@@ -90,10 +90,10 @@ publishing {
 	repositories {
 		maven {
 			name = 'central'
-			url = 'https://oss.sonatype.org/service/local/staging/deploy/maven2/'
+			url = 'https://ossrh-staging-api.central.sonatype.com/service/local/staging/deploy/maven2/'
 			credentials {
-				username "$centralUser"
-				password "$centralPassword"
+				username = "$centralUser"
+				password = "$centralPassword"
 			}
 		}
 	}
@@ -113,8 +113,8 @@ tasks.withType(Task).all {
 signing {
 	// required { !version.endsWith("SNAPSHOT") && gradle.taskGraph.hasTask("publish") }
 	// def signingKeyId = findProperty("signingKeyId")
-	def signingKey = GPG_SIGNING_KEY
-	def signingPassword = GPG_SIGNING_PASSWORD
+	def signingKey = findProperty('GPG_SIGNING_KEY') ?: ''
+	def signingPassword = findProperty('GPG_SIGNING_PASSWORD') ?: ''
 	useInMemoryPgpKeys(signingKey, signingPassword)
 	sign publishing.publications.relizaJavaClient
 }

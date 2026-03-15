@@ -12,6 +12,7 @@ import java.util.UUID;
 
 import org.apache.commons.io.IOUtils;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import reliza.java.client.responses.FullRelease;
@@ -51,6 +52,7 @@ public class LibraryTest {
 	/**
 	 * Test for setting a new release and pushing project details.
 	 */
+	@Ignore("Skipping test due to API key issues")
 	@Test public void testAddRelease() {
 		Flags flags = Flags.builder().apiKeyId(TEST_PROJECT_API_ID)
 			.apiKey(TEST_PROJECT_API_KEY)
