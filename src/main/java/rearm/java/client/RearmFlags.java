@@ -53,6 +53,8 @@ public class RearmFlags {
 	// Source code entry
 	private String commitMessage;
 	private String commitHash;
+	private String commitAuthor;
+	private String commitEmail;
 	private String commitList;
 	private String vcsType;
 	private String vcsTag;

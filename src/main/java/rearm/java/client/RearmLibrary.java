@@ -250,6 +250,8 @@ public class RearmLibrary {
 		Map<String, Object> sce = new LinkedHashMap<>();
 		putIfPresent(sce, "commit", flags.getCommitHash());
 		putIfPresent(sce, "commitMessage", flags.getCommitMessage());
+		putIfPresent(sce, "commitAuthor", flags.getCommitAuthor());
+		putIfPresent(sce, "commitEmail", flags.getCommitEmail());
 		putIfPresent(sce, "uri", flags.getVcsUri());
 		putIfPresent(sce, "type", flags.getVcsType());
 		putIfPresent(sce, "vcsTag", flags.getVcsTag());
