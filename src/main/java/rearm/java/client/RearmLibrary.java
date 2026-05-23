@@ -1,14 +1,17 @@
 package rearm.java.client;
 
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Base64;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 import org.apache.commons.collections4.CollectionUtils;
@@ -19,16 +22,23 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 import lombok.extern.slf4j.Slf4j;
+import okhttp3.MediaType;
+import okhttp3.MultipartBody;
 import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+import okhttp3.Response;
 import rearm.java.client.interceptors.RearmBasicAuthInterceptor;
 import rearm.java.client.interceptors.RearmCsrfInterceptor;
 import rearm.java.client.responses.RearmGraphQLResponse;
 import rearm.java.client.responses.RearmRelease;
 import rearm.java.client.responses.RearmVersion;
 import retrofit2.Call;
-import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.jackson.JacksonConverterFactory;
+
+// retrofit2.Response is also in scope but referenced fully-qualified below to
+// avoid clashing with okhttp3.Response (used by the multipart path).
 
 /**
  * Java client for the ReARM GraphQL programmatic API. Sibling of
@@ -48,20 +58,21 @@ public class RearmLibrary {
 
 	private final RearmFlags flags;
 	private final RearmService service;
+	private final OkHttpClient httpClient;
 	private final ObjectMapper om = new ObjectMapper();
 
 	public RearmLibrary(RearmFlags flags) {
 		this.flags = flags;
 		this.om.registerModule(new JavaTimeModule());
 		this.om.setSerializationInclusion(JsonInclude.Include.NON_EMPTY);
-		OkHttpClient client = new OkHttpClient.Builder()
+		this.httpClient = new OkHttpClient.Builder()
 				.addInterceptor(new RearmBasicAuthInterceptor(flags.getApiKeyId(), flags.getApiKey()))
 				.addInterceptor(new RearmCsrfInterceptor(flags.getBaseUrl()))
 				.build();
 		Retrofit retrofit = new Retrofit.Builder()
 				.baseUrl(flags.getBaseUrl())
 				.addConverterFactory(JacksonConverterFactory.create(om))
-				.client(client)
+				.client(this.httpClient)
 				.build();
 		this.service = retrofit.create(RearmService.class);
 	}
@@ -144,6 +155,15 @@ public class RearmLibrary {
 		variables.put("rebuildRelease", flags.getRebuild());
 
 		Map<String, Object> sce = buildSourceCodeEntryMap();
+		// SCE artifacts go *inside* the sourceCodeEntry map (the backend's
+		// addReleaseProgrammatic only consumes `sourceCodeEntry.artifacts`,
+		// not a top-level `sceArts` — the latter would be silently dropped
+		// even though the schema declares it). If no SCE map was built yet
+		// (no commit, no message) but we have sceArtifacts, create a stub.
+		if (CollectionUtils.isNotEmpty(flags.getSceArtifacts())) {
+			if (sce == null) sce = new LinkedHashMap<>();
+			sce.put("artifacts", deepCopyList(flags.getSceArtifacts()));
+		}
 		if (sce != null) {
 			variables.put("sourceCodeEntry", sce);
 		}
@@ -162,11 +182,23 @@ public class RearmLibrary {
 			variables.put("outboundDeliverables", outbound);
 		}
 
-		String query = "mutation ($ReleaseInputProg: ReleaseInputProg!) {"
+		// Free-form release artifacts (mirrors rearm-cli's --releasearts);
+		// deliverable artifacts append to the single deliverable we built.
+		if (CollectionUtils.isNotEmpty(flags.getReleaseArtifacts())) {
+			List<Map<String, Object>> rels = (List<Map<String, Object>>) variables.getOrDefault("artifacts", new ArrayList<>());
+			rels.addAll(deepCopyList(flags.getReleaseArtifacts()));
+			variables.put("artifacts", rels);
+		}
+		if (CollectionUtils.isNotEmpty(flags.getDeliverableArtifacts()) && outbound != null && !outbound.isEmpty()) {
+			List<Map<String, Object>> delArts = (List<Map<String, Object>>) outbound.get(0).getOrDefault("artifacts", new ArrayList<>());
+			delArts.addAll(deepCopyList(flags.getDeliverableArtifacts()));
+			outbound.get(0).put("artifacts", delArts);
+		}
+
+		String query = "mutation addReleaseProgrammatic($ReleaseInputProg: ReleaseInputProg!) {"
 				+ " addReleaseProgrammatic(release: $ReleaseInputProg) { " + RELEASE_FIELDS + " }"
 				+ "}";
-		Map<String, Object> body = graphqlBody(query, "ReleaseInputProg", variables);
-		Map<String, Object> response = execute(service.graphql(body));
+		Map<String, Object> response = sendMutation("addReleaseProgrammatic", query, "ReleaseInputProg", variables);
 		return response == null ? null
 				: om.convertValue(response.get("addReleaseProgrammatic"), RearmRelease.class);
 	}
@@ -447,6 +479,156 @@ public class RearmLibrary {
 	}
 
 	/**
+	 * Sends a mutation, automatically switching to the Apollo
+	 * graphql-multipart-request-spec transport if the variables tree carries
+	 * any artifact maps with a {@code filePath} marker. Used by addRelease;
+	 * other mutations can adopt the same path when they grow Upload inputs.
+	 */
+	private Map<String, Object> sendMutation(String operationName, String query,
+			String inputName, Map<String, Object> variables) {
+		Map<String, List<String>> locationMap = new LinkedHashMap<>();
+		Map<String, FileUpload> filesMap = new LinkedHashMap<>();
+		AtomicInteger counter = new AtomicInteger(0);
+		extractUploads(variables, "variables." + inputName, counter, locationMap, filesMap);
+
+		Map<String, Object> body = graphqlBody(query, inputName, variables);
+		if (filesMap.isEmpty()) {
+			return execute(service.graphql(body));
+		}
+		return executeMultipart(operationName, query, (Map<String, Object>) body.get("variables"),
+				locationMap, filesMap);
+	}
+
+	/**
+	 * Walks an artifact-bearing variables tree. Whenever it finds a Map with
+	 * a non-empty {@code filePath} String entry, reads the file, registers it
+	 * as an upload, swaps {@code filePath} for a {@code file: null} placeholder
+	 * (the Apollo spec's marker that gets resolved from the multipart parts),
+	 * and records the JSON path the part should fill in.
+	 */
+	private static void extractUploads(Object node, String path, AtomicInteger counter,
+			Map<String, List<String>> locationMap, Map<String, FileUpload> filesMap) {
+		if (node instanceof Map) {
+			@SuppressWarnings("unchecked")
+			Map<String, Object> map = (Map<String, Object>) node;
+			Object rawPath = map.get("filePath");
+			if (rawPath instanceof String && StringUtils.isNotEmpty((String) rawPath)) {
+				String filePath = (String) rawPath;
+				try {
+					Path p = Paths.get(filePath);
+					byte[] bytes = Files.readAllBytes(p);
+					String key = String.valueOf(counter.incrementAndGet());
+					String filename = p.getFileName().toString();
+					filesMap.put(key, new FileUpload(filename, bytes));
+					locationMap.put(key, List.of(path + ".file"));
+					map.remove("filePath");
+					map.put("file", null);
+				} catch (IOException ex) {
+					throw new RearmApiException("Failed to read artifact file " + filePath, ex);
+				}
+			}
+			for (Map.Entry<String, Object> entry : new ArrayList<>(map.entrySet())) {
+				extractUploads(entry.getValue(), path + "." + entry.getKey(), counter, locationMap, filesMap);
+			}
+		} else if (node instanceof List) {
+			@SuppressWarnings("unchecked")
+			List<Object> list = (List<Object>) node;
+			for (int i = 0; i < list.size(); i++) {
+				extractUploads(list.get(i), path + "." + i, counter, locationMap, filesMap);
+			}
+		}
+	}
+
+	private Map<String, Object> executeMultipart(String operationName, String query,
+			Map<String, Object> variables,
+			Map<String, List<String>> locationMap,
+			Map<String, FileUpload> filesMap) {
+		try {
+			Map<String, Object> operations = new LinkedHashMap<>();
+			operations.put("operationName", operationName);
+			operations.put("variables", variables);
+			operations.put("query", query);
+
+			MultipartBody.Builder builder = new MultipartBody.Builder()
+					.setType(MultipartBody.FORM)
+					.addFormDataPart("operations", om.writeValueAsString(operations))
+					.addFormDataPart("map", om.writeValueAsString(locationMap));
+			MediaType octet = MediaType.parse("application/octet-stream");
+			for (Map.Entry<String, FileUpload> e : filesMap.entrySet()) {
+				FileUpload fu = e.getValue();
+				builder.addFormDataPart(e.getKey(), fu.filename,
+						RequestBody.create(fu.bytes, octet));
+			}
+
+			Request req = new Request.Builder()
+					.url(flags.getBaseUrl() + "/graphql")
+					.header("User-Agent", "ReARM Java Client")
+					.header("Apollo-Require-Preflight", "true")
+					.post(builder.build())
+					.build();
+			try (Response resp = httpClient.newCall(req).execute()) {
+				String body = resp.body() != null ? resp.body().string() : "";
+				if (!resp.isSuccessful()) {
+					throw new RearmApiException("ReARM multipart HTTP " + resp.code() + ": " + body);
+				}
+				RearmGraphQLResponse parsed = om.readValue(body, RearmGraphQLResponse.class);
+				List<RearmGraphQLResponse.Error> errors = parsed.getErrors();
+				if (errors != null && !errors.isEmpty()) {
+					String joined = errors.stream()
+							.map(RearmGraphQLResponse.Error::getMessage)
+							.collect(Collectors.joining("; "));
+					throw new RearmApiException("ReARM GraphQL errors: " + joined);
+				}
+				return parsed.getData();
+			}
+		} catch (IOException e) {
+			throw new RearmApiException("IO exception on multipart upload: " + e.getMessage(), e);
+		}
+	}
+
+	/** Deep-copy a list of maps so callers' inputs aren't mutated when we walk
+	 *  the tree to extract file uploads. */
+	private static List<Map<String, Object>> deepCopyList(List<Map<String, Object>> in) {
+		List<Map<String, Object>> out = new ArrayList<>(in.size());
+		for (Map<String, Object> m : in) {
+			out.add(deepCopyMap(m));
+		}
+		return out;
+	}
+
+	@SuppressWarnings("unchecked")
+	private static Map<String, Object> deepCopyMap(Map<String, Object> in) {
+		Map<String, Object> out = new LinkedHashMap<>();
+		for (Map.Entry<String, Object> e : in.entrySet()) {
+			Object v = e.getValue();
+			if (v instanceof Map) {
+				out.put(e.getKey(), deepCopyMap((Map<String, Object>) v));
+			} else if (v instanceof List) {
+				List<Object> srcList = (List<Object>) v;
+				List<Object> dstList = new ArrayList<>(srcList.size());
+				for (Object item : srcList) {
+					if (item instanceof Map) {
+						dstList.add(deepCopyMap((Map<String, Object>) item));
+					} else {
+						dstList.add(item);
+					}
+				}
+				out.put(e.getKey(), dstList);
+			} else {
+				out.put(e.getKey(), v);
+			}
+		}
+		return out;
+	}
+
+	/** Container for one multipart file part. */
+	private static final class FileUpload {
+		final String filename;
+		final byte[] bytes;
+		FileUpload(String filename, byte[] bytes) { this.filename = filename; this.bytes = bytes; }
+	}
+
+	/**
 	 * Maps user-friendly checksum algo spellings to ReARM's
 	 * {@code TeaArtifactChecksumType} enum values. Accepts the OCI/Docker form
 	 * (`sha256`), the CycloneDX/IANA hyphenated form (`SHA-256`), and the raw
@@ -492,7 +674,7 @@ public class RearmLibrary {
 
 	private static Map<String, Object> execute(Call<RearmGraphQLResponse> call) {
 		try {
-			Response<RearmGraphQLResponse> resp = call.execute();
+			retrofit2.Response<RearmGraphQLResponse> resp = call.execute();
 			if (resp.body() == null) {
 				String err = resp.errorBody() != null ? resp.errorBody().string() : "(no body)";
 				throw new RearmApiException("ReARM HTTP " + resp.code() + ": " + err);

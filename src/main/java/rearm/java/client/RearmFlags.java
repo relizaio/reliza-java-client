@@ -1,6 +1,7 @@
 package rearm.java.client;
 
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import lombok.Builder;
@@ -90,6 +91,20 @@ public class RearmFlags {
 	private String deliverableBuildUri;
 	private String deliverableCiMeta;
 	private String deliverablePurl;
+
+	// Free-form artifact lists. Each map is shaped like the GraphQL
+	// {@code ArtifactInput}: {@code displayIdentifier}, {@code type},
+	// {@code bomFormat}, etc. A special {@code filePath} key (matching the
+	// rearm-cli convention) points at a local file — the library walks
+	// every artifact map at send time, reads the file, and posts the call
+	// via the Apollo graphql-multipart-request-spec instead of JSON. Nested
+	// {@code artifacts: [...]} works recursively for artifact-of-artifact
+	// (e.g. SIGNATURE attached to a BOM).
+	@Singular("sceArtifact") private List<Map<String, Object>> sceArtifacts;
+	@Singular("releaseArtifact") private List<Map<String, Object>> releaseArtifacts;
+	// Artifacts to attach to the outbound deliverable. Nested under the
+	// single deliverable we already build; same map shape as above.
+	@Singular("deliverableArtifact") private List<Map<String, Object>> deliverableArtifacts;
 
 	// Hash lookup
 	private String hash;
