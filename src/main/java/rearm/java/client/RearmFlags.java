@@ -78,6 +78,17 @@ public class RearmFlags {
 	@Singular("tagKeys") private List<String> tagKeys;
 	@Singular("tagVals") private List<String> tagVals;
 
+	// Outbound deliverable (one per release; matches rearm-cli's --odel* flags).
+	// Identifier + type are the minimum required to land a Deliverable row; the
+	// rest populate softwareMetadata.
+	private String deliverableId;
+	private String deliverableType;
+	private String deliverableDigest;
+	private String deliverableBuildId;
+	private String deliverableBuildUri;
+	private String deliverableCiMeta;
+	private String deliverablePurl;
+
 	// Hash lookup
 	private String hash;
 

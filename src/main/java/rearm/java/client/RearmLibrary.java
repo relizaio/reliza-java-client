@@ -157,6 +157,11 @@ public class RearmLibrary {
 			variables.put("artifacts", artifacts);
 		}
 
+		List<Map<String, Object>> outbound = buildOutboundDeliverables();
+		if (outbound != null) {
+			variables.put("outboundDeliverables", outbound);
+		}
+
 		String query = "mutation ($ReleaseInputProg: ReleaseInputProg!) {"
 				+ " addReleaseProgrammatic(release: $ReleaseInputProg) { " + RELEASE_FIELDS + " }"
 				+ "}";
@@ -336,7 +341,7 @@ public class RearmLibrary {
 						return null;
 					}
 					Map<String, String> record = new LinkedHashMap<>();
-					record.put("algo", parts[0].toUpperCase());
+					record.put("algo", normalizeChecksumAlgo(parts[0]));
 					record.put("digest", parts[1]);
 					digestRecords.add(record);
 				}
@@ -375,6 +380,81 @@ public class RearmLibrary {
 		}
 
 		return artifacts;
+	}
+
+	/**
+	 * Builds the single-entry {@code outboundDeliverables} list when the
+	 * caller has supplied at least a {@code deliverableId}. Mirrors what
+	 * {@code rearm-cli}'s {@code --odel*} flags produce: a Deliverable row
+	 * attached to the release, typed (CONTAINER/FILE/...) with a
+	 * softwareMetadata block carrying build trail + digest + an optional
+	 * PURL identifier.
+	 *
+	 * <p>Keep the surface single-deliverable for now — N-deliverable support
+	 * mirrors the artifact list pattern (parallel @Singular lists) if it
+	 * becomes useful.
+	 */
+	private List<Map<String, Object>> buildOutboundDeliverables() {
+		if (StringUtils.isEmpty(flags.getDeliverableId())) {
+			return null;
+		}
+		Map<String, Object> deliv = new LinkedHashMap<>();
+		deliv.put("displayIdentifier", flags.getDeliverableId());
+		if (StringUtils.isNotEmpty(flags.getDeliverableType())) {
+			deliv.put("type", flags.getDeliverableType().toUpperCase());
+		}
+
+		Map<String, Object> swMeta = new LinkedHashMap<>();
+		putIfPresent(swMeta, "buildId", flags.getDeliverableBuildId());
+		putIfPresent(swMeta, "buildUri", flags.getDeliverableBuildUri());
+		putIfPresent(swMeta, "cicdMeta", flags.getDeliverableCiMeta());
+		if (StringUtils.isNotEmpty(flags.getDeliverableDigest())) {
+			// Use the simple `digests: [String]` list — the backend parses
+			// each "<algo>:<hash>" entry and assigns the default DigestScope
+			// itself. The structured `digestRecords` list would require an
+			// explicit scope which `rearm-cli`'s --odeldigests doesn't ask
+			// for either.
+			List<String> digests = new ArrayList<>();
+			for (String entry : StringUtils.split(flags.getDeliverableDigest(), ",")) {
+				String[] parts = StringUtils.split(entry, ":", 2);
+				if (parts.length != 2) {
+					log.error("deliverable digest {} must be in <algo>:<value> form", entry);
+					return null;
+				}
+				digests.add(normalizeChecksumAlgo(parts[0]) + ":" + parts[1]);
+			}
+			swMeta.put("digests", digests);
+		}
+		if (!swMeta.isEmpty()) {
+			deliv.put("softwareMetadata", swMeta);
+		}
+
+		if (StringUtils.isNotEmpty(flags.getDeliverablePurl())) {
+			Map<String, String> idRec = new LinkedHashMap<>();
+			idRec.put("idType", "PURL");
+			idRec.put("idValue", flags.getDeliverablePurl());
+			deliv.put("identifiers", List.of(idRec));
+		}
+
+		return List.of(deliv);
+	}
+
+	/**
+	 * Maps user-friendly checksum algo spellings to ReARM's
+	 * {@code TeaArtifactChecksumType} enum values. Accepts the OCI/Docker form
+	 * (`sha256`), the CycloneDX/IANA hyphenated form (`SHA-256`), and the raw
+	 * enum form (`SHA_256`). Anything else is passed through upper-cased and
+	 * underscore-normalized as a best-effort guess.
+	 */
+	private static String normalizeChecksumAlgo(String raw) {
+		if (raw == null) return null;
+		String upper = raw.trim().toUpperCase();
+		// Common Docker/OCI: sha256 / sha512 -> SHA_256 / SHA_512
+		if (upper.matches("SHA(1|256|384|512)")) {
+			return "SHA_" + upper.substring(3);
+		}
+		// Hyphenated -> underscored
+		return upper.replace('-', '_');
 	}
 
 	private static List<String> upperCaseAll(List<String> in) {
