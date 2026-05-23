@@ -26,7 +26,7 @@ java.targetCompatibility = JavaVersion.VERSION_17
 
 
 group = 'io.reliza'
-version = '2026-05-rearm-support.1'
+version = '2026-05-rearm-support.2'
 
 task changeVersion {
 	doLast {
