@@ -1,5 +1,62 @@
-# Reliza Java Client (SDK)
-This tool is a Java client for [Reliza Hub at relizahub.com](https://app.relizahub.com). Particularly, this library can stream metadata about instances, releases, artifacts, and resolve bundles based on Reliza Hub data.
+# Reliza / ReARM Java Client (SDK)
+This artifact ships two parallel Java clients in one jar:
+
+* **`reliza.java.client.*`** — the original client for
+  [Reliza Hub](https://app.relizahub.com). Streams metadata about
+  instances, releases, artifacts, and resolves bundles based on Reliza Hub
+  data. See "Use cases" below.
+* **`rearm.java.client.*`** — sibling client for
+  [ReARM](https://rearmhq.com). Speaks the ReARM GraphQL programmatic API
+  (`getNewVersionProgrammatic`, `addReleaseProgrammatic`,
+  `getLatestReleaseProgrammatic`, `getReleaseByHashProgrammatic`,
+  `approveReleaseProgrammatic`). Auth is HTTP-Basic with a ReARM FREEFORM
+  API key; the client also bootstraps the ReARM CSRF token + cookie on
+  construction (sending CSRF is what lets HTTP-Basic callers reach
+  `/graphql`).
+
+The two packages share no code — they're kept apart so the Reliza-Hub
+half can be removed cleanly once Reliza Hub is retired. Pick the one that
+matches the backend you're talking to; they can coexist in the same
+application if you need to double-publish during a migration.
+
+```java
+// ReARM example: mint a version (without creating the release yet),
+// then create it with full metadata once the build artefact is ready.
+import rearm.java.client.RearmFlags;
+import rearm.java.client.RearmLibrary;
+import rearm.java.client.responses.RearmRelease;
+import rearm.java.client.responses.RearmVersion;
+
+RearmFlags flags = RearmFlags.builder()
+    .baseUrl("https://app.rearmhq.com")
+    .apiKeyId("FREEFORM__...__ord__...")
+    .apiKey("...")
+    .branch("main")
+    .vcsUri("https://github.com/acme/widget")
+    .repoPath("service")
+    .createComponentIfMissing(true)
+    .createComponentName("widget")
+    .createComponentVersionSchema("semver")
+    .createComponentFeatureBranchVersionSchema("Branch.Micro")
+    .onlyVersion(true)
+    .build();
+
+RearmLibrary rearm = new RearmLibrary(flags);
+RearmVersion v = rearm.getVersion();
+// ... build artefact, compute digest, etc ...
+RearmFlags release = flags.toBuilder()
+    .version(v.getVersion())
+    .commitHash("deadbeef")
+    .artId("acme/widget").artType("Docker")
+    .artDigests("sha256:...")
+    .build();
+RearmRelease r = new RearmLibrary(release).addRelease();
+```
+
+---
+
+## Reliza Hub use cases (`reliza.java.client.*`)
+
 
 Video tutorial about key functionality of Reliza Hub is available on [YouTube](https://www.youtube.com/watch?v=yDlf5fMBGuI).
 
