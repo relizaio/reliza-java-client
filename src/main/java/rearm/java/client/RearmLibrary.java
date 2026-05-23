@@ -343,6 +343,7 @@ public class RearmLibrary {
 					Map<String, String> record = new LinkedHashMap<>();
 					record.put("algo", normalizeChecksumAlgo(parts[0]));
 					record.put("digest", parts[1]);
+					record.put("scope", "ORIGINAL_FILE");
 					digestRecords.add(record);
 				}
 				artifacts.get(i).put("digestRecords", digestRecords);
@@ -409,21 +410,25 @@ public class RearmLibrary {
 		putIfPresent(swMeta, "buildUri", flags.getDeliverableBuildUri());
 		putIfPresent(swMeta, "cicdMeta", flags.getDeliverableCiMeta());
 		if (StringUtils.isNotEmpty(flags.getDeliverableDigest())) {
-			// Use the simple `digests: [String]` list — the backend parses
-			// each "<algo>:<hash>" entry and assigns the default DigestScope
-			// itself. The structured `digestRecords` list would require an
-			// explicit scope which `rearm-cli`'s --odeldigests doesn't ask
-			// for either.
-			List<String> digests = new ArrayList<>();
+			// `digests: [String]` is deprecated server-side — DeliverableService
+			// has a one-time migrator that copies it into `digestRecords` with
+			// scope=ORIGINAL_FILE. Send the structured form directly so the
+			// UI's per-deliverable view (which reads digestRecords) actually
+			// shows the hashes.
+			List<Map<String, String>> digestRecords = new ArrayList<>();
 			for (String entry : StringUtils.split(flags.getDeliverableDigest(), ",")) {
 				String[] parts = StringUtils.split(entry, ":", 2);
 				if (parts.length != 2) {
 					log.error("deliverable digest {} must be in <algo>:<value> form", entry);
 					return null;
 				}
-				digests.add(normalizeChecksumAlgo(parts[0]) + ":" + parts[1]);
+				Map<String, String> rec = new LinkedHashMap<>();
+				rec.put("algo", normalizeChecksumAlgo(parts[0]));
+				rec.put("digest", parts[1]);
+				rec.put("scope", "ORIGINAL_FILE");
+				digestRecords.add(rec);
 			}
-			swMeta.put("digests", digests);
+			swMeta.put("digestRecords", digestRecords);
 		}
 		if (!swMeta.isEmpty()) {
 			deliv.put("softwareMetadata", swMeta);
