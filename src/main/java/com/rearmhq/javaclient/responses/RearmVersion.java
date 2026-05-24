@@ -1,4 +1,4 @@
-package rearm.java.client.responses;
+package com.rearmhq.javaclient.responses;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 

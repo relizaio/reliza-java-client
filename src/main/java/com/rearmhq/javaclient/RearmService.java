@@ -1,8 +1,8 @@
-package rearm.java.client;
+package com.rearmhq.javaclient;
 
 import java.util.Map;
 
-import rearm.java.client.responses.RearmGraphQLResponse;
+import com.rearmhq.javaclient.responses.RearmGraphQLResponse;
 
 import retrofit2.Call;
 import retrofit2.http.Body;
@@ -13,7 +13,7 @@ import retrofit2.http.POST;
  * Retrofit binding for the ReARM GraphQL endpoint. The {@code Apollo-Require-Preflight}
  * header is what ReARM's WAF inspects to distinguish first-party clients from
  * generic HTTP-Basic posters; CSRF token + JSESSIONID are attached by
- * {@link rearm.java.client.interceptors.RearmCsrfInterceptor}.
+ * {@link com.rearmhq.javaclient.interceptors.RearmCsrfInterceptor}.
  */
 public interface RearmService {
 	// NOTE: do NOT add Accept-Encoding here. Setting it explicitly turns off

@@ -1,4 +1,4 @@
-package rearm.java.client;
+package com.rearmhq.javaclient;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -28,11 +28,11 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
-import rearm.java.client.interceptors.RearmBasicAuthInterceptor;
-import rearm.java.client.interceptors.RearmCsrfInterceptor;
-import rearm.java.client.responses.RearmGraphQLResponse;
-import rearm.java.client.responses.RearmRelease;
-import rearm.java.client.responses.RearmVersion;
+import com.rearmhq.javaclient.interceptors.RearmBasicAuthInterceptor;
+import com.rearmhq.javaclient.interceptors.RearmCsrfInterceptor;
+import com.rearmhq.javaclient.responses.RearmGraphQLResponse;
+import com.rearmhq.javaclient.responses.RearmRelease;
+import com.rearmhq.javaclient.responses.RearmVersion;
 import retrofit2.Call;
 import retrofit2.Retrofit;
 import retrofit2.converter.jackson.JacksonConverterFactory;

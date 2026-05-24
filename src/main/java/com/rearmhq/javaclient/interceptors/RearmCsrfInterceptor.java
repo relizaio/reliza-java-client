@@ -1,4 +1,4 @@
-package rearm.java.client.interceptors;
+package com.rearmhq.javaclient.interceptors;
 
 import java.io.IOException;
 import java.util.List;

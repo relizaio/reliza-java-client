@@ -1,4 +1,4 @@
-package rearm.java.client;
+package com.rearmhq.javaclient;
 
 import java.util.List;
 import java.util.Map;

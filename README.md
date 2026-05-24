@@ -5,7 +5,7 @@ This artifact ships two parallel Java clients in one jar:
   [Reliza Hub](https://app.relizahub.com). Streams metadata about
   instances, releases, artifacts, and resolves bundles based on Reliza Hub
   data. See "Use cases" below.
-* **`rearm.java.client.*`** — sibling client for
+* **`com.rearmhq.javaclient.*`** — sibling client for
   [ReARM](https://rearmhq.com). Speaks the ReARM GraphQL programmatic API
   (`getNewVersionProgrammatic`, `addReleaseProgrammatic`,
   `getLatestReleaseProgrammatic`, `getReleaseByHashProgrammatic`,
@@ -22,10 +22,10 @@ application if you need to double-publish during a migration.
 ```java
 // ReARM example: mint a version (without creating the release yet),
 // then create it with full metadata once the build artefact is ready.
-import rearm.java.client.RearmFlags;
-import rearm.java.client.RearmLibrary;
-import rearm.java.client.responses.RearmRelease;
-import rearm.java.client.responses.RearmVersion;
+import com.rearmhq.javaclient.RearmFlags;
+import com.rearmhq.javaclient.RearmLibrary;
+import com.rearmhq.javaclient.responses.RearmRelease;
+import com.rearmhq.javaclient.responses.RearmVersion;
 
 RearmFlags flags = RearmFlags.builder()
     .baseUrl("https://app.rearmhq.com")
