@@ -1,5 +1,198 @@
-# Reliza Java Client (SDK)
-This tool is a Java client for [Reliza Hub at relizahub.com](https://app.relizahub.com). Particularly, this library can stream metadata about instances, releases, artifacts, and resolve bundles based on Reliza Hub data.
+# Reliza / ReARM Java Client (SDK)
+This artifact ships two parallel Java clients in one jar:
+
+* **`reliza.java.client.*`** — the original client for
+  [Reliza Hub](https://app.relizahub.com). Streams metadata about
+  instances, releases, artifacts, and resolves bundles based on Reliza Hub
+  data. See "Use cases" below.
+* **`com.rearmhq.javaclient.*`** — sibling client for
+  [ReARM](https://rearmhq.com). Speaks the ReARM GraphQL programmatic API
+  (`getNewVersionProgrammatic`, `addReleaseProgrammatic`,
+  `getLatestReleaseProgrammatic`, `getReleaseByHashProgrammatic`,
+  `approveReleaseProgrammatic`). Auth is HTTP-Basic with a ReARM FREEFORM
+  API key; the client also bootstraps the ReARM CSRF token + cookie on
+  construction (sending CSRF is what lets HTTP-Basic callers reach
+  `/graphql`).
+
+The two packages share no code — they're kept apart so the Reliza-Hub
+half can be removed cleanly once Reliza Hub is retired. Pick the one that
+matches the backend you're talking to; they can coexist in the same
+application if you need to double-publish during a migration.
+
+---
+
+## ReARM use cases (`com.rearmhq.javaclient.*`)
+
+### Authentication + transport
+
+Every call goes through a `RearmLibrary` constructed from a `RearmFlags`
+holding the base URL plus a FREEFORM API key:
+
+```java
+RearmFlags flags = RearmFlags.builder()
+    .baseUrl("https://app.rearmhq.com")
+    .apiKeyId("FREEFORM__<orgUuid>__ord__<keyUuid>")
+    .apiKey("<secret>")
+    .build();
+RearmLibrary rearm = new RearmLibrary(flags);
+```
+
+`RearmLibrary`'s constructor calls `/api/manual/v1/fetchCsrf` once, captures
+the CSRF token + `XSRF-TOKEN` cookie, and attaches them to every subsequent
+request — that's what lets HTTP-Basic callers reach `/graphql` (the API
+gateway rejects raw HTTP-Basic without the CSRF flow).
+
+All methods throw `RearmLibrary.RearmApiException` on backend / network
+failure with the GraphQL error text in the message.
+
+### 1. Mint a version + create a PENDING release
+
+Canonical CI flow: mint a version at the start of the build, finalize the
+release at the end. `getVersion()` creates the release in `PENDING`
+lifecycle so it's visible in the UI immediately; `addRelease()` later
+updates the same row in place and flips it to `ASSEMBLED`.
+
+```java
+RearmFlags mintFlags = flags.toBuilder()
+    .branch("main")
+    .vcsUri("https://github.com/acme/widget")          // alternative to componentId
+    .repoPath("service")
+    .createComponentIfMissing(true)                     // org-WRITE FREEFORM key required
+    .createComponentName("acme widget service")
+    .createComponentVersionSchema("semver")
+    .createComponentFeatureBranchVersionSchema("Branch.Micro")
+    .lifecycle("PENDING")                               // default; ASSEMBLED for one-shot
+    .commitHash("deadbeef…")
+    .commitMessage("first commit on main")
+    .commitAuthor("alice")
+    .commitEmail("alice@acme.example")
+    .dateActual("2026-05-24T08:30:00Z")
+    .build();
+RearmVersion v = new RearmLibrary(mintFlags).getVersion();
+// v.getVersion(), v.getDockerTagSafeVersion(), v.getLifecycle()
+```
+
+Pass `.onlyVersion(true)` instead to reserve only the version assignment
+without creating a release row.
+
+### 2. Finalize the release with build metadata + an outbound deliverable
+
+A second call with the minted version + the build outputs. ReARM's
+`addReleaseProgrammatic` finds the PENDING release on `(component, version)`
+and updates it in place — no duplicate row.
+
+```java
+RearmFlags finalizeFlags = mintFlags.toBuilder()
+    .version(v.getVersion())
+    .lifecycle("ASSEMBLED")
+    .deliverableId("registry.acme.example/widget:" + v.getDockerTagSafeVersion())
+    .deliverableType("CONTAINER")                              // or FILE
+    .deliverableDigest("sha256:abc…")                          // accepts sha256/SHA-256/SHA_256
+    .deliverablePurl("pkg:oci/widget@sha256:abc…")             // optional
+    .deliverableBuildId("ci-run-123")
+    .deliverableBuildUri("https://ci.acme.example/runs/123")
+    .deliverableCiMeta("Jenkins")
+    .build();
+RearmRelease r = new RearmLibrary(finalizeFlags).addRelease();
+// r.getUuid(), r.getVersion(), r.getLifecycle()
+```
+
+### 3. Attach artifacts (BOMs, signatures, …) at any of three scopes
+
+Each artifact is a `Map<String, Object>` shaped like
+[`ArtifactInput`](https://github.com/relizaio/rearm-saas/blob/main/backend/src/main/resources/schema/schema.graphqls)
+(`displayIdentifier`, `type`, `bomFormat`, `tags`, …). A special `filePath`
+key — value is a local path — triggers an upload via the Apollo
+[`graphql-multipart-request-spec`](https://github.com/jaydenseric/graphql-multipart-request-spec)
+for that artifact; without it the entry is metadata-only. The library
+walks the entire tree before sending so nested artifacts upload too.
+
+| Builder method | Lands at |
+|---|---|
+| `.sceArtifact(map)` (or `.sceArtifacts(list)`) | `sourceCodeEntry.artifacts` on the release's SCE — e.g. fs-bom + its signature |
+| `.releaseArtifact(map)` (or `.releaseArtifacts(list)`) | the release's own `artifacts` — release-level BOMs, VDRs, etc. |
+| `.deliverableArtifact(map)` (or `.deliverableArtifacts(list)`) | nested under the outbound deliverable — image-scoped BOMs / attestations |
+
+Artifact-of-artifact is just a nested `artifacts: [...]` inside any map —
+canonical use is a `SIGNATURE` attached to a `BOM`:
+
+```java
+Map<String, Object> sigArt = Map.of(
+    "displayIdentifier", "widget-image.cdx.json.sig",
+    "type",              "SIGNATURE",
+    "filePath",          "/tmp/widget-image.cdx.json.sig"
+);
+Map<String, Object> bomArt = Map.of(
+    "displayIdentifier", "widget-image.cdx.json",
+    "type",              "BOM",
+    "bomFormat",         "CYCLONEDX",
+    "filePath",          "/tmp/widget-image.cdx.json",
+    "artifacts",         List.of(sigArt)                       // nested upload
+);
+
+RearmFlags fullFlags = finalizeFlags.toBuilder()
+    .sceArtifact(Map.of(
+        "displayIdentifier", "widget-fs.cdx.json",
+        "type",              "BOM",
+        "bomFormat",         "CYCLONEDX",
+        "filePath",          "/tmp/widget-fs.cdx.json"))
+    .releaseArtifact(Map.of(
+        "displayIdentifier", "widget-release.vdr.json",
+        "type",              "VDR",
+        "filePath",          "/tmp/widget-release.vdr.json"))
+    .deliverableArtifact(bomArt)
+    .build();
+new RearmLibrary(fullFlags).addRelease();
+```
+
+### 4. Read the latest release on a branch
+
+For "what commit was last shipped?" / "have we built this before?" checks:
+
+```java
+RearmFlags latestFlags = flags.toBuilder()
+    .vcsUri("https://github.com/acme/widget")
+    .repoPath("service")
+    .branch("main")
+    .lifecycle("ASSEMBLED")                                    // optional filter
+    .build();
+RearmRelease latest = new RearmLibrary(latestFlags).getLatestRelease();
+String previousCommit = latest != null && latest.getSourceCodeEntryDetails() != null
+        ? latest.getSourceCodeEntryDetails().getCommit() : null;
+```
+
+### 5. Look up a release by an artifact / deliverable digest
+
+Useful in monorepos to detect "did this artifact ship already?" before
+spending CI time rebuilding:
+
+```java
+RearmFlags hashFlags = flags.toBuilder()
+    .componentId(componentUuid)
+    .hash("sha256:abc…")
+    .build();
+String releaseUuid = new RearmLibrary(hashFlags).getReleaseByHash();
+if (releaseUuid != null) { /* already shipped */ }
+```
+
+### 6. Programmatic release approval
+
+Approval mutations require a FREEFORM key whose permissions cover the
+release's component and grant the requested approval type:
+
+```java
+RearmFlags approve = flags.toBuilder()
+    .releaseId(releaseUuid)
+    .approvalType("SECURITY_REVIEW")                            // matches your approval entry
+    .disapprove(false)                                          // true for negative
+    .build();
+new RearmLibrary(approve).approveRelease();
+```
+
+---
+
+## Reliza Hub use cases (`reliza.java.client.*`)
+
 
 Video tutorial about key functionality of Reliza Hub is available on [YouTube](https://www.youtube.com/watch?v=yDlf5fMBGuI).
 
