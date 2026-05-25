@@ -5,7 +5,7 @@ on:
 name: Publish to Maven Central
 
 jobs:
-  push:
+  update:
     name: Push-To-Central
     runs-on: ubuntu-latest
     env:
@@ -70,7 +70,7 @@ jobs:
           echo "commit=$approved_commit"     >> "$GITHUB_OUTPUT"
       - name: Checkout the approved commit
         run: git checkout ${{ steps.rearm.outputs.commit }}
-     - name: Set build.gradle version
+      - name: Set build.gradle version
         run: gradle changeVersion -PnewVersion="${{ steps.rearm.outputs.version }}"
       - name: Run tests
         run: gradle test
