@@ -5,35 +5,71 @@ on:
 name: Publish to Maven Central
 
 jobs:
-  update:
-    name: Update
+  push:
+    name: Push-To-Central
     runs-on: ubuntu-latest
     env:
       CENTRAL_USER: ${{ secrets.CENTRAL_USER }}
       CENTRAL_PASS: ${{ secrets.CENTRAL_PASS }}
-      SIGN_PASS: ${{ secrets.SIGN_PASS }}
-      SIGN_KEY: ${{ secrets.SIGN_KEY }}
-      RELIZA_API_ID: ${{ secrets.RELIZA_API_ID }}
-      RELIZA_API_KEY: ${{ secrets.RELIZA_API_KEY }}
+      SIGN_PASS:    ${{ secrets.SIGN_PASS }}
+      SIGN_KEY:     ${{ secrets.SIGN_KEY }}
     steps:
       - name: Checkout
         uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
         with:
-          fetch-depth: 50
+          fetch-depth: 0
       - name: Setup JDK
         uses: actions/setup-java@f2beeb24e141e01a676f977032f5a29d81c9e27e # v5.1.0
         with:
           java-version: 21
           distribution: temurin
-      - name: Get version
+      - name: Setup rearm CLI
+        uses: relizaio/rearm-actions/setup-cli@46f1e94352761205d85e8a26d32dc0d618687b6d # v1.4.0
+      # Verify the dispatch payload version against ReARM's current
+      # ready-to-ship release. The trigger's Dynamic client payload (CEL)
+      # produces `{"version": "<release.version>"}` so the payload version
+      # is what fired the trigger. Cross-check it against
+      # `getlatestrelease --lifecycle READY_TO_SHIP` (server-side this is a
+      # `lifecycle.ordinal() >= READY_TO_SHIP.ordinal()` filter, so it also
+      # accepts GENERAL_AVAILABILITY and later states). If the latest
+      # ready-to-ship release no longer matches the payload (e.g. a newer
+      # release was approved between trigger fire and workflow start), bail
+      # out instead of republishing a superseded version.
+      - name: Resolve and verify approved release
+        id: rearm
+        env:
+          REARM_API_ID:  ${{ secrets.REARM_API_ID }}
+          REARM_API_KEY: ${{ secrets.REARM_API_KEY }}
+          REARM_URI: https://reliza.rearmhq.com
+          PAYLOAD_VER:   ${{ github.event.client_payload.version }}
         run: |
-          latest_rlz=$(docker run --rm relizaio/reliza-cli getlatestrelease -k ${{ secrets.RELIZA_API_KEY }} -i ${{ secrets.RELIZA_API_ID }} -b main --env PRODUCTION)
-          reliza_ver=$(echo $latest_rlz | jq -r ".version")
-          approved_commit=$(echo $latest_rlz | jq -r ".sourceCodeEntryDetails.commit")
-          echo $reliza_ver
-          echo $approved_commit
-          echo "RLZ_FULL_VER=$reliza_ver" >> $GITHUB_ENV
-          git checkout $approved_commit
+          set -euo pipefail
+          if [ -z "${PAYLOAD_VER:-}" ]; then
+            echo "::error::client_payload.version missing — the ReARM trigger's Dynamic client payload must evaluate to {\"version\":\"<release.version>\"}"
+            exit 1
+          fi
+          latest=$(rearm getlatestrelease \
+            -i "$REARM_API_ID" -k "$REARM_API_KEY" \
+            -u https://reliza.rearmhq.com \
+            --branch main \
+            --lifecycle READY_TO_SHIP \
+            --vcsuri github.com/${{ github.repository }})
+          approved_ver=$(echo       "$latest" | jq -r '.version')
+          approved_lifecycle=$(echo "$latest" | jq -r '.lifecycle')
+          approved_commit=$(echo    "$latest" | jq -r '.sourceCodeEntryDetails.commit')
+          echo "ReARM approved: version=$approved_ver lifecycle=$approved_lifecycle commit=$approved_commit"
+          if [ "$approved_ver" != "$PAYLOAD_VER" ]; then
+            echo "::error::trigger payload version '$PAYLOAD_VER' no longer matches latest ready-to-ship version '$approved_ver' on main — refusing to publish a superseded release"
+            exit 1
+          fi
+          if [ -z "$approved_commit" ] || [ "$approved_commit" = "null" ]; then
+            echo "::error::approved release $approved_ver has no recorded source commit — cannot determine what to publish"
+            exit 1
+          fi
+          echo "version=$approved_ver"       >> "$GITHUB_OUTPUT"
+          echo "commit=$approved_commit"     >> "$GITHUB_OUTPUT"
+      - name: Checkout the approved commit
+        run: git checkout ${{ steps.rearm.outputs.commit }}
       - name: Set build.gradle version
         run: gradle changeVersion -PnewVersion="${RLZ_FULL_VER}"
       - name: Run tests
