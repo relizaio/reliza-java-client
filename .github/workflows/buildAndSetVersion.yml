@@ -1,71 +1,115 @@
 on: [push]
 
-name: Pull versions from Reliza, do a test build, update version and commit
+name: Pull versions from ReARM, do a test build, update version and commit
+
+permissions:
+  contents: write
+  id-token: write
 
 jobs:
   update:
     name: Update
     runs-on: ubuntu-latest
-    env:
-      RELIZA_API_ID: ${{ secrets.RELIZA_API_ID }}
-      RELIZA_API_KEY: ${{ secrets.RELIZA_API_KEY }}
     steps:
     - name: Checkout
-      uses: actions/checkout@v2
+      uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
       with:
-        fetch-depth: 50
-    - name: Get version
-      run: |
-        last_commit=$(docker run --rm relizaio/reliza-cli getlatestrelease -i ${{ secrets.RELIZA_API_ID }} -k ${{ secrets.RELIZA_API_KEY }} \
-          --branch $GITHUB_REF | jq -r ".sourceCodeEntryDetails.commit")
-        if [ ! -z "$last_commit" ]
-        then
-          echo -n "--commits $(git log $last_commit..$GITHUB_SHA --date=iso-strict --pretty='%H|||%ad|||%s' | base64 -w 0) " > get_version_command
-        fi
-        echo -n "-k ${{ secrets.RELIZA_API_KEY }} -i ${{ secrets.RELIZA_API_ID }} -b $GITHUB_REF \
-          --commit $GITHUB_SHA --commitmessage \"$(git log -1 --pretty='%s')\" --date $(git log -1 --date=iso-strict --pretty='%ad') \
-          --vcstype git --vcsuri github.com/$GITHUB_REPOSITORY " >> get_version_command
-        reliza_ver=$(docker run --rm relizaio/reliza-cli getversion $(cat get_version_command))
-        echo "RLZ_VER_JSON=$reliza_ver" >> $GITHUB_ENV
-        echo "completed getting ver"
-        echo $reliza_ver
-    - name: Extract Actual Version From JSON
-      run: |
-        full_ver=$(echo $RLZ_VER_JSON | jq -r ".version")
-        echo "RLZ_FULL_VER=$full_ver" >> $GITHUB_ENV
-        echo $full_ver
+        fetch-depth: 0 
+    - id: setup-rearm
+      name: setup-rearm
+      uses: relizaio/rearm-actions/setup-cli@46f1e94352761205d85e8a26d32dc0d618687b6d # v1.4.0
+    - name: Initialize ReARM Release
+      id: init
+      uses: relizaio/rearm-actions/initialize@46f1e94352761205d85e8a26d32dc0d618687b6d # v1.4.0
+      with:
+        rearm_api_id:  ${{ secrets.REARM_API_ID }}
+        rearm_api_key: ${{ secrets.REARM_API_KEY }}
+        rearm_api_url: https://reliza.rearmhq.com
+
     - name: Set build.gradle version
-      run: gradle changeVersion -PnewVersion="${RLZ_FULL_VER}"
+      if: steps.init.outputs.do_build == 'true'
+      run: gradle changeVersion -PnewVersion="${{ steps.init.outputs.full_version }}"
+
+    # Lock the minted version in via a commit before we build — Reliza/ReARM
+    # version assignments are consumed-once, so this happens regardless of
+    # whether the test run that follows passes (the rejected-finalize step
+    # records the outcome).
     - name: Commit and push
+      if: steps.init.outputs.do_build == 'true'
       run: |
-        rm get_version_command
-        git config --global user.name 'reliza-auto'
+        git config --global user.name  'reliza-auto'
         git config --global user.email 'info@reliza.io'
-        git commit -am "chore: update project version to ${RLZ_FULL_VER}"
+        git commit -am "chore: update project version to ${{ steps.init.outputs.full_version }}"
         git push
+
     - name: Run tests
+      if: steps.init.outputs.do_build == 'true'
       run: gradle test
-    - name: If build fails
-      if: failure()
-      run: echo "--status rejected " > reliza_command
-    - name: Extract Last Release Commit And Prepare List Of Commits
-      run: |
-        last_commit=$(docker run --rm relizaio/reliza-cli getlatestrelease -i ${{ secrets.RELIZA_API_ID }} -k ${{ secrets.RELIZA_API_KEY }} \
-          --branch $GITHUB_REF | jq -r ".sourceCodeEntryDetails.commit")
-        if [ ! -z "$last_commit" ]
-        then
-          echo -n "--commits $(git log $last_commit..$(git rev-parse HEAD) --date=iso-strict --pretty='%H|||%ad|||%s' | base64 -w 0) " >> reliza_command
-        fi
-    - name: Send release metadata
-      if: always()
-      run: |
-        echo "-i $RELIZA_API_ID -k $RELIZA_API_KEY -b $GITHUB_REF --vcstype git \
-        --date $(git log -1 --date=iso-strict --pretty="%ad") --commit $(git rev-parse HEAD) \
-        --commitmessage \"$(git log -1 --pretty='%s')\" \
-        --vcsuri github.com/$GITHUB_REPOSITORY -v $RLZ_FULL_VER" >> reliza_command
-        # debug
-        cat reliza_command
-        # send data
-        echo docker run --rm relizaio/reliza-cli addrelease $(cat reliza_command) > rlz_cmd_exec
-        eval $(cat rlz_cmd_exec)
+
+    # Source-tree SBOM only — this workflow doesn't ship a built artifact, so
+    # `deliverable_type: FILE` with an empty image_digest skips the
+    # CONTAINER-only deliverable-scan / docker-pull branches inside the
+    # action. `source_code_sbom_type: other` runs cdxgen with auto-detection
+    # against the Gradle project root and emits the result as scearts.
+    # `enable_public_cosign_sigstore: 'true'` adds keyless cosign signing
+    # of the fs BOM — the action's sign_sbom helper runs cosign sign-blob
+    # and attaches the resulting SIGNATURE + CERTIFICATE_X_509 as nested
+    # artifacts under the fs BOM in scearts. Container-deliverable signing
+    # is skipped (gated on CONTAINER); only the fs-BOM signing fires.
+    - name: Generate SBOMs
+      if: steps.init.outputs.do_build == 'true'
+      id: sbom
+      uses: relizaio/rearm-actions/sbom-sign-scan@46f1e94352761205d85e8a26d32dc0d618687b6d # v1.4.0
+      with:
+        image_full_name:                reliza-java-client
+        image_digest:                   ''
+        rearm_short_version:            ${{ steps.init.outputs.short_version }}
+        rearm_full_version:             ${{ steps.init.outputs.full_version }}
+        deliverable_type:               FILE
+        enable_sbom:                    'true'
+        source_code_sbom_type:          'other'
+        enable_public_cosign_sigstore:  'true'
+    - name: Finalize ReARM Release (ASSEMBLED)
+      if: steps.init.outputs.do_build == 'true' && success()
+      uses: relizaio/rearm-actions/finalize@46f1e94352761205d85e8a26d32dc0d618687b6d # v1.4.0
+      with:
+        rearm_api_id:           ${{ secrets.REARM_API_ID }}
+        rearm_api_key:          ${{ secrets.REARM_API_KEY }}
+        rearm_api_url:          https://reliza.rearmhq.com
+        image_full_name:        reliza-java-client
+        rearm_build_start:      ${{ steps.init.outputs.build_start }}
+        rearm_short_version:    ${{ steps.init.outputs.short_version }}
+        rearm_full_version:     ${{ steps.init.outputs.full_version }}
+        rearm_build_lifecycle:  ASSEMBLED
+        deliverable_type:       FILE
+        commit_list:            ${{ steps.init.outputs.commit_list }}
+        sce_commit:             ${{ steps.init.outputs.sce_commit }}
+        sce_commit_message:     ${{ steps.init.outputs.sce_commit_message }}
+        sce_commit_date:        ${{ steps.init.outputs.sce_commit_date }}
+        sce_vcs_uri:            ${{ steps.init.outputs.sce_vcs_uri }}
+        scearts:                ${{ steps.sbom.outputs.scearts }}
+        odelartsjson:           ${{ steps.sbom.outputs.odelartsjson }}
+        purl:                   ${{ steps.sbom.outputs.purl }}
+
+    # Mirrors the old workflow's `--status rejected` branch — runs only when
+    # one of the test / sbom steps above failed but the release row was
+    # already minted by initialize.
+    - name: Finalize ReARM Release (REJECTED)
+      if: steps.init.outputs.do_build == 'true' && failure()
+      uses: relizaio/rearm-actions/finalize@46f1e94352761205d85e8a26d32dc0d618687b6d # v1.4.0
+      with:
+        rearm_api_id:           ${{ secrets.REARM_API_ID }}
+        rearm_api_key:          ${{ secrets.REARM_API_KEY }}
+        rearm_api_url:          https://reliza.rearmhq.com
+        image_full_name:        reliza-java-client
+        rearm_build_start:      ${{ steps.init.outputs.build_start }}
+        rearm_short_version:    ${{ steps.init.outputs.short_version }}
+        rearm_full_version:     ${{ steps.init.outputs.full_version }}
+        rearm_build_lifecycle:  REJECTED
+        deliverable_type:       FILE
+        commit_list:            ${{ steps.init.outputs.commit_list }}
+        sce_commit:             ${{ steps.init.outputs.sce_commit }}
+        sce_commit_message:     ${{ steps.init.outputs.sce_commit_message }}
+        sce_commit_date:        ${{ steps.init.outputs.sce_commit_date }}
+        sce_vcs_uri:            ${{ steps.init.outputs.sce_vcs_uri }}
         
